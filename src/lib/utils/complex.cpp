@@ -1,0 +1,67 @@
+/* 
+ * Copyright (C) 2020 Lana Mineh and John Scott.
+ *
+ * This file is part of QSL, the quantum computer simulator.
+ *
+ * QSL is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * QSL is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with QSL.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \file complex.cpp
+ * \brief Implementation of functions relating to the complex type
+ *
+ */
+
+#include "qsl/utils/complex.hpp"
+#define _USE_MATH_DEFINES // For MSVC, to use M_PI
+#include <cmath>
+
+template<typename Fp>
+std::ostream & operator<< (std::ostream & stream, complex<Fp> val)
+{
+    stream << "(" << val.real << ", " << val.imag << ")";
+    return stream;
+}
+
+template<typename Fp>
+complex<Fp>::complex(Fp r, Fp i)
+{
+    real = r;
+    imag = i;
+}
+
+template<typename Fp>
+complex<Fp>::complex() : complex(0,0) { }
+
+template<typename Fp>
+complex<Fp> operator - (const complex<Fp> & a, const complex<Fp> & b)
+{
+    return complex{ a.real - b.real, a.imag - b.imag};
+}
+
+template<typename Fp>
+Fp abs(const complex<Fp> & a)
+{
+    return std::sqrt(a.real*a.real + a.imag*a.imag);
+}
+
+/// Explicit template instantiations
+template struct complex<float>;
+template struct complex<double>;
+
+template std::ostream & operator<< (std::ostream & stream, complex<float> val);
+template std::ostream & operator<< (std::ostream & stream, complex<double> val);
+
+template float abs(const complex<float> & a);
+template double abs(const complex<double> & a);

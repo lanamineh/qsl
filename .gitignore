@@ -1,0 +1,23 @@
+*~
+*#*
+*.o
+*.d
+test
+test_quest
+*.bin
+*.obj
+disasm/
+callgrind*
+*.out
+
+# Ignore cmake output
+build/
+
+# Ignore visual studio files
+/.vs
+/Debug
+
+# Ignore generated documentation
+docs/doxy
+docs/html
+docs/doctrees
