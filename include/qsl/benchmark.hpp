@@ -34,6 +34,7 @@
 #include <map>
 #include "benchmark/results.hpp"
 
+
 ///\todo Write documentation
 enum class Test
 {

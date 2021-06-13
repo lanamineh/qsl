@@ -48,3 +48,6 @@ target_link_libraries(example PUBLIC qsl)
 
 add_executable(benchmark src/benchmark.cpp)
 target_link_libraries(benchmark PUBLIC qsl)
+
+add_executable(verify src/verify.cpp)
+target_link_libraries(verify PUBLIC qsl)
