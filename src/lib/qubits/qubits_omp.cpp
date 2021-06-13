@@ -134,84 +134,33 @@ void Qubits<Type::Omp, Fp>::print() const
 std::mutex mtx;           // mutex for critical section
 
 template<typename Fp>
-void Qubits<Type::Omp, Fp>::pauliX_outer(std::size_t start,
-					  std::size_t end,
-					  std::size_t k)
-{
-    for (std::size_t s = start; s < end; s += 2*k) { 
-	for (std::size_t r = 0; r < k; r++) {
-	    // Get the indices that need to be switched
-	    std::size_t index1 = s + r;
-	    std::size_t index2 = s + k + r;
-	    std::swap(state[index1], state[index2]);
-	}
-    }
-}
-
-template<typename Fp>
-void Qubits<Type::Omp, Fp>::pauliX_inner(std::size_t start,
-					    std::size_t end,
-					    std::size_t k)
-{
-    for (std::size_t s = 0; s < dim; s += 2*k) { 
-	for (std::size_t r = start; r < end; r++) {
-	    // Get the indices that need to be switched
-	    std::size_t index1 = s + r;
-	    std::size_t index2 = s + k + r;
-	    std::swap(state[index1], state[index2]);
-	}
-    }
-}
-
-template<typename Fp>
 void Qubits<Type::Omp, Fp>::pauliX(unsigned targ)
 {
-// #pragma omp parallel num_threads(nthreads)
-//     {
-// 	std::size_t k = 1 << targ;
-
-// 	if(targ < nqubits-2) {	
-// #pragma omp for
-// 	    for (std::size_t s = 0; s < dim; s += 2*k) { 
-// 		for (std::size_t r = 0; r < k; r++) {
-// 		    // Get the indices that need to be switched
-// 		    std::size_t index1 = s + r;
-// 		    std::size_t index2 = s + k + r;
-	    
-// 		    std::swap(state[index1], state[index2]);
-// 		}
-// 	    }
-// 	} else {
-// 	    for (std::size_t s = 0; s < dim; s += 2*k) { 
-// #pragma omp for
-// 		for (std::size_t r = 0; r < k; r++) {
-// 		    // Get the indices that need to be switched
-// 		    std::size_t index1 = s + r;
-// 		    std::size_t index2 = s + k + r;
-		    
-// 		    std::swap(state[index1], state[index2]);
-// 		}
-// 	    }
-// 	}
-//     }
 #pragma omp parallel num_threads(nthreads)
     {
 	std::size_t k = 1 << targ;
-	if (targ < nqubits-4) {
-	    {
-		unsigned thread_num = omp_get_thread_num();
-		unsigned total_threads = omp_get_num_threads();
-		std::size_t start = thread_num*(dim/total_threads);
-		std::size_t end = start + (dim/total_threads);
-		pauliX_outer(start,end,k);
+
+	if(targ < nqubits-2) {	
+#pragma omp for
+	    for (std::size_t s = 0; s < dim; s += 2*k) { 
+		for (std::size_t r = 0; r < k; r++) {
+		    // Get the indices that need to be switched
+		    std::size_t index1 = s + r;
+		    std::size_t index2 = s + k + r;
+	    
+		    std::swap(state[index1], state[index2]);
+		}
 	    }
 	} else {
-	    {
-		unsigned thread_num = omp_get_thread_num();
-		unsigned total_threads = omp_get_num_threads();
-		std::size_t start = thread_num*(k/total_threads);
-		std::size_t end = start + (k/total_threads);
-		pauliX_inner(start,end,k);
+	    for (std::size_t s = 0; s < dim; s += 2*k) { 
+#pragma omp for
+		for (std::size_t r = 0; r < k; r++) {
+		    // Get the indices that need to be switched
+		    std::size_t index1 = s + r;
+		    std::size_t index2 = s + k + r;
+		    
+		    std::swap(state[index1], state[index2]);
+		}
 	    }
 	}
     }
