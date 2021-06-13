@@ -10,10 +10,10 @@ int main ()
     Qubits<Type::Default, double> q{rand};
     Qubits<Type::Omp, double> qomp{rand};
     
-    q.pauliX(2);
+    q.rotateX(0,12);
     q.print();
 
-    qomp.pauliX(2);
+    qomp.rotateX(0,12);
     qomp.print();
 
 }

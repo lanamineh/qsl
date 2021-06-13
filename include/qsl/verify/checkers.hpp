@@ -475,12 +475,16 @@ public:
 	    
 	    // Loop through every pair of sim1
 	    for (unsigned n = 0; n < nqubits; n++) {
+
+		// equate the states
+		sim2->setState(sim1->getState());
+
 		std::cout << "Qubit no " << n << ": ";
-	    
+		
 		// Apply the gates stored in member pointers fn and gn
 		std::invoke(fn, sim1, n);
 		std::invoke(gn, sim2, n);
-	    
+		
 		///\todo Should be float?
 		double distance = fubiniStudy(sim1->getState(),
 					      sim2->getState());
@@ -501,11 +505,15 @@ public:
     
 	    // Loop through every pair of sim1
 	    for (unsigned n = 0; n < nqubits; n++) {
+
+		// equate the states
+		sim2->setState(sim1->getState());
+
 		std::cout << "Qubit no " << n << ": ";
 		// Apply the gates stored in member pointers fn and gn
 		std::invoke(fn, sim1, n, sim1_phase_list[n]);
 		std::invoke(gn, sim2, n, sim2_phase_list[n]);
-
+		
 		///\todo Should be float?
 		double distance = fubiniStudy(sim1->getState(),
 					      sim2->getState());
@@ -521,6 +529,10 @@ public:
 	    // Loop through every pair of sim1
 	    for (unsigned n = 0; n < nqubits; n++) {
 		for (unsigned m = 0; m < nqubits; m++) {
+
+		    // equate the states
+		    sim2->setState(sim1->getState());
+
 		    if (n != m) {
 			std::cout << "Sim1 " << n  << " and " << m << ": ";
 
@@ -551,6 +563,10 @@ public:
 	    // Loop through every pair of sim1
 	    for (unsigned n = 0; n < nqubits; n++) {
 		for (unsigned m = 0; m < nqubits; m++) {
+
+		    // equate the states
+		    sim2->setState(sim1->getState());
+
 		    if (n != m) {
 			std::cout << "Sim1 " << n  << " and " << m << ": ";
 
@@ -590,6 +606,7 @@ class DefaultGateChecker : public GateChecker<Sim1,Sim2>
 {
 public:
     void checkAll() {
+
 	std::cout << "Checking pauliX" << std::endl;
 	this->check(&Sim1::pauliX, &Sim2::pauliX);
 	std::cout << "Checking rotateX" << std::endl;
