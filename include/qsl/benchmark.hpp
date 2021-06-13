@@ -18,13 +18,13 @@
  */
 
 /**
- * \file bench.hpp
+ * \file benchmark.hpp
  * \brief Routines for testing the speed of the simulators
  * 
  */
 
-#ifndef BENCH_HPP
-#define BENCH_HPP
+#ifndef BENCHMARK_HPP
+#define BENCHMARK_HPP
 
 #include "utils/quantum.hpp"
 #include "utils/timer.hpp"

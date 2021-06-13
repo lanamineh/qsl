@@ -27,7 +27,7 @@
 #ifndef COMPARE_HPP
 #define COMPARE_HPP
 
-#include "qsl/bench.hpp"
+#include "qsl/benchmark.hpp"
 
 /**
  * \brief Compare the speed of an operation between a

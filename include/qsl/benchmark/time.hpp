@@ -27,7 +27,7 @@
 #ifndef TIME_HPP
 #define TIME_HPP
 
-#include "qsl/bench.hpp"
+#include "qsl/benchmark.hpp"
 
 enum class Function
 {
