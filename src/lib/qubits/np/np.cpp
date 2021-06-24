@@ -18,7 +18,7 @@
  */
 
 /**
- * \file qubits_np.cpp
+ * \file np.cpp
  * \brief Contains the implementation of the number preserved Qubits class.
  *
  */
