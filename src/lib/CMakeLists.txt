@@ -7,7 +7,7 @@ set(THREADS_SRC threads/joiner.cpp threads/pool.cpp)
 
 # Qubits object source file list
 set(QUBITS_SRC qubits/default/default.cpp qubits/omp/omp.cpp qubits/np/np.cpp
-qubits/qubits_thread.cpp,qubits/qubits_asm.cpp,qubits/x86_64/pauliX.S qubits/x86_64/rotateX.S)
+qubits/qubits_thread.cpp qubits/qubits_asm.cpp qubits/x86_64/pauliX.S qubits/x86_64/rotateX.S)
 
 # Make the utilities library
 add_library(utils ${UTILS_SRC})
