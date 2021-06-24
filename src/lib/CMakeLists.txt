@@ -3,7 +3,7 @@ set(UTILS_SRC utils/complex.cpp utils/quantum.cpp
   utils/timer.cpp utils/misc.cpp utils/random.cpp)
 
 # Qubits object source file list
-set(QUBITS_SRC qubits/default.cpp qubits/omp.cpp qubits/np.cpp)
+set(QUBITS_SRC qubits/default/default.cpp qubits/omp/omp.cpp qubits/np/np.cpp)
 
 # Make the utilities library
 add_library(utils ${UTILS_SRC})
