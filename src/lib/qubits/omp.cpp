@@ -18,7 +18,7 @@
  */
 
 /**
- * \file qubits_omp.cpp
+ * \file omp.cpp
  * \brief Contains the implementation of the OpenMP-based Qubits class
  *
  */

@@ -18,7 +18,7 @@
  */
 
 /**
- * \file qubits_default.cpp
+ * \file default.cpp
  * \brief Contains the implementation of the Qubits class
  *
  */
