@@ -19,18 +19,19 @@
 
 /**
  * \file measure.cpp
- * \brief Contains the implementation of measurement and sampling 
- *        in the Default qubits class
+ * \brief Contains the implementation of measurement and sampling
+ *        in the OpenMP-based Qubits class.
  */
 
 #include "qsl/qubits.hpp"
 #include "qsl/utils/misc.hpp"
+#include <iostream>
 #include <cmath>
-#include <algorithm>
+#include <omp.h>
 
 
 template<typename Fp>
-void Qubits<Type::Default, Fp>::collapse(unsigned targ, unsigned outcome,
+void Qubits<Type::Omp, Fp>::collapse(unsigned targ, unsigned outcome,
 					 Fp factor)
 {
     // Collapse to outcome and renormalise the state vector simultaneously   
@@ -40,6 +41,7 @@ void Qubits<Type::Default, Fp>::collapse(unsigned targ, unsigned outcome,
 
     // Loop through the state vector and renormalise amplitudes associated with
     // the correct outcome and zero out those with the opposite outcome.
+#pragma omp parallel for num_threads(nthreads)
     for (std::size_t s = 0; s < dim; s += 2*k) { 
 	for (std::size_t r = 0; r < k; r++) {
 	    // Get the indices that need to be renormalised
@@ -58,7 +60,7 @@ void Qubits<Type::Default, Fp>::collapse(unsigned targ, unsigned outcome,
 
 
 template<typename Fp>
-std::vector<typename Qubits<Type::Default, Fp>::Dist> Qubits<Type::Default, Fp>::generateDist()
+std::vector<typename Qubits<Type::Omp, Fp>::Dist> Qubits<Type::Omp, Fp>::generateDist()
 {
     // Construct cumulative probability vector
     std::vector<Dist> dist;
@@ -79,7 +81,7 @@ std::vector<typename Qubits<Type::Default, Fp>::Dist> Qubits<Type::Default, Fp>:
 
 
 template<typename Fp>
-int Qubits<Type::Default, Fp>::measure(unsigned targ)
+int Qubits<Type::Omp, Fp>::measure(unsigned targ)
 {
     // Calculate probabilty of measuring 0 on qubit targ
     double prob0 = prob(targ, 0);
@@ -108,7 +110,7 @@ int Qubits<Type::Default, Fp>::measure(unsigned targ)
 
 
 template<typename Fp>
-std::size_t Qubits<Type::Default, Fp>::measureAll()
+std::size_t Qubits<Type::Omp, Fp>::measureAll()
 {
     // Construct cumulative probability vector
     std::vector<Dist> dist = generateDist();
@@ -124,7 +126,7 @@ std::size_t Qubits<Type::Default, Fp>::measureAll()
 
 
 template<typename Fp>
-double Qubits<Type::Default, Fp>::prob(unsigned targ, unsigned outcome)
+double Qubits<Type::Omp, Fp>::prob(unsigned targ, unsigned outcome)
     const
 {
     double probability = 0;
@@ -132,6 +134,7 @@ double Qubits<Type::Default, Fp>::prob(unsigned targ, unsigned outcome)
     std::size_t k = 1 << targ;
     std::size_t res = outcome * k;
     
+#pragma omp parallel for num_threads(nthreads) 
     for (std::size_t s = 0; s < dim; s += 2*k) { 
 	for (std::size_t r = 0; r < k; r++) {
 	    // Get the indices that need to be added
@@ -147,7 +150,7 @@ double Qubits<Type::Default, Fp>::prob(unsigned targ, unsigned outcome)
 }
 
 template<typename Fp>
-double Qubits<Type::Default, Fp>::postselect(unsigned targ,
+double Qubits<Type::Omp, Fp>::postselect(unsigned targ,
 					     unsigned outcome)
 {
     // Calculate renormalisation factor
@@ -162,7 +165,7 @@ double Qubits<Type::Default, Fp>::postselect(unsigned targ,
 
 
 template<typename Fp>
-std::size_t Qubits<Type::Default, Fp>::drawSample(const std::vector<Dist> & dist)
+std::size_t Qubits<Type::Omp, Fp>::drawSample(const std::vector<Dist> & dist)
 {
     std::size_t sampled = 0, L = 0, R = dist.size()-2, m = 0;
    
@@ -189,7 +192,7 @@ std::size_t Qubits<Type::Default, Fp>::drawSample(const std::vector<Dist> & dist
 
 
 template<typename Fp>
-std::vector<std::size_t> Qubits<Type::Default, Fp>::sample(unsigned targ,
+std::vector<std::size_t> Qubits<Type::Omp, Fp>::sample(unsigned targ,
 							   std::size_t nsamples)
 {
     // Initialise an empty vector, results[0] will store the amount of
@@ -202,6 +205,7 @@ std::vector<std::size_t> Qubits<Type::Default, Fp>::sample(unsigned targ,
     // Generate a random number and use it to generate the outcome
     // If the random number is less than the probability of getting
     // 0, then the outcome is 0, otherwise it is 1.    
+#pragma omp parallel for num_threads(nthreads)
     for (std::size_t i = 0; i < nsamples; i++) {
 	double rand = random.getNum();
 	if (rand < prob0) {
@@ -218,13 +222,14 @@ std::vector<std::size_t> Qubits<Type::Default, Fp>::sample(unsigned targ,
 
 
 template<typename Fp>
-std::map<std::size_t, std::size_t> Qubits<Type::Default, Fp>::sampleAll(std::size_t nsamples)
+std::map<std::size_t, std::size_t> Qubits<Type::Omp, Fp>::sampleAll(std::size_t nsamples)
 {    
     // Construct cumulative probability vector
     std::vector<Dist> dist = generateDist();
     
     // Sample from the vector nmeas times
     std::map<std::size_t, std::size_t> results;
+#pragma omp parallel for num_threads(nthreads)
     for (std::size_t i = 0; i < nsamples; i++) {
 	// The [] operator zero-initialises keys that don't exist.
 	results[drawSample(dist)]++;
@@ -234,39 +239,6 @@ std::map<std::size_t, std::size_t> Qubits<Type::Default, Fp>::sampleAll(std::siz
 }
 
 
-template<typename Fp>
-std::map<std::size_t, std::size_t> Qubits<Type::Default, Fp>::sampleAll2(std::size_t nsamples)
-{        
-    // Generate a sorted list of nsamples random numbers
-    std::vector<Fp> rand_list(nsamples);
-    for (std::size_t i = 0; i < nsamples; i++) {
-	rand_list[i] = random.getNum();
-    }
-    std::ranges::sort(rand_list);    
-    //std::sort(rand_list.begin(), rand_list.end());
-          
-    std::map<std::size_t, std::size_t> results;
-    
-    Fp sum = 0;  // Running cumulative probability distribution
-    std::size_t m = 0;  // Keeps track of rand_list index searched
-    std::size_t count = 0;  // Keeps track of how many times an outcome has occured  
-    
-    /// \todo Can this be tidied up a bit and improved?
-    for (std::size_t i = 0; i < dim; i++) {
-	sum += state[i].real * state[i].real + state[i].imag * state[i].imag;
-	count = 0;
-	while (rand_list[m] < sum and m < nsamples) {
-	    count++;
-	    m++;
-	}
-	// Add to the map
-	results[i] = count;
-    }
-        
-    return results;
-}
-
-
 // Explicit instantiations
-template class Qubits<Type::Default, float>;
-template class Qubits<Type::Default, double>;
+template class Qubits<Type::Omp, float>;
+template class Qubits<Type::Omp, double>;
