@@ -29,6 +29,8 @@
 #include <string>
 #include <omp.h>
 
+namespace qsl {
+
 template<>
 const std::string Qubits<Type::Omp, double>::name =
     std::string("Qub<omp,double>");
@@ -132,3 +134,5 @@ void Qubits<Type::Omp, Fp>::print() const
 // Explicit instantiations
 template class Qubits<Type::Omp, float>;
 template class Qubits<Type::Omp, double>;
+
+}

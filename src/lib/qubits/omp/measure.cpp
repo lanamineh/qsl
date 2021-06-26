@@ -29,6 +29,7 @@
 #include <cmath>
 #include <omp.h>
 
+namespace qsl {
 
 template<typename Fp>
 void Qubits<Type::Omp, Fp>::collapse(unsigned targ, unsigned outcome,
@@ -242,3 +243,5 @@ std::map<std::size_t, std::size_t> Qubits<Type::Omp, Fp>::sampleAll(std::size_t 
 // Explicit instantiations
 template class Qubits<Type::Omp, float>;
 template class Qubits<Type::Omp, double>;
+
+}

@@ -4,11 +4,11 @@
 int main ()
 {
     unsigned nqubits = 3;
-    Qubits<Type::Default, double> q{nqubits};
+    qsl::Qubits<qsl::Type::Default, double> q{nqubits};
 
-    Compare<Test::SingleSim,
-	    Qubits<Type::Default, double>,
-	    Qubits<Type::Omp, double>> cmp{16,1000};
+    qsl::Compare<qsl::Test::SingleSim,
+		 qsl::Qubits<qsl::Type::Default, double>,
+		 qsl::Qubits<qsl::Type::Omp, double>> cmp{16,1000};
     cmp.phase();
     
 }

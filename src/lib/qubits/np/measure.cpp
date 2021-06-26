@@ -29,6 +29,7 @@
 #include <cmath>
 #include <algorithm>
 
+namespace qsl {
 
 template<typename Fp>
 void Qubits<Type::NP, Fp>::collapse(unsigned targ, unsigned outcome,
@@ -293,3 +294,5 @@ std::map<std::size_t, std::size_t> Qubits<Type::NP, Fp>::sampleAll2(std::size_t 
 // Explicit instantiations
 template class Qubits<Type::NP, float>;
 template class Qubits<Type::NP, double>;
+
+}

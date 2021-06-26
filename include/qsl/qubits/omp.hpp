@@ -48,6 +48,8 @@
 #include "qsl/utils/random.hpp"
 #include <omp.h>
 
+namespace qsl {
+
 /**
  * \brief OpenMP quantum simulator object
  *
@@ -349,4 +351,6 @@ public:
 
 };
 
+}
+    
 #endif

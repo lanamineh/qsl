@@ -3,10 +3,10 @@
 
 int main ()
 {
-    Verify<Qubits<Type::Default, double>,
-	   Qubits<Type::Omp, double>,
-	   DefaultStateGen<double>,
-	   DefaultGateChecker> verify;
+    qsl::Verify<qsl::Qubits<qsl::Type::Default, double>,
+		qsl::Qubits<qsl::Type::Omp, double>,
+		qsl::DefaultStateGen<double>,
+		qsl::DefaultGateChecker> verify;
     verify.configureState(4);
     verify.checkAll();
     

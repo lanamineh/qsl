@@ -23,13 +23,13 @@
  *
  */
 
-#define _USE_MATH_DEFINES // For MSVC, to use M_PI
-
 #include <random>
 #include <vector>
 #include <string>
 #include "qsl/utils/complex.hpp"
 //#include <cmath>
+
+namespace qsl {
 
 template<typename Fp = double>
 complex<Fp> innerProduct(const std::vector<complex<Fp>> & v,
@@ -113,3 +113,5 @@ template double fubiniStudy(const std::vector<complex<double>> & v,
 
 template float normalise(std::vector<complex<float>> &state);
 template double normalise(std::vector<complex<double>> &state);
+
+}

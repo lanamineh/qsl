@@ -46,9 +46,7 @@ namespace qsl {
  */
 enum class Type {
     Default, ///< The default simulator object (no inline assembly or threading)
-    Asm, ///< A simulator with gates written in x86_64 assembly
     Omp, ///< Simulator supporting multithreading based on OpenMP
-    Thread, ///< Simulator supporting multithreading based on std::thread
     NP, ///< Number preserving simulator
 };
 
@@ -64,12 +62,14 @@ enum class Type {
  */
 template<Type T = Type::Default, typename Fp = double> class Qubits;
 
+}
+    
 ///\todo Find a good structure for including these files
 #include "qubits/default.hpp"
-#include "qubits/asm.hpp"
 #include "qubits/omp.hpp"
-#include "qubits/thread.hpp"
 #include "qubits/np.hpp"
+
+namespace qsl {
 
 ///\todo Maybe these typedefs are a bad idea?
 template<typename Sim, typename... Args>

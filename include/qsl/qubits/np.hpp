@@ -48,6 +48,8 @@
 #include "qsl/utils/complex.hpp"
 #include "qsl/utils/random.hpp"
 
+namespace qsl {
+
 /**
  * \brief Numper preserving simulator object
  *
@@ -338,4 +340,6 @@ public:
     std::map<std::size_t, std::size_t> sampleAll2(std::size_t nsamples);
 };
 
+}
+    
 #endif

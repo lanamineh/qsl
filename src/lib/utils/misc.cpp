@@ -30,30 +30,17 @@
 #include <iomanip>
 #include "qsl/utils/colours.hpp"
 
-// Make a windows version of __builtin_ctz for the
-// next function
-#ifdef _MSC_VER
-#include <intrin.h>
-#include <windows.h>
-uint32_t __inline ctz(uint32_t value)
-{
-    DWORD trailing_zero = 0;
-    if (_BitScanForward(&trailing_zero, value)) {
-        return trailing_zero;
-    } else {
-        // This is undefined for __builtin_ctz
-        return 32;
-    }
-}
+namespace qsl {
 
 // Use __builtin_ctz with gcc/clang/icc
-#elif defined(__GNUC__) || defined(__clang__) || defined(__INTEL_COMPILER)
+#if defined(__GNUC__) || defined(__clang__) || defined(__INTEL_COMPILER)
 #define ctz __builtin_ctz
 
 // Catch other cases
 #else
 #error The compiler you are using is not recognised
 #endif
+
 
 void next(std::size_t & x) {
 
@@ -173,4 +160,6 @@ unsigned choose(unsigned n, unsigned k)
 	ans /= i;
     }
     return ans;
+}
+
 }

@@ -28,6 +28,8 @@
 #include "qsl/utils/misc.hpp"
 #include <iostream>
 
+namespace qsl {
+
 template<>
 const std::string Qubits<Type::Default, double>::name =
     std::string("Qub<def,double>");
@@ -129,3 +131,5 @@ void Qubits<Type::Default, Fp>::print() const
 // Explicit instantiations
 template class Qubits<Type::Default, float>;
 template class Qubits<Type::Default, double>;
+
+}

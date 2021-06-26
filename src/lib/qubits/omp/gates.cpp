@@ -29,6 +29,8 @@
 #include <omp.h>
 #include <mutex>
 
+namespace qsl {
+
 std::mutex mtx;           // mutex for critical section
 
 /* One-qubit gates ***************************************************/
@@ -201,3 +203,5 @@ void Qubits<Type::Omp, Fp>::controlPhase(unsigned ctrl,
 // Explicit instantiations
 template class Qubits<Type::Omp, float>;
 template class Qubits<Type::Omp, double>;
+
+}

@@ -45,8 +45,6 @@ namespace qsl {
 	return distribution(generator);
     }
 
-}
-
 
 template<typename Fp>
 std::vector<complex<Fp>> makeRandomState(std::uint8_t nqubits)
@@ -130,3 +128,5 @@ template std::vector<complex<double>> makeRandomNPState(std::uint8_t nqubits);
 
 template std::vector<float> makeRandomPhases(int nqubits);
 template std::vector<double> makeRandomPhases(int nqubits);
+
+}

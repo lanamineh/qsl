@@ -29,6 +29,7 @@
 #include <vector>
 #include <cstddef>
 #include <cmath>
+#include <functional>
 
 namespace qsl {
 

@@ -31,6 +31,8 @@
 #include <string>
 #include <algorithm>
 
+namespace qsl {
+
 template<>
 const std::string Qubits<Type::NP, double>::name =
     std::string("Qub<np,double>");
@@ -253,3 +255,5 @@ void Qubits<Type::NP, Fp>::print() const
 // Explicit instantiations
 template class Qubits<Type::NP, float>;
 template class Qubits<Type::NP, double>;
+
+}

@@ -29,6 +29,8 @@
 #include <cmath>
 #include <algorithm>
 
+namespace qsl {
+
 /* One-qubit gates ***************************************************/
 
 template<typename Fp>
@@ -136,3 +138,5 @@ void Qubits<Type::NP, Fp>::swap(unsigned q1, unsigned q2)
 // Explicit instantiations
 template class Qubits<Type::NP, float>;
 template class Qubits<Type::NP, double>;
+
+}

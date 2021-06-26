@@ -28,6 +28,8 @@
 #include <cmath>
 #include <algorithm>
 
+namespace qsl {
+
 /* One-qubit gates ***************************************************/
 
 template<typename Fp>
@@ -156,3 +158,5 @@ void Qubits<Type::Default, Fp>::controlPhase(unsigned ctrl,
 // Explicit instantiations
 template class Qubits<Type::Default, float>;
 template class Qubits<Type::Default, double>;
+
+}

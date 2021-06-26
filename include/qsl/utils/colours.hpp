@@ -28,7 +28,7 @@
 #define COLOURS_HPP
 
 /// Requires <string>, use of std::string
-
+namespace qsl {
 namespace Colour {
 
     const std::string GREEN{"\033[1;32m"};
@@ -50,5 +50,6 @@ namespace Colour {
     const std::string Immediate{PALE};
     const std::string Reset{RESET};
 };
-
+}
+    
 #endif

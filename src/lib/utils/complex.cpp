@@ -24,8 +24,9 @@
  */
 
 #include "qsl/utils/complex.hpp"
-#define _USE_MATH_DEFINES // For MSVC, to use M_PI
 #include <cmath>
+
+namespace qsl {
 
 template<typename Fp>
 std::ostream & operator<< (std::ostream & stream, complex<Fp> val)
@@ -65,3 +66,5 @@ template std::ostream & operator<< (std::ostream & stream, complex<double> val);
 
 template float abs(const complex<float> & a);
 template double abs(const complex<double> & a);
+
+}
