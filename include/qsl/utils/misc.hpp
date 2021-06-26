@@ -31,6 +31,8 @@
 #include <random>
 #include "complex.hpp"
 
+namespace qsl {
+
 /**
  *
  * \brief Get the next number with the same number of bits set.
@@ -179,6 +181,6 @@ unsigned hammingWeight(std::size_t n);
  */
 unsigned choose(unsigned n, unsigned k);
 
-
+}
 
 #endif

@@ -29,6 +29,8 @@
 #include <vector>
 #include "complex.hpp"
 
+namespace qsl {
+
 /**
  * \brief Compute the inner product between two state vectors
  *
@@ -139,4 +141,6 @@ Fp fubiniStudy(const std::vector<complex<Fp>> & v,
 template<typename Fp = double>
 Fp normalise(std::vector<complex<Fp>> &state);
 
+}
+    
 #endif

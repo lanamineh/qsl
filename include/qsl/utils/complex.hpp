@@ -29,6 +29,8 @@
 
 #include <ostream>
 
+namespace qsl {
+
 /**
  * \brief Struct containing a single complex number
  *
@@ -78,4 +80,5 @@ Fp abs(const complex<Fp> & a);
 template<typename Fp = double>
 complex<Fp> operator - (const complex<Fp> & a, const complex<Fp> & b);
 
+}
 #endif

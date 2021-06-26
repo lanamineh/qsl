@@ -29,6 +29,7 @@
 
 #include "qsl/benchmark.hpp"
 
+namespace qsl {
 /**
  * \brief Compare the speed of an operation between a
  * pair of randomly generated simulators.
@@ -229,7 +230,7 @@ public:
     ///\todo Add sample, sampleAll, measureAll, prob
     ///\todo Add the other gates
 };
-
+}
 #include "qsl/benchmark/compare_multi.tpp"
 #include "qsl/benchmark/compare_single.tpp"
 

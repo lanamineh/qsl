@@ -72,9 +72,25 @@ class Qubits<Type::Omp, Fp>
 	double prob;
     };
     
-    /// Helper function for measurement related functions
+    /**
+     * \brief Run binary search to draw a sample from the cumulative
+     * probability vector.
+     */
     std::size_t drawSample(const std::vector<Dist> & dist);
 
+    /**
+     * \brief Collapse a qubit to the given outcome with the given
+     * renormalisation factor.
+     */
+    void collapse(unsigned targ, unsigned outcome, Fp factor);
+
+    /**
+     * \brief Generate the cumulative probability vector, ignoring
+     * amplitudes that are zero.
+     */
+    std::vector<Dist> generateDist();
+
+    
     void pauliX_inner(std::size_t start, std::size_t end, std::size_t k);
     void pauliX_outer(std::size_t start, std::size_t end, std::size_t k);
     
@@ -304,17 +320,19 @@ public:
 
     /**
      * \brief Sample measurement outcome for one qubit multiple times.
+     * 
      * \ingroup qubits_meas
      *
      * \param targ The qubit to measure.
      * \param nsamples The number of samples to draw.
      * \return A vector containing all the measurement results.
      */
-    std::vector<int> sample(unsigned targ, std::size_t nsamples);
+    std::vector<std::size_t> sample(unsigned targ, std::size_t nsamples);
     
     /**
      * \brief Sample measurement outcome for all of the qubits 
      * at once multiple times.
+     *
      * \ingroup qubits_meas
      *
      * Measuring all of the qubits at once is the same as measuring them 
@@ -323,11 +341,12 @@ public:
      * instead of the measure function where possible. Note that this 
      * function does not modify the state vector.
      * 
-     * \param nmeas The number of measurements to perform.
-     * \return A vector containing all of the measurement results, each
-     *         result is returned as the computational basis state index. 
+     * \param nsamples The number of measurements to perform.
+     * \return A map containing all of the measurement results, 
+     *         mapping outcomes to the number of times they happen. 
      */
-    std::vector<std::size_t> sampleAll(std::size_t nsamples);
+    std::map<std::size_t, std::size_t> sampleAll(std::size_t nsamples);
+
 };
 
 #endif

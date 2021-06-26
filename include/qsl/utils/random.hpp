@@ -83,7 +83,7 @@ namespace qsl {
 //template<typename Fp = double>
 //Random(Fp, Fp) -> Random<Fp>;
 
-}
+
 
 /**
  * \brief Restrictions that apply to some simulators
@@ -159,5 +159,5 @@ public:
 template<typename Fp = double>
 std::vector<Fp> makeRandomPhases(int test_len);
 
-
+}
 #endif

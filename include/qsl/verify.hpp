@@ -45,6 +45,8 @@
 #include "qsl/verify/checkers.hpp"
 #include "qsl/verify/stategen.hpp"
 
+namespace qsl {
+
 /**
  * \brief Verify two simulators against one another
  *
@@ -129,4 +131,5 @@ public:
 	}	  
 };
 
+}
 #endif

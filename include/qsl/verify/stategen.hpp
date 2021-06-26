@@ -25,6 +25,8 @@
 #ifndef STATEGEN_HPP
 #define STATEGEN_HPP
 
+namespace qsl {
+
 /**
  * \brief State generator for number preserved states
  *
@@ -109,6 +111,6 @@ public:
 
 };
 
-
+}
 
 #endif

@@ -30,6 +30,8 @@
 #include <cstddef>
 #include <cmath>
 
+namespace qsl {
+
 /**
  * \brief Function to calculate 2-sided z-value
  */
@@ -722,4 +724,6 @@ public:
     
 };
 
+}
+    
 #endif
