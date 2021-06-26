@@ -22,6 +22,8 @@
  * \brief Implementation of the single simulator version of Time class
  */
 
+namespace qsl {
+
 template<typename Sim, Restrictions Res>
 template<typename R, typename S>
 void Time<Test::SingleSim, Sim, Res>::setMeta(
@@ -217,4 +219,6 @@ Results<std::size_t, double> Time<Test::SingleSim, Sim, Res>::sampleAll()
     }
     
     return r;
+}
+
 }

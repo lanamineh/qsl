@@ -33,6 +33,8 @@
 #include <functional>
 #include <map>
 
+namespace qsl {
+
 ///\todo Fix this for float
 template<Type T, typename Fp = double>
 void verifyPostselect(unsigned nqubits)
@@ -209,4 +211,6 @@ void verifyGate(Gate<F, ArgsF...> fn, Gate<G, ArgsG...> gn,
 	
     // Run the verification
     impl(fn, gn, qubits, quest);
+}
+
 }

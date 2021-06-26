@@ -26,6 +26,7 @@
 #ifndef QUBITS_HPP
 #define QUBITS_HPP
 
+namespace qsl {
 /**
  * \defgroup gates Quantum gates
  * \brief One- and two- qubit gates in the Qubits class
@@ -80,4 +81,5 @@ using OneQubitGate = Gate<Sim, unsigned, Args...>;
 template<typename Sim, typename... Args>
 using TwoQubitGate = Gate<Sim, unsigned, unsigned, Args...>;
 
+}
 #endif

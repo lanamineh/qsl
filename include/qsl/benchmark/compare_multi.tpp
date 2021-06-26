@@ -23,6 +23,7 @@
  */
 
 #include "qsl/utils/misc.hpp"
+namespace qsl {
 
 template<typename Sim1, typename Sim2>
 template<typename R, typename S>
@@ -293,4 +294,5 @@ Results<std::size_t, double> Compare<Test::MultiSim, Sim1, Sim2>::sampleAll()
     }
     
     return r;
+}
 }

@@ -29,6 +29,8 @@
 
 #include "qsl/benchmark.hpp"
 
+namespace qsl {
+
 enum class Function
 {
     pauliX,
@@ -351,6 +353,7 @@ public:
 
 };
 
+}
 #include "qsl/benchmark/time_multi.tpp"
 #include "qsl/benchmark/time_single.tpp"
 

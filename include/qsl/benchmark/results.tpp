@@ -27,6 +27,7 @@
 #include <iostream>
 #include <fstream>
 
+namespace qsl {
 
 template<typename T, typename R>
 Results<T,R>::Results(const std::vector<std::string> & headings)
@@ -319,4 +320,6 @@ void Results<T, R>::writeToFile(const std::string & filename) const
 	    file << fpcols[row].back() << std::endl;
 	}
     }
+}
+    
 }

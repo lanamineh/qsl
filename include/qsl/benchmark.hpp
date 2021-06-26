@@ -34,6 +34,7 @@
 #include <map>
 #include "benchmark/results.hpp"
 
+namespace qsl {
 
 ///\todo Write documentation
 enum class Test
@@ -170,6 +171,7 @@ void benchmark1SampleAll(unsigned nqubits, int nsamples, int test_len = 1);
 
 //#include "benchmark/bench1.tpp"
 //#include "benchmark/bench2.tpp"
-
+}
+    
 #endif
 

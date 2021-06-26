@@ -29,6 +29,8 @@
 #include <concepts>
 #include <iostream>
 
+namespace qsl {
+
 template<typename Sim>
 concept HasNPGates = requires (Sim sim, unsigned ctrl, unsigned targ,
 			       Sim::Fp_type param) {
@@ -68,4 +70,5 @@ concept NPSimulator = HasMeasurement<Sim> && HasNPGates<Sim>;
 template<typename Sim>
 concept NonNPSimulator = HasMeasurement<Sim> && HasNonNPGates<Sim>;
 
+}
 #endif

@@ -29,6 +29,7 @@
 #include <map>
 #include <vector>
 
+namespace qsl {
 /**
  * \brief A simple results class for holding a table of columns and metadata 
  *
@@ -240,7 +241,7 @@ public:
      */
     void print() const;
 };
-
+}
 #include "qsl/benchmark/results.tpp"
 
 #endif 

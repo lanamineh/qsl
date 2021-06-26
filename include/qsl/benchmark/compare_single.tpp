@@ -22,6 +22,8 @@
  * \brief Implementation of the single simulator version of Compare class
  */
 
+namespace qsl {
+
 template<typename Sim1, typename Sim2>
 template<typename R, typename S>
 void Compare<Test::SingleSim, Sim1, Sim2>::setMeta(
@@ -286,4 +288,5 @@ Results<std::size_t, double> Compare<Test::SingleSim, Sim1, Sim2>::sampleAll()
     }
     
     return r;
+}
 }
