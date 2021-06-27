@@ -30,133 +30,133 @@
 
 namespace qsl {
 
-/* One-qubit gates ***************************************************/
+    /* One-qubit gates ***************************************************/
 
-template<std::floating_point Fp>
-void Qubits<Type::Default, Fp>::pauliX(unsigned targ)
-{
-    std::size_t k = 1 << targ;
-    for (std::size_t s = 0; s < dim; s += 2*k) { 
-	for (std::size_t r = 0; r < k; r++) {
-	    // Get the indices that need to be switched
-	    std::size_t index1 = s + r;
-	    std::size_t index2 = s + k + r;
-	    std::swap(state[index1], state[index2]);
-	}
-    }
-}
-
-template<std::floating_point Fp>
-void Qubits<Type::Default, Fp>::phase(unsigned targ, Fp angle)
-{
-    complex<Fp> phase = complex(std::cos(angle), std::sin(angle));
-    std::size_t k = 1 << targ;
-    for (std::size_t s = 0; s < dim; s += 2*k) { 
-	for (std::size_t r = 0; r < k; r++) {
-	    // Get the index of |1>
-	    std::size_t index = s + k + r;
-	    // state[index] *= phase;
-	    complex temp = state[index];
-	    state[index].real = phase.real * temp.real - phase.imag * temp.imag;
-	    state[index].imag = phase.real * temp.imag + phase.imag * temp.real;
-	}
-    }
-}
-
-template<std::floating_point Fp>
-void Qubits<Type::Default, Fp>::rotateX(unsigned targ, Fp angle)
-{
-    // Store variables
-    Fp cos = std::cos(angle/2);
-    Fp sin = std::sin(angle/2);
-    std::size_t k = 1 << targ;
-    for (std::size_t s = 0; s < dim; s += 2*k) { 
-	for (std::size_t r = 0; r < k; r++) {
-
-	    // Get the index of |0> and |1>
-	    std::size_t index_0 = s + r;
-	    std::size_t index_1 = s + k + r;
-
-	    // Store the values of |0> and |1> amplitudes
-	    complex<Fp> a0 = state[index_0];
-	    complex<Fp> a1 = state[index_1];
-
-	    // Write the new |0> amplitude
-	    state[index_0].real = a0.real * cos + a1.imag * sin;
-	    state[index_0].imag = a0.imag * cos - a1.real * sin;
-
-	    // Write the new |1> amplitude
-	    state[index_1].real = a1.real * cos + a0.imag * sin;
-	    state[index_1].imag = a1.imag * cos - a0.real * sin;
-	    
-	}
-    }
-}
-
-
-/* Two-qubit gates ***************************************************/
-
-template<std::floating_point Fp>
-void Qubits<Type::Default, Fp>::controlNot(unsigned ctrl, unsigned targ)
-{
-    std::size_t small_bit = 1 << std::min(ctrl, targ);
-    std::size_t large_bit = 1 << std::max(ctrl, targ);
-
-    std::size_t mid_incr = (small_bit << 1);
-    std::size_t high_incr = (large_bit << 1);
-    std::size_t targ_bit = (1 << targ);
-    std::size_t ctrl_bit = (1 << ctrl);
-
-    // Increment through the indices above largest bit (ctrl or targ)
-    for (std::size_t i = 0; i < dim; i += high_incr) {
-	// Increment through the middle set of bits
-	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
-	    // Increment through the low set of bits
-	    for (std::size_t k = 0; k < small_bit; k++) {
-		// Get the |01> and |11> indices
-		std::size_t index1 = i + j + k + ctrl_bit;
-		std::size_t index2 = index1 + targ_bit;
-
+    template<std::floating_point Fp>
+    void Qubits<Type::Default, Fp>::pauliX(unsigned targ)
+    {
+	std::size_t k = 1 << targ;
+	for (std::size_t s = 0; s < dim; s += 2*k) { 
+	    for (std::size_t r = 0; r < k; r++) {
+		// Get the indices that need to be switched
+		std::size_t index1 = s + r;
+		std::size_t index2 = s + k + r;
 		std::swap(state[index1], state[index2]);
 	    }
 	}
-    }    
-}
+    }
 
-template<std::floating_point Fp>
-void Qubits<Type::Default, Fp>::controlPhase(unsigned ctrl,
-					     unsigned targ,
-					     Fp angle)
-{
-    complex<Fp> phase = complex(std::cos(angle), std::sin(angle));
-    
-    std::size_t small_bit = 1 << std::min(ctrl, targ);
-    std::size_t large_bit = 1 << std::max(ctrl, targ);
-
-    std::size_t mid_incr = (small_bit << 1);
-    std::size_t high_incr = (large_bit << 1);
-
-    std::size_t outcome = (1 << targ) + (1 << ctrl);
-    
-    // Increment through the indices above largest bit (ctrl or targ)
-    for (std::size_t i = 0; i < dim; i += high_incr) {
-	// Increment through the middle set of bits
-	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
-	    // Increment through the low set of bits
-	    for (std::size_t k = 0; k < small_bit; k++) {
-		std::size_t index = i + j + k + outcome;
+    template<std::floating_point Fp>
+    void Qubits<Type::Default, Fp>::phase(unsigned targ, Fp angle)
+    {
+	complex<Fp> phase = complex(std::cos(angle), std::sin(angle));
+	std::size_t k = 1 << targ;
+	for (std::size_t s = 0; s < dim; s += 2*k) { 
+	    for (std::size_t r = 0; r < k; r++) {
+		// Get the index of |1>
+		std::size_t index = s + k + r;
 		// state[index] *= phase;
-		complex amp = state[index];
-		state[index].real = phase.real * amp.real - phase.imag * amp.imag;
-		state[index].imag = phase.real * amp.imag + phase.imag * amp.real;
+		complex temp = state[index];
+		state[index].real = phase.real * temp.real - phase.imag * temp.imag;
+		state[index].imag = phase.real * temp.imag + phase.imag * temp.real;
 	    }
 	}
-    }    
-}
+    }
+
+    template<std::floating_point Fp>
+    void Qubits<Type::Default, Fp>::rotateX(unsigned targ, Fp angle)
+    {
+	// Store variables
+	Fp cos = std::cos(angle/2);
+	Fp sin = std::sin(angle/2);
+	std::size_t k = 1 << targ;
+	for (std::size_t s = 0; s < dim; s += 2*k) { 
+	    for (std::size_t r = 0; r < k; r++) {
+
+		// Get the index of |0> and |1>
+		std::size_t index_0 = s + r;
+		std::size_t index_1 = s + k + r;
+
+		// Store the values of |0> and |1> amplitudes
+		complex<Fp> a0 = state[index_0];
+		complex<Fp> a1 = state[index_1];
+
+		// Write the new |0> amplitude
+		state[index_0].real = a0.real * cos + a1.imag * sin;
+		state[index_0].imag = a0.imag * cos - a1.real * sin;
+
+		// Write the new |1> amplitude
+		state[index_1].real = a1.real * cos + a0.imag * sin;
+		state[index_1].imag = a1.imag * cos - a0.real * sin;
+	    
+	    }
+	}
+    }
 
 
-// Explicit instantiations
-template class Qubits<Type::Default, float>;
-template class Qubits<Type::Default, double>;
+    /* Two-qubit gates ***************************************************/
+
+    template<std::floating_point Fp>
+    void Qubits<Type::Default, Fp>::controlNot(unsigned ctrl, unsigned targ)
+    {
+	std::size_t small_bit = 1 << std::min(ctrl, targ);
+	std::size_t large_bit = 1 << std::max(ctrl, targ);
+
+	std::size_t mid_incr = (small_bit << 1);
+	std::size_t high_incr = (large_bit << 1);
+	std::size_t targ_bit = (1 << targ);
+	std::size_t ctrl_bit = (1 << ctrl);
+
+	// Increment through the indices above largest bit (ctrl or targ)
+	for (std::size_t i = 0; i < dim; i += high_incr) {
+	    // Increment through the middle set of bits
+	    for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+		// Increment through the low set of bits
+		for (std::size_t k = 0; k < small_bit; k++) {
+		    // Get the |01> and |11> indices
+		    std::size_t index1 = i + j + k + ctrl_bit;
+		    std::size_t index2 = index1 + targ_bit;
+
+		    std::swap(state[index1], state[index2]);
+		}
+	    }
+	}    
+    }
+
+    template<std::floating_point Fp>
+    void Qubits<Type::Default, Fp>::controlPhase(unsigned ctrl,
+						 unsigned targ,
+						 Fp angle)
+    {
+	complex<Fp> phase = complex(std::cos(angle), std::sin(angle));
+    
+	std::size_t small_bit = 1 << std::min(ctrl, targ);
+	std::size_t large_bit = 1 << std::max(ctrl, targ);
+
+	std::size_t mid_incr = (small_bit << 1);
+	std::size_t high_incr = (large_bit << 1);
+
+	std::size_t outcome = (1 << targ) + (1 << ctrl);
+    
+	// Increment through the indices above largest bit (ctrl or targ)
+	for (std::size_t i = 0; i < dim; i += high_incr) {
+	    // Increment through the middle set of bits
+	    for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+		// Increment through the low set of bits
+		for (std::size_t k = 0; k < small_bit; k++) {
+		    std::size_t index = i + j + k + outcome;
+		    // state[index] *= phase;
+		    complex amp = state[index];
+		    state[index].real = phase.real * amp.real - phase.imag * amp.imag;
+		    state[index].imag = phase.real * amp.imag + phase.imag * amp.real;
+		}
+	    }
+	}    
+    }
+
+
+    // Explicit instantiations
+    template class Qubits<Type::Default, float>;
+    template class Qubits<Type::Default, double>;
 
 }

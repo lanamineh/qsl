@@ -29,40 +29,40 @@
 #include <concepts>
 
 namespace qsl {
-/**
- * \defgroup gates Quantum gates
- * \brief One- and two- qubit gates in the Qubits class
- */
+    /**
+     * \defgroup gates Quantum gates
+     * \brief One- and two- qubit gates in the Qubits class
+     */
 
-/**
- * \defgroup meas Measurement
- * \brief Functions related to measurement, probabilities, etc.
- */
+    /**
+     * \defgroup meas Measurement
+     * \brief Functions related to measurement, probabilities, etc.
+     */
 
-/**
- * \brief An enum for distinguishing between different simulator 
- * implementations
- *
- * A value from this enum should be passed as the first template parameter
- * to the Qubits class to determine which simulator should be used.
- */
-enum class Type {
-    Default, ///< The default simulator object (no inline assembly or threading)
-    Omp, ///< Simulator supporting multithreading based on OpenMP
-    NP, ///< Number preserving simulator
-};
+    /**
+     * \brief An enum for distinguishing between different simulator 
+     * implementations
+     *
+     * A value from this enum should be passed as the first template parameter
+     * to the Qubits class to determine which simulator should be used.
+     */
+    enum class Type {
+	Default, ///< The default simulator object (no inline assembly or threading)
+	Omp, ///< Simulator supporting multithreading based on OpenMP
+	NP, ///< Number preserving simulator
+    };
 
-/**
- * \brief The main quantum simulator object
- *
- * There are several different types of simulator
- * objects, depending on the implementation. The
- * type of simulator is chosen by specifying the
- * implementation using the Type enum, and specifying
- * the simulator precision Fp. 
- * 
- */
-template<Type T = Type::Default, std::floating_point Fp = double> class Qubits;
+    /**
+     * \brief The main quantum simulator object
+     *
+     * There are several different types of simulator
+     * objects, depending on the implementation. The
+     * type of simulator is chosen by specifying the
+     * implementation using the Type enum, and specifying
+     * the simulator precision Fp. 
+     * 
+     */
+    template<Type T = Type::Default, std::floating_point Fp = double> class Qubits;
 
 }
     
@@ -73,15 +73,15 @@ template<Type T = Type::Default, std::floating_point Fp = double> class Qubits;
 
 namespace qsl {
 
-///\todo Maybe these typedefs are a bad idea?
-template<typename Sim, typename... Args>
-using Gate = void(Sim::*)(Args...);
+    ///\todo Maybe these typedefs are a bad idea?
+    template<typename Sim, typename... Args>
+    using Gate = void(Sim::*)(Args...);
 
-template<typename Sim, typename... Args>
-using OneQubitGate = Gate<Sim, unsigned, Args...>;
+    template<typename Sim, typename... Args>
+    using OneQubitGate = Gate<Sim, unsigned, Args...>;
 
-template<typename Sim, typename... Args>
-using TwoQubitGate = Gate<Sim, unsigned, unsigned, Args...>;
+    template<typename Sim, typename... Args>
+    using TwoQubitGate = Gate<Sim, unsigned, unsigned, Args...>;
 
 }
 #endif

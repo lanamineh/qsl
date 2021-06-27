@@ -31,44 +31,44 @@
 
 namespace qsl {
 
-template<typename Sim>
-concept HasNPGates = requires (Sim sim, unsigned ctrl, unsigned targ,
-			       Sim::Fp_type param) {
-    sim.phase(targ,param);
-    sim.controlPhase(ctrl,targ,param);
-    // Swap too
-};
+    template<typename Sim>
+    concept HasNPGates = requires (Sim sim, unsigned ctrl, unsigned targ,
+				   Sim::Fp_type param) {
+	sim.phase(targ,param);
+	sim.controlPhase(ctrl,targ,param);
+	// Swap too
+    };
 
-template<typename Sim>
-concept HasNonNPGates = requires (Sim sim, unsigned ctrl, unsigned targ,
-				  Sim::Fp_type param) {
-    sim.pauliX(targ);
-    sim.rotateX(targ,param);
-    sim.controlNot(ctrl,targ);
-};
+    template<typename Sim>
+    concept HasNonNPGates = requires (Sim sim, unsigned ctrl, unsigned targ,
+				      Sim::Fp_type param) {
+	sim.pauliX(targ);
+	sim.rotateX(targ,param);
+	sim.controlNot(ctrl,targ);
+    };
 
-template<typename Sim>
-concept HasMeasurement = requires (Sim sim, unsigned targ,
-			       unsigned outcome, std::size_t nsamples) {
-    ///\todo Change some of the returned types to use Fp_type
-    { sim.measure(targ) } -> std::same_as<int>;
-    { sim.measureAll() } -> std::same_as<std::size_t>;
-    { sim.prob(targ,outcome) } -> std::convertible_to<double>;
-    { sim.postselect(targ,outcome) } -> std::convertible_to<double>;
-    { sim.sample(targ,nsamples) };// -> std::same_as<std::vector<std::size_t>>;
-    { sim.sampleAll(nsamples) };// -> std::same_as<std::map<std::size_t,std::size_t>>;
-};
+    template<typename Sim>
+    concept HasMeasurement = requires (Sim sim, unsigned targ,
+				       unsigned outcome, std::size_t nsamples) {
+	///\todo Change some of the returned types to use Fp_type
+	{ sim.measure(targ) } -> std::same_as<int>;
+	{ sim.measureAll() } -> std::same_as<std::size_t>;
+	{ sim.prob(targ,outcome) } -> std::convertible_to<double>;
+	{ sim.postselect(targ,outcome) } -> std::convertible_to<double>;
+	{ sim.sample(targ,nsamples) };// -> std::same_as<std::vector<std::size_t>>;
+	{ sim.sampleAll(nsamples) };// -> std::same_as<std::map<std::size_t,std::size_t>>;
+    };
 
-/// Definition of a type 
-template<typename Sim>
-concept HasAllGates = HasNPGates<Sim> && HasNonNPGates<Sim>;
+    /// Definition of a type 
+    template<typename Sim>
+    concept HasAllGates = HasNPGates<Sim> && HasNonNPGates<Sim>;
 
-template<typename Sim>
-concept NPSimulator = HasMeasurement<Sim> && HasNPGates<Sim>;
+    template<typename Sim>
+    concept NPSimulator = HasMeasurement<Sim> && HasNPGates<Sim>;
 
-/// Just in case you want...
-template<typename Sim>
-concept NonNPSimulator = HasMeasurement<Sim> && HasNonNPGates<Sim>;
+    /// Just in case you want...
+    template<typename Sim>
+    concept NonNPSimulator = HasMeasurement<Sim> && HasNonNPGates<Sim>;
 
 }
 #endif

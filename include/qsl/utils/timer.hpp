@@ -30,9 +30,9 @@
 
 namespace qsl {
 
-/**
- * \brief A class for timing things.
- */
+    /**
+     * \brief A class for timing things.
+     */
     class Timer
     {
     private:

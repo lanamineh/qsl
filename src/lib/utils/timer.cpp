@@ -27,29 +27,22 @@
 
 namespace qsl {
 
-/**********************************************************************/
     void Timer::start()
     {
 	time1 = clock_t::now();
     }
 
-
-/**********************************************************************/
     void Timer::stop()
     {
 	time2 = clock_t::now();
 	elapsed = std::chrono::duration_cast<second_t>(time2 - time1).count();
     }
 
-
-/**********************************************************************/
     double Timer::getElapsed()
     {
 	return elapsed;
     }
 
-
-/**********************************************************************/
     std::string Timer::printElapsed()
     {
 	auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(time2 - time1);
@@ -69,8 +62,6 @@ namespace qsl {
 	return timeTaken;
     }
 
-
-/**********************************************************************/
     std::string Timer::getCurrentTime()
     {
 	auto timenow = clock_t::to_time_t(clock_t::now());

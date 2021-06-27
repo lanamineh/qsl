@@ -31,116 +31,116 @@
 
 namespace qsl {
 
-template<std::floating_point Fp = double>
-complex<Fp> innerProduct(const std::vector<complex<Fp>> & v,
-			 const std::vector<complex<Fp>> & w)
-{
-    if(v.size() != w.size()) {
-	std::string msg = "Cannot compute inner product between vectors ";
-	msg += "of different sizes: ";
-	msg += std::to_string(v.size()) + " and " + std::to_string(w.size());
-	throw std::logic_error(msg);
+    template<std::floating_point Fp = double>
+    complex<Fp> innerProduct(const std::vector<complex<Fp>> & v,
+			     const std::vector<complex<Fp>> & w)
+    {
+	if(v.size() != w.size()) {
+	    std::string msg = "Cannot compute inner product between vectors ";
+	    msg += "of different sizes: ";
+	    msg += std::to_string(v.size()) + " and " + std::to_string(w.size());
+	    throw std::logic_error(msg);
+	}
+
+	complex<Fp> result{ 0,0 };
+	for(std::size_t n=0; n<v.size(); n++) {
+	    result.real += v[n].real * w[n].real + v[n].imag * w[n].imag;
+	    result.imag += v[n].real * w[n].imag - v[n].imag * w[n].real;
+	}
+
+	return result;
     }
 
-    complex<Fp> result{ 0,0 };
-    for(std::size_t n=0; n<v.size(); n++) {
-	result.real += v[n].real * w[n].real + v[n].imag * w[n].imag;
-	result.imag += v[n].real * w[n].imag - v[n].imag * w[n].real;
-    }
+    template<std::floating_point Fp = double>
+    Fp norm(const std::vector<complex<Fp>> & v)
+    {
+	// Find the norm of the vector
+	Fp inner_prod = 0;
+	for (std::size_t i = 0; i < v.size(); i++) {
+	    inner_prod += v[i].real * v[i].real + v[i].imag * v[i].imag;
+	}
 
-    return result;
-}
-
-template<std::floating_point Fp = double>
-Fp norm(const std::vector<complex<Fp>> & v)
-{
-    // Find the norm of the vector
-    Fp inner_prod = 0;
-    for (std::size_t i = 0; i < v.size(); i++) {
-	inner_prod += v[i].real * v[i].real + v[i].imag * v[i].imag;
-    }
-
-    return std::sqrt(inner_prod);
+	return std::sqrt(inner_prod);
     
-}
-
-/**
- * \brief Compute arccos after checking argument
- *
- * The function is necessary in case a number rounds 
- * to something bigger than 1 or smaller than -1
- *
- */
-double acosSafe(double value)
-{
-    if (value <= -1.0) {
-        return M_PI;
-    } else if (value >= 1.0) {
-        return 0;
-    } else {
-        return std::acos(value);
     }
-}
 
-template<std::floating_point Fp = double>
-Fp fubiniStudy(const std::vector<complex<Fp>> & v,
-	       const std::vector<complex<Fp>> & w)
-{
-    Fp numerator = abs(innerProduct(v,w));
-    Fp denominator = norm(v) * norm(w); 
-    return acosSafe(numerator/denominator);
-}
+    /**
+     * \brief Compute arccos after checking argument
+     *
+     * The function is necessary in case a number rounds 
+     * to something bigger than 1 or smaller than -1
+     *
+     */
+    double acosSafe(double value)
+    {
+	if (value <= -1.0) {
+	    return M_PI;
+	} else if (value >= 1.0) {
+	    return 0;
+	} else {
+	    return std::acos(value);
+	}
+    }
 
-template<std::floating_point Fp = double>
-Fp normalise(std::vector<complex<Fp>> &state)
-{
-    // Find the norm of the vector
-    Fp factor = norm(state);
+    template<std::floating_point Fp = double>
+    Fp fubiniStudy(const std::vector<complex<Fp>> & v,
+		   const std::vector<complex<Fp>> & w)
+    {
+	Fp numerator = abs(innerProduct(v,w));
+	Fp denominator = norm(v) * norm(w); 
+	return acosSafe(numerator/denominator);
+    }
+
+    template<std::floating_point Fp = double>
+    Fp normalise(std::vector<complex<Fp>> &state)
+    {
+	// Find the norm of the vector
+	Fp factor = norm(state);
    
-    // Divide by the norm;
-    for (std::size_t i = 0; i < state.size(); i++) {
-	state[i].real /= factor;
-	state[i].imag /= factor;
+	// Divide by the norm;
+	for (std::size_t i = 0; i < state.size(); i++) {
+	    state[i].real /= factor;
+	    state[i].imag /= factor;
+	}
+
+	return factor;
     }
 
-    return factor;
-}
+    template<std::floating_point Fp>
+    unsigned checkStateSize(const std::vector<complex<Fp>> & state) {
 
-template<std::floating_point Fp>
-unsigned checkStateSize(const std::vector<complex<Fp>> & state) {
-
-    // Counts the number of ones in the binary representation of dim
-    // If this number is not 1, then dim is not a power of 2 and
-    // is therefore invalid
-    unsigned one_count = 0;
-    // Counts the length of the binary representation of dim
-    unsigned len = 0;
+	// Counts the number of ones in the binary representation of dim
+	// If this number is not 1, then dim is not a power of 2 and
+	// is therefore invalid
+	unsigned one_count = 0;
+	// Counts the length of the binary representation of dim
+	unsigned len = 0;
     
-    std::size_t n = state.size();
-    while(n > 0) {
-	len += 1;
-	one_count += n & 1;
-	n >>= 1;
-    }
+	std::size_t n = state.size();
+	while(n > 0) {
+	    len += 1;
+	    one_count += n & 1;
+	    n >>= 1;
+	}
     
-    if(one_count != 1) {
-	throw std::logic_error("State vector size is not a power of two");
+	if(one_count != 1) {
+	    throw std::logic_error("State vector size is not a power of two");
+	}
+
+	return len - 1;
+
     }
 
-    return len - 1;
+    /// Explicit instantiations
+    template float fubiniStudy(const std::vector<complex<float>> & v,
+			       const std::vector<complex<float>> & w);
+    template double fubiniStudy(const std::vector<complex<double>> & v,
+				const std::vector<complex<double>> & w);
 
-}
+    template float normalise(std::vector<complex<float>> &state);
+    template double normalise(std::vector<complex<double>> &state);
 
-/// Explicit instantiations
-template float fubiniStudy(const std::vector<complex<float>> & v,
-			   const std::vector<complex<float>> & w);
-template double fubiniStudy(const std::vector<complex<double>> & v,
-			    const std::vector<complex<double>> & w);
-
-template float normalise(std::vector<complex<float>> &state);
-template double normalise(std::vector<complex<double>> &state);
-
-template unsigned checkStateSize(const std::vector<complex<float>> & state);
-template unsigned checkStateSize(const std::vector<complex<double>> & state);
+    template unsigned checkStateSize(const std::vector<complex<float>> & state);
+    template unsigned checkStateSize(const std::vector<complex<double>> & state);
 
 }

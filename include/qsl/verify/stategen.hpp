@@ -27,89 +27,89 @@
 
 namespace qsl {
 
-/**
- * \brief State generator for number preserved states
- *
- * This class is intended to be used as the InitState parameter in the
- * Verify class. It generates a random number preserved state with a 
- * given number of qubits and ones. This state is then used to as the input
- * to the checking algorithms (to initialise the simulators).
- *
- */
-template<std::floating_point Fp>
-class NPStateGen
-{
-    std::vector<complex<Fp>> state;
-    qsl::Random<Fp> random;
+    /**
+     * \brief State generator for number preserved states
+     *
+     * This class is intended to be used as the InitState parameter in the
+     * Verify class. It generates a random number preserved state with a 
+     * given number of qubits and ones. This state is then used to as the input
+     * to the checking algorithms (to initialise the simulators).
+     *
+     */
+    template<std::floating_point Fp>
+    class NPStateGen
+    {
+	std::vector<complex<Fp>> state;
+	qsl::Random<Fp> random;
     
-public:
+    public:
 
-    NPStateGen() : random(-1,1) {}
+	NPStateGen() : random(-1,1) {}
 
-    void configureState(unsigned nqubits, unsigned nones) {
-	std::cout << "Setting number of ones = " << nones << std::endl;
+	void configureState(unsigned nqubits, unsigned nones) {
+	    std::cout << "Setting number of ones = " << nones << std::endl;
 
-	std::size_t dim = 1 << nqubits;
+	    std::size_t dim = 1 << nqubits;
 
-	std::size_t x = (1ULL << nones) - 1;
-	std::size_t end = x << (nqubits - nones);
+	    std::size_t x = (1ULL << nones) - 1;
+	    std::size_t end = x << (nqubits - nones);
 
-	// Make state vector with correct length
-	state.clear();
-	state.resize(dim);
+	    // Make state vector with correct length
+	    state.clear();
+	    state.resize(dim);
 
-	std::cout << "Generating a random state vector" << std::endl;
-	while (x <= end) {
+	    std::cout << "Generating a random state vector" << std::endl;
+	    while (x <= end) {
 
-	    Fp val_real = random.getNum();
-	    Fp val_imag = random.getNum();
-	    state[x] = complex(val_real, val_imag);	
-	    next(x);
+		Fp val_real = random.getNum();
+		Fp val_imag = random.getNum();
+		state[x] = complex(val_real, val_imag);	
+		next(x);
+	    }
+    
+	    // Normalise the state vector
+	    normalise(state);
 	}
-    
-	// Normalise the state vector
-	normalise(state);
-    }
 
-    [[nodiscard]] std::vector<complex<Fp>> getState() const {
-	return state;
-    }
-
-};
-
-template<std::floating_point Fp>
-class DefaultStateGen
-{
-    std::vector<complex<Fp>> state;
-    qsl::Random<Fp> random;
-    
-public:
-
-    DefaultStateGen() : random(-1,1) {}
-
-    void configureState(unsigned nqubits) {
-
-	std::size_t dim = 1 << nqubits;
-
-	// Make state vector with correct length
-	state.clear();
-
-	std::cout << "Generating a random state vector" << std::endl;
-	for (std::size_t n = 0; n < dim; n++) {
-	    Fp val_real = random.getNum();
-	    Fp val_imag = random.getNum();
-	    state.push_back(complex(val_real, val_imag));	
+	[[nodiscard]] std::vector<complex<Fp>> getState() const {
+	    return state;
 	}
+
+    };
+
+    template<std::floating_point Fp>
+    class DefaultStateGen
+    {
+	std::vector<complex<Fp>> state;
+	qsl::Random<Fp> random;
     
-	// Normalise the state vector
-	normalise(state);
-    }
+    public:
 
-    [[nodiscard]] std::vector<complex<Fp>> getState() const {
-	return state;
-    }
+	DefaultStateGen() : random(-1,1) {}
 
-};
+	void configureState(unsigned nqubits) {
+
+	    std::size_t dim = 1 << nqubits;
+
+	    // Make state vector with correct length
+	    state.clear();
+
+	    std::cout << "Generating a random state vector" << std::endl;
+	    for (std::size_t n = 0; n < dim; n++) {
+		Fp val_real = random.getNum();
+		Fp val_imag = random.getNum();
+		state.push_back(complex(val_real, val_imag));	
+	    }
+    
+	    // Normalise the state vector
+	    normalise(state);
+	}
+
+	[[nodiscard]] std::vector<complex<Fp>> getState() const {
+	    return state;
+	}
+
+    };
 
 }
 

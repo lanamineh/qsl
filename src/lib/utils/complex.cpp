@@ -28,43 +28,43 @@
 
 namespace qsl {
 
-template<std::floating_point Fp>
-std::ostream & operator<< (std::ostream & stream, complex<Fp> val)
-{
-    stream << "(" << val.real << ", " << val.imag << ")";
-    return stream;
-}
+    template<std::floating_point Fp>
+    std::ostream & operator<< (std::ostream & stream, complex<Fp> val)
+    {
+	stream << "(" << val.real << ", " << val.imag << ")";
+	return stream;
+    }
 
-template<std::floating_point Fp>
-complex<Fp>::complex(Fp r, Fp i)
-{
-    real = r;
-    imag = i;
-}
+    template<std::floating_point Fp>
+    complex<Fp>::complex(Fp r, Fp i)
+    {
+	real = r;
+	imag = i;
+    }
 
-template<std::floating_point Fp>
-complex<Fp>::complex() : complex(0,0) { }
+    template<std::floating_point Fp>
+    complex<Fp>::complex() : complex(0,0) { }
 
-template<std::floating_point Fp>
-complex<Fp> operator - (const complex<Fp> & a, const complex<Fp> & b)
-{
-    return complex{ a.real - b.real, a.imag - b.imag};
-}
+    template<std::floating_point Fp>
+    complex<Fp> operator - (const complex<Fp> & a, const complex<Fp> & b)
+    {
+	return complex{ a.real - b.real, a.imag - b.imag};
+    }
 
-template<std::floating_point Fp>
-Fp abs(const complex<Fp> & a)
-{
-    return std::sqrt(a.real*a.real + a.imag*a.imag);
-}
+    template<std::floating_point Fp>
+    Fp abs(const complex<Fp> & a)
+    {
+	return std::sqrt(a.real*a.real + a.imag*a.imag);
+    }
 
-/// Explicit template instantiations
-template struct complex<float>;
-template struct complex<double>;
+    /// Explicit template instantiations
+    template struct complex<float>;
+    template struct complex<double>;
 
-template std::ostream & operator<< (std::ostream & stream, complex<float> val);
-template std::ostream & operator<< (std::ostream & stream, complex<double> val);
+    template std::ostream & operator<< (std::ostream & stream, complex<float> val);
+    template std::ostream & operator<< (std::ostream & stream, complex<double> val);
 
-template float abs(const complex<float> & a);
-template double abs(const complex<double> & a);
+    template float abs(const complex<float> & a);
+    template double abs(const complex<double> & a);
 
 }
