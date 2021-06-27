@@ -71,7 +71,8 @@ Fp norm(const std::vector<complex<Fp>> & v)
  * to something bigger than 1 or smaller than -1
  *
  */
-double acosSafe(double value) {
+double acosSafe(double value)
+{
     if (value <= -1.0) {
         return M_PI;
     } else if (value >= 1.0) {
@@ -105,6 +106,31 @@ Fp normalise(std::vector<complex<Fp>> &state)
     return factor;
 }
 
+template<typename Fp>
+unsigned checkStateSize(const std::vector<complex<Fp>> & state) {
+
+    // Counts the number of ones in the binary representation of dim
+    // If this number is not 1, then dim is not a power of 2 and
+    // is therefore invalid
+    unsigned one_count = 0;
+    // Counts the length of the binary representation of dim
+    unsigned len = 0;
+    
+    std::size_t n = state.size();
+    while(n > 0) {
+	len += 1;
+	one_count += n & 1;
+	n >>= 1;
+    }
+    
+    if(one_count != 1) {
+	throw std::logic_error("State vector size is not a power of two");
+    }
+
+    return len - 1;
+
+}
+
 /// Explicit instantiations
 template float fubiniStudy(const std::vector<complex<float>> & v,
 			   const std::vector<complex<float>> & w);
@@ -113,5 +139,8 @@ template double fubiniStudy(const std::vector<complex<double>> & v,
 
 template float normalise(std::vector<complex<float>> &state);
 template double normalise(std::vector<complex<double>> &state);
+
+template unsigned checkStateSize(const std::vector<complex<float>> & state);
+template unsigned checkStateSize(const std::vector<complex<double>> & state);
 
 }

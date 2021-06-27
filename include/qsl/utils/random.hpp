@@ -25,7 +25,6 @@
 #ifndef RANDOM_HPP
 #define RANDOM_HPP
 
-#define _USE_MATH_DEFINES // For MSVC, to use M_PI
 
 #include <random>
 #include "complex.hpp"

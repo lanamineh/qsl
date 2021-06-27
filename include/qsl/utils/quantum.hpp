@@ -69,35 +69,28 @@ complex<Fp> innerProduct(const std::vector<complex<Fp>> & v,
  * which is derived from the inner product on the complex vector space.
  *
  */
-//template<typename Fp = double>
-//double norm(const std::vector<complex<Fp>> & v);
+template<typename Fp = double>
+Fp norm(const std::vector<complex<Fp>> & v);
 
 /**
- * \brief Compute the norm of a real or complex vector
- * 
- * In both cases, the norm is given by the sum of the
- * squares of the absolute values of the numbers in the
- * vector. For a real vector space, this is called the
- * Euclidean distance between the vectors.
+ * \brief Compute the norm of a real vector 
  *
- * This function is not meant to be fast. 
+ * The norm of a vector v is given by the following expression 
  *
+ * \f[
+ * \lVert v\rVert = \sqrt{\langle v|v \rangle} 
+ *  = \sqrt{\sum_{n=0}^N \left|v_i\right|^2}.
+ * \f]
  */
-template<typename T>
-double norm(const std::vector<T> & v)
+template<std::floating_point Fp>
+Fp norm(const std::vector<Fp> & v)
 {
-    // The abs below will either come from
-    // std::abs or the complex overload abs
-    using namespace std;
-
     double norm = 0;
     for(std::size_t n=0; n<v.size(); n++) {
-	// Either std::abs(double) or abs(complex)
-	norm += abs(v[n]) * abs(v[n]);
+	norm += v[n] * v[n];
     }
 
-    return norm;
-    
+    return std::sqrt(norm);
 }
 
 
@@ -141,6 +134,17 @@ Fp fubiniStudy(const std::vector<complex<Fp>> & v,
 template<typename Fp = double>
 Fp normalise(std::vector<complex<Fp>> &state);
 
+/**
+ * \brief Check whether the state vector is a valid size
+ *
+ * If it is, return the number of qubits associated to the state
+ * vector. If not, throw an exception.
+ *
+ */
+template<typename Fp = double>
+unsigned checkStateSize(const std::vector<complex<Fp>> & state);
+
+    
 }
     
 #endif

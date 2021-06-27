@@ -107,38 +107,8 @@ void printRow(double time1, double time2)
 
 void printBin(const std::string & name, unsigned int x) {
     std::cout << name << " = ";
-    std::cout << "0b" << std::bitset<5>(x) << std::endl;
+    std::cout << "0b" << std::bitset<10>(x) << std::endl;
 }
-
-template<typename Fp>
-unsigned checkStateSize(const std::vector<complex<Fp>> & state) {
-
-    // Counts the number of ones in the binary representation of dim
-    // If this number is not 1, then dim is not a power of 2 and
-    // is therefore invalid
-    unsigned one_count = 0;
-    // Counts the length of the binary representation of dim
-    unsigned len = 0;
-    
-    std::size_t n = state.size();
-    while(n > 0) {
-	len += 1;
-	one_count += n & 1;
-	n >>= 1;
-    }
-    
-    if(one_count != 1) {
-	throw std::logic_error("State vector size is not a power of two");
-    }
-
-    return len - 1;
-
-}
-
-
-// Explicit instantiations
-template unsigned checkStateSize(const std::vector<complex<float>> & state);
-template unsigned checkStateSize(const std::vector<complex<double>> & state);
 
 
 unsigned hammingWeight(std::size_t n)

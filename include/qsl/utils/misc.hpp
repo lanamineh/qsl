@@ -112,16 +112,6 @@ double distance(const std::vector<T> & v1, const std::vector<T> & v2)
     return norm(v1 - v2);
 }
 
-/**
- * \brief Check whether the state vector is a valid size
- *
- * If it is, return the number of qubits associated to the state
- * vector. If not, throw an exception.
- *
- */
-template<typename Fp = double>
-unsigned checkStateSize(const std::vector<complex<Fp>> & state);
-
 
 /**
  * \brief Convert a state vector from one floating point type to another

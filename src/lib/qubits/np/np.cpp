@@ -26,6 +26,7 @@
 
 #include "qsl/qubits.hpp"
 #include "qsl/utils/misc.hpp"
+#include "qsl/utils/quantum.hpp"
 #include <iostream>
 #include <cmath>
 #include <string>
