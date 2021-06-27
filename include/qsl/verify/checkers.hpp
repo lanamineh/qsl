@@ -30,6 +30,7 @@
 #include <cstddef>
 #include <cmath>
 #include <functional>
+#include <map>
 
 namespace qsl {
 
