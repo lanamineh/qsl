@@ -57,18 +57,6 @@ namespace qsl {
     void printRow(double time1, double time2);
 
     /**
-     * \brief Print a std::vector of arbitrary type
-     */
-    template<typename T>
-    std::ostream& operator<< (std::ostream &stream, const std::vector<T> &vec)
-    {
-	for (unsigned int i = 0; i < vec.size(); i++) {
-	    stream << vec[i] << std::endl;
-	}
-	return stream;
-    }
-
-    /**
      * \brief Print a number in binary with a label
      *
      * \todo The length of the bitstring is hardcoded, fix it
@@ -171,6 +159,19 @@ namespace qsl {
      */
     unsigned choose(unsigned n, unsigned k);
 
+}
+
+
+/**
+ * \brief Print a std::vector of arbitrary type
+ */
+template<typename T>
+std::ostream& operator<< (std::ostream &stream, const std::vector<T> &vec)
+{
+    for (unsigned int i = 0; i < vec.size(); i++) {
+	stream << vec[i] << std::endl;
+    }
+    return stream;
 }
 
 #endif

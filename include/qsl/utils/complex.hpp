@@ -53,12 +53,6 @@ namespace qsl {
     complex(Fp, Fp) -> complex<Fp>;
 
     /**
-     * \brief Print a complex number to an output stream
-     */
-    template<std::floating_point Fp = double>
-    std::ostream & operator<< (std::ostream & stream, complex<Fp> val);
-
-    /**
      * \brief Compute the absolute value of a complex number
      *
      * It is important this has the same name as std::abs so
@@ -81,4 +75,12 @@ namespace qsl {
     complex<Fp> operator - (const complex<Fp> & a, const complex<Fp> & b);
 
 }
+
+/**
+ * \brief Print a complex number to an output stream
+ */
+template<std::floating_point Fp = double>
+std::ostream & operator<< (std::ostream & stream, qsl::complex<Fp> val);
+
+
 #endif

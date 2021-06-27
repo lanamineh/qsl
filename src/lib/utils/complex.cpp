@@ -29,13 +29,6 @@
 namespace qsl {
 
     template<std::floating_point Fp>
-    std::ostream & operator<< (std::ostream & stream, complex<Fp> val)
-    {
-	stream << "(" << val.real << ", " << val.imag << ")";
-	return stream;
-    }
-
-    template<std::floating_point Fp>
     complex<Fp>::complex(Fp r, Fp i)
     {
 	real = r;
@@ -61,10 +54,20 @@ namespace qsl {
     template struct complex<float>;
     template struct complex<double>;
 
-    template std::ostream & operator<< (std::ostream & stream, complex<float> val);
-    template std::ostream & operator<< (std::ostream & stream, complex<double> val);
 
     template float abs(const complex<float> & a);
     template double abs(const complex<double> & a);
 
 }
+
+template<std::floating_point Fp>
+std::ostream & operator<< (std::ostream & stream, qsl::complex<Fp> val)
+{
+    stream << "(" << val.real << ", " << val.imag << ")";
+    return stream;
+}
+
+template std::ostream & operator<< (std::ostream & stream,
+				    qsl::complex<float> val);
+template std::ostream & operator<< (std::ostream & stream,
+				    qsl::complex<double> val);
