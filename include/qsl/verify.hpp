@@ -64,37 +64,16 @@ namespace qsl {
      * The function returns after everything has been checked.
      *
      * It is possible to customise the behaviour of the Verify class by writing
-     * new state generators and checkers. They must obey they following 
-     * requirements:
-     *
-     * - StateGen is any class which
-     *   1) contains a default constructor which initialises an internal 
-     *      state
-     *   2) (optionally) has a configureState method (with any parameter list),
-     *      which generators a new internal state
-     *   3) has a getState (const) method which returns the current internal
-     *      state.
-     *
-     * - Checkers... is any list of classes, each of which
-     *   1) is templated on template<typename Sim1, typename Sim2>
-     *   2) contains a default constructor
-     *   3) contains a bind(std::unique_ptr<Sim1>&, std::unique_ptr<Sim2>&)
-     *      function to attach two simulators to the checker. The simulators
-     *      are assumed to be initialised in equal states according to the
-     *      StateGen class
-     *   4) contains a checkAll() member function, which performs checks on
-     *      the simulators.
-     *   5) (optionally) contains a configureChecker method (any parameter list)
+     * new state generators and checkers. 
      *
      */
-    template<qsl::Simulator Sim1, qsl::Simulator Sim2,
-	     typename StateGen,
+    template<qsl::Simulator Sim1, qsl::Simulator Sim2, qsl::StateGenerator Gen,
 	     template<typename,typename> class... Checkers>
     // Constrain the Checkers type using the SimChecker concept
-    requires (SimChecker<Checkers<Sim1,Sim2>,Sim1,Sim2>>...)
+    requires (qsl::SimChecker<Checkers<Sim1,Sim2>,Sim1,Sim2>>...)
     class Verify
     {
-	StateGen init;
+	Gen init;
 	std::tuple<Checkers<Sim1, Sim2>...> checkers;
 
 	/**

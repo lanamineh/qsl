@@ -62,7 +62,6 @@ namespace qsl {
     	// Required member functions
     	t.bind(p1,p2);
     };
-
     
     /**
      * \brief Function to calculate 2-sided z-value
@@ -190,7 +189,7 @@ namespace qsl {
      * that the results from the two simulators are equal.
      *
      */
-    template<typename Sim1, typename Sim2>
+    template<qsl::Simulator Sim1, qsl::Simulator Sim2>
     class ProbChecker
     {
 	std::unique_ptr<Sim1> sim1;
@@ -235,7 +234,7 @@ namespace qsl {
     };
 
     /// Check the sample function
-    template<typename Sim1, typename Sim2>
+    template<qsl::Simulator Sim1, qsl::Simulator Sim2>
     class SampleChecker
     {
 	std::size_t nsamples;
@@ -348,7 +347,7 @@ namespace qsl {
      * relative frequency of each outcome.
      *
      */
-    template<typename Sim1, typename Sim2>
+    template<qsl::Simulator Sim1, qsl::Simulator Sim2>
     class SampleAllChecker
     {
 	std::size_t nsamples;
@@ -494,7 +493,7 @@ namespace qsl {
      *
      * \todo Find a way to control the phases, etc.
      */
-    template<typename Sim1, typename Sim2>
+    template<qsl::Simulator Sim1, qsl::Simulator Sim2>
     class GateChecker
     {
 	std::unique_ptr<Sim1> sim1;
@@ -683,7 +682,7 @@ namespace qsl {
      * checks depending on what is required.
      *
      */
-    template<typename Sim1, typename Sim2>
+    template<qsl::Simulator Sim1, qsl::Simulator Sim2>
     class PostselectChecker
     {
 	std::unique_ptr<Sim1> sim1;

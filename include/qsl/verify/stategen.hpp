@@ -28,6 +28,32 @@
 namespace qsl {
 
     /**
+     * \brief State generator object object concept
+     *
+     * All state generators should conform to this specification.
+     * A state generator must
+     *
+     *   1) contain a default constructor which initialises an internal 
+     *      state
+     *   2) have a getState (const) method which returns the current internal
+     *      state.
+     * 
+     * The state generator can optionally have a configureState method 
+     * (with any parameter list),  which generators a new internal state
+     *
+     * \todo Need to add something about the floating point type it 
+     * returns, so as to make it compatible with the simulators
+     */
+    template<typename T>
+    concept StateGenerator = std::is_default_constructible<T>::value
+    	&& requires(T t)
+    {
+    	// Required member functions
+    	t.getState();
+    };
+
+    
+    /**
      * \brief State generator for number preserved states
      *
      * This class is intended to be used as the InitState parameter in the
