@@ -90,6 +90,8 @@ namespace qsl {
     template<qsl::Simulator Sim1, qsl::Simulator Sim2,
 	     typename StateGen,
 	     template<typename,typename> class... Checkers>
+    // Constrain the Checkers type using the SimChecker concept
+    requires (SimChecker<Checkers<Sim1,Sim2>,Sim1,Sim2>>...)
     class Verify
     {
 	StateGen init;
