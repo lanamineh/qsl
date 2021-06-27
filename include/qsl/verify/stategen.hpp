@@ -36,7 +36,7 @@ namespace qsl {
  * to the checking algorithms (to initialise the simulators).
  *
  */
-template<typename Fp>
+template<std::floating_point Fp>
 class NPStateGen
 {
     std::vector<complex<Fp>> state;
@@ -77,7 +77,7 @@ public:
 
 };
 
-template<typename Fp>
+template<std::floating_point Fp>
 class DefaultStateGen
 {
     std::vector<complex<Fp>> state;

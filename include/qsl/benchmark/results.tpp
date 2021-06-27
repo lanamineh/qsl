@@ -29,12 +29,12 @@
 
 namespace qsl {
 
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 Results<T,R>::Results(const std::vector<std::string> & headings)
     : head{headings}
 { }
 
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 template<typename S>
 std::vector<S> Results<T,R>::column(std::size_t index) const
 {
@@ -64,13 +64,13 @@ std::vector<S> Results<T,R>::column(std::size_t index) const
     return column;
 }
 
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 void Results<T, R>::addMeta(const std::string & line)
 {
     meta.push_back(line);
 }
 
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 void Results<T, R>::addRow(const std::vector<T> & intcols_in,
 			   const std::vector<R> & fpcols_in)
 {
@@ -104,20 +104,20 @@ void Results<T, R>::addRow(const std::vector<T> & intcols_in,
 }
 
 
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 std::vector<std::string> Results<T,R>::headings() const
 {
     return head;
 }
 
 
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 std::vector<std::string> Results<T, R>::getMeta() const
 {
     return meta;
 }
 
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 template<typename S>
 S Results<T, R>::mean(std::size_t index) const
 {
@@ -148,7 +148,7 @@ S Results<T, R>::mean(std::size_t index) const
     return average;
 }
 
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 template<typename S>
 S Results<T,R>::variance(std::size_t index) const
 {
@@ -182,7 +182,7 @@ S Results<T,R>::variance(std::size_t index) const
     return variance;
 }
 
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 Results<T,R> Results<T,R>::subset(const std::vector<std::size_t> & indices) const
 {
     // Make the new list of headings
@@ -236,7 +236,7 @@ Results<T,R> Results<T,R>::subset(const std::vector<std::size_t> & indices) cons
 }
 
 
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 void Results<T, R>::print() const
 {
     std::cout << std::endl;
@@ -280,7 +280,7 @@ void Results<T, R>::print() const
 
 }
 
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 void Results<T, R>::writeToFile(const std::string & filename) const
 {
     std::ofstream file;

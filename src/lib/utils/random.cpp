@@ -30,7 +30,7 @@
 
 namespace qsl {
  
-    template<typename Fp>
+    template<std::floating_point Fp>
     Random<Fp>::Random(Fp a, Fp b)
     {
 	///\todo Is std::random_device OK?
@@ -40,13 +40,13 @@ namespace qsl {
 	distribution = std::uniform_real_distribution<Fp>(a,b);
     }
 
-    template<typename Fp>
+    template<std::floating_point Fp>
     Fp Random<Fp>::getNum() {
 	return distribution(generator);
     }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 std::vector<complex<Fp>> makeRandomState(std::uint8_t nqubits)
 {
     std::size_t dim = 1 << nqubits;
@@ -69,7 +69,7 @@ std::vector<complex<Fp>> makeRandomState(std::uint8_t nqubits)
 }
 
 ///\todo This needs testing
-template<typename Fp>
+template<std::floating_point Fp>
 std::vector<complex<Fp>> makeRandomNPState(std::uint8_t nqubits)
 {
     std::size_t dim = 1 << nqubits;
@@ -103,7 +103,7 @@ std::vector<complex<Fp>> makeRandomNPState(std::uint8_t nqubits)
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 std::vector<Fp> makeRandomPhases(int test_len)
 {
     std::vector<Fp> phase_list;

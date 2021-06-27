@@ -37,7 +37,7 @@ namespace qsl {
  * This class is deliberately minimal to avoid performance problems.
  *
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 struct complex
 {
     Fp real;
@@ -49,13 +49,13 @@ struct complex
 };
 
 // Deduction guide for complex constructor
-template<typename Fp>
+template<std::floating_point Fp>
 complex(Fp, Fp) -> complex<Fp>;
 
 /**
  * \brief Print a complex number to an output stream
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 std::ostream & operator<< (std::ostream & stream, complex<Fp> val);
 
 /**
@@ -68,7 +68,7 @@ std::ostream & operator<< (std::ostream & stream, complex<Fp> val);
  * \todo Maybe it would be good to add an absSquared?
  * 
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 Fp abs(const complex<Fp> & a);
 
 /**
@@ -77,7 +77,7 @@ Fp abs(const complex<Fp> & a);
  * This function is not meant to be fast
  *
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 complex<Fp> operator - (const complex<Fp> & a, const complex<Fp> & b);
 
 }

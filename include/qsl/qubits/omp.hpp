@@ -59,7 +59,7 @@ namespace qsl {
  * in the constructor.
  *
  */
-template<typename Fp>
+template<std::floating_point Fp>
 class Qubits<Type::Omp, Fp>
 {
     const unsigned nqubits;

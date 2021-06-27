@@ -35,7 +35,7 @@ std::mutex mtx;           // mutex for critical section
 
 /* One-qubit gates ***************************************************/
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Omp, Fp>::pauliX(unsigned targ)
 {
 #pragma omp parallel num_threads(nthreads)
@@ -68,7 +68,7 @@ void Qubits<Type::Omp, Fp>::pauliX(unsigned targ)
     }
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Omp, Fp>::phase(unsigned targ, Fp angle)
 {
 #pragma omp parallel num_threads(nthreads)
@@ -92,7 +92,7 @@ void Qubits<Type::Omp, Fp>::phase(unsigned targ, Fp angle)
     }
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Omp, Fp>::rotateX(unsigned targ, Fp angle)
 {
 #pragma omp parallel num_threads(nthreads)
@@ -131,7 +131,7 @@ void Qubits<Type::Omp, Fp>::rotateX(unsigned targ, Fp angle)
 
 /* Two-qubit gates ***************************************************/
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Omp, Fp>::controlNot(unsigned ctrl, unsigned targ)
 {
 #pragma omp parallel num_threads(nthreads)
@@ -162,7 +162,7 @@ void Qubits<Type::Omp, Fp>::controlNot(unsigned ctrl, unsigned targ)
     }    
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Omp, Fp>::controlPhase(unsigned ctrl,
 						     unsigned targ,
 						     Fp angle)

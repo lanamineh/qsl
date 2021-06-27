@@ -40,7 +40,7 @@ template<>
 const std::string Qubits<Type::Omp, float>::name =
     std::string("Qub<omp,float>");
 
-template<typename Fp>
+template<std::floating_point Fp>
 Qubits<Type::Omp, Fp>::Qubits(unsigned nqubits_in, unsigned nthreads_in) 
     : nqubits{ nqubits_in }, dim{ std::size_t(1) << nqubits },
       nthreads{ nthreads_in }, state(dim), random(0,1)
@@ -49,7 +49,7 @@ Qubits<Type::Omp, Fp>::Qubits(unsigned nqubits_in, unsigned nthreads_in)
     reset();
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 Qubits<Type::Omp, Fp>::Qubits(const std::vector<complex<Fp>> & state,
 				  unsigned nthreads_in)
     : nqubits{ checkStateSize(state) }, dim{ state.size() },
@@ -59,7 +59,7 @@ Qubits<Type::Omp, Fp>::Qubits(const std::vector<complex<Fp>> & state,
     //std::cout << "dim = " << dim << std::endl;
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Omp, Fp>::reset()
 {
     for (std::size_t n = 0; n < dim; n++) {
@@ -69,7 +69,7 @@ void Qubits<Type::Omp, Fp>::reset()
     state[0].real = 1;
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Omp, Fp>::setState(const std::vector<complex<Fp>> & state_in)
 {
     if (state_in.size() != dim) {
@@ -82,7 +82,7 @@ void Qubits<Type::Omp, Fp>::setState(const std::vector<complex<Fp>> & state_in)
     state = state_in;
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Omp, Fp>::setBasisState(std::size_t index)
 {
     // Clear the state - set all amplitudes to zero
@@ -96,7 +96,7 @@ void Qubits<Type::Omp, Fp>::setBasisState(std::size_t index)
 
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Omp, Fp>::operator = (const Qubits & old) {
 
     // Check if nqubits (and therefore dim) are the same
@@ -112,20 +112,20 @@ void Qubits<Type::Omp, Fp>::operator = (const Qubits & old) {
 }
 
 /// Get the state vector associated to the qubits
-template<typename Fp>
+template<std::floating_point Fp>
 std::vector<complex<Fp>> Qubits<Type::Omp, Fp>::getState() const
 {
     return state;
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 unsigned Qubits<Type::Omp, Fp>::getNumQubits() const
 {
     return nqubits;
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Omp, Fp>::print() const
 {
     std::cout << "Number of qubits = " << nqubits << std::endl;

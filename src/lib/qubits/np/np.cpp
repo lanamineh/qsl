@@ -42,7 +42,7 @@ template<>
 const std::string Qubits<Type::NP, float>::name =
     std::string("Qub<np,float>");
 
-template<typename Fp>
+template<std::floating_point Fp>
 Qubits<Type::NP, Fp>::Qubits(unsigned nqubits_in, unsigned nones_in) 
     : nqubits{ nqubits_in }, dim{ std::size_t(1) << nqubits },
       nones{ nones_in }, state(dim), random(0,1)
@@ -65,7 +65,7 @@ Qubits<Type::NP, Fp>::Qubits(unsigned nqubits_in, unsigned nones_in)
  * This function is probably inefficient - needs improving.
  * Also might make it a member function of the class 
  */
-template<typename Fp>
+template<std::floating_point Fp>
 unsigned checkStateNP(const std::vector<complex<Fp>> & state)
 {
     unsigned nones = 0;
@@ -92,7 +92,7 @@ unsigned checkStateNP(const std::vector<complex<Fp>> & state)
 
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 Qubits<Type::NP, Fp>::Qubits(const std::vector<complex<Fp>> & state)
     : nqubits{ checkStateSize(state) }, dim{ state.size() },
       nones{ checkStateNP(state) }, state{ state }, random(0,1)
@@ -107,7 +107,7 @@ Qubits<Type::NP, Fp>::Qubits(const std::vector<complex<Fp>> & state)
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::NP, Fp>::reset()
 {
     for (std::size_t n = 0; n < dim; n++) {
@@ -120,7 +120,7 @@ void Qubits<Type::NP, Fp>::reset()
     state[idx].real = 1;
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::NP, Fp>::setState(const std::vector<complex<Fp>> & state_in)
 {   
     if (state_in.size() != dim) {
@@ -140,7 +140,7 @@ void Qubits<Type::NP, Fp>::setState(const std::vector<complex<Fp>> & state_in)
     state = state_in;
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::NP, Fp>::setBasisState(std::size_t index)
 {
     unsigned nones_old = nones;
@@ -160,7 +160,7 @@ void Qubits<Type::NP, Fp>::setBasisState(std::size_t index)
 
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::NP, Fp>::operator = (const Qubits & old)
 {
     // Check if nqubits (and therefore dim) are the same
@@ -175,27 +175,27 @@ void Qubits<Type::NP, Fp>::operator = (const Qubits & old)
 }
 
 /// Get the state vector associated to the qubits
-template<typename Fp>
+template<std::floating_point Fp>
 std::vector<complex<Fp>> Qubits<Type::NP, Fp>::getState() const
 {
     return state;
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 unsigned Qubits<Type::NP, Fp>::getNumQubits() const
 {
     return nqubits;
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 unsigned Qubits<Type::NP, Fp>::getNumOnes() const
 {
     return nones;
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::NP, Fp>::setNumOnes(unsigned nones_in) 
 {
     if (nones_in < 1 or nones_in >= nqubits) {
@@ -227,7 +227,7 @@ void Qubits<Type::NP, Fp>::setNumOnes(unsigned nones_in)
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::NP, Fp>::initLookup() 
 {
     lookup.clear();
@@ -244,7 +244,7 @@ void Qubits<Type::NP, Fp>::initLookup()
 
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::NP, Fp>::print() const
 {
     std::cout << "Number of qubits = " << nqubits << std::endl;

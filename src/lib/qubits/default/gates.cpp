@@ -32,7 +32,7 @@ namespace qsl {
 
 /* One-qubit gates ***************************************************/
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Default, Fp>::pauliX(unsigned targ)
 {
     std::size_t k = 1 << targ;
@@ -46,7 +46,7 @@ void Qubits<Type::Default, Fp>::pauliX(unsigned targ)
     }
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Default, Fp>::phase(unsigned targ, Fp angle)
 {
     complex<Fp> phase = complex(std::cos(angle), std::sin(angle));
@@ -63,7 +63,7 @@ void Qubits<Type::Default, Fp>::phase(unsigned targ, Fp angle)
     }
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Default, Fp>::rotateX(unsigned targ, Fp angle)
 {
     // Store variables
@@ -96,7 +96,7 @@ void Qubits<Type::Default, Fp>::rotateX(unsigned targ, Fp angle)
 
 /* Two-qubit gates ***************************************************/
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Default, Fp>::controlNot(unsigned ctrl, unsigned targ)
 {
     std::size_t small_bit = 1 << std::min(ctrl, targ);
@@ -123,7 +123,7 @@ void Qubits<Type::Default, Fp>::controlNot(unsigned ctrl, unsigned targ)
     }    
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Default, Fp>::controlPhase(unsigned ctrl,
 					     unsigned targ,
 					     Fp angle)

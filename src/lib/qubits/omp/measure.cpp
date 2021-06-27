@@ -31,7 +31,7 @@
 
 namespace qsl {
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::Omp, Fp>::collapse(unsigned targ, unsigned outcome,
 					 Fp factor)
 {
@@ -60,7 +60,7 @@ void Qubits<Type::Omp, Fp>::collapse(unsigned targ, unsigned outcome,
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 std::vector<typename Qubits<Type::Omp, Fp>::Dist> Qubits<Type::Omp, Fp>::generateDist()
 {
     // Construct cumulative probability vector
@@ -81,7 +81,7 @@ std::vector<typename Qubits<Type::Omp, Fp>::Dist> Qubits<Type::Omp, Fp>::generat
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 int Qubits<Type::Omp, Fp>::measure(unsigned targ)
 {
     // Calculate probabilty of measuring 0 on qubit targ
@@ -110,7 +110,7 @@ int Qubits<Type::Omp, Fp>::measure(unsigned targ)
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 std::size_t Qubits<Type::Omp, Fp>::measureAll()
 {
     // Construct cumulative probability vector
@@ -126,7 +126,7 @@ std::size_t Qubits<Type::Omp, Fp>::measureAll()
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 double Qubits<Type::Omp, Fp>::prob(unsigned targ, unsigned outcome)
     const
 {
@@ -150,7 +150,7 @@ double Qubits<Type::Omp, Fp>::prob(unsigned targ, unsigned outcome)
     return probability;
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 double Qubits<Type::Omp, Fp>::postselect(unsigned targ,
 					     unsigned outcome)
 {
@@ -165,7 +165,7 @@ double Qubits<Type::Omp, Fp>::postselect(unsigned targ,
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 std::size_t Qubits<Type::Omp, Fp>::drawSample(const std::vector<Dist> & dist)
 {
     std::size_t sampled = 0, L = 0, R = dist.size()-2, m = 0;
@@ -192,7 +192,7 @@ std::size_t Qubits<Type::Omp, Fp>::drawSample(const std::vector<Dist> & dist)
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 std::vector<std::size_t> Qubits<Type::Omp, Fp>::sample(unsigned targ,
 							   std::size_t nsamples)
 {
@@ -222,7 +222,7 @@ std::vector<std::size_t> Qubits<Type::Omp, Fp>::sample(unsigned targ,
 
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 std::map<std::size_t, std::size_t> Qubits<Type::Omp, Fp>::sampleAll(std::size_t nsamples)
 {    
     // Construct cumulative probability vector

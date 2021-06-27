@@ -36,7 +36,7 @@
 namespace qsl {
 
 ///\todo Fix this for float
-template<Type T, typename Fp = double>
+template<Type T, std::floating_point Fp = double>
 void verifyPostselect(unsigned nqubits)
 {
     std::cout << "============================================" << std::endl;

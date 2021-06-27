@@ -26,6 +26,8 @@
 #ifndef QUBITS_HPP
 #define QUBITS_HPP
 
+#include <concepts>
+
 namespace qsl {
 /**
  * \defgroup gates Quantum gates
@@ -60,7 +62,7 @@ enum class Type {
  * the simulator precision Fp. 
  * 
  */
-template<Type T = Type::Default, typename Fp = double> class Qubits;
+template<Type T = Type::Default, std::floating_point Fp = double> class Qubits;
 
 }
     

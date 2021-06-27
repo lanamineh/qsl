@@ -57,7 +57,7 @@ namespace qsl {
  * or any inline assembly of any kind.
  *
  */
-template<typename Fp>
+template<std::floating_point Fp>
 class Qubits<Type::Default, Fp>
 {
     const unsigned nqubits;

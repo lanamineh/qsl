@@ -28,30 +28,30 @@
 
 namespace qsl {
 
-template<typename Fp>
+template<std::floating_point Fp>
 std::ostream & operator<< (std::ostream & stream, complex<Fp> val)
 {
     stream << "(" << val.real << ", " << val.imag << ")";
     return stream;
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 complex<Fp>::complex(Fp r, Fp i)
 {
     real = r;
     imag = i;
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 complex<Fp>::complex() : complex(0,0) { }
 
-template<typename Fp>
+template<std::floating_point Fp>
 complex<Fp> operator - (const complex<Fp> & a, const complex<Fp> & b)
 {
     return complex{ a.real - b.real, a.imag - b.imag};
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 Fp abs(const complex<Fp> & a)
 {
     return std::sqrt(a.real*a.real + a.imag*a.imag);

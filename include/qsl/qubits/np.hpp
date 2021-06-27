@@ -57,7 +57,7 @@ namespace qsl {
  * associated to bit strings with a specified number of ones.
  *
  */
-template<typename Fp>
+template<std::floating_point Fp>
 class Qubits<Type::NP, Fp>
 {
     const unsigned nqubits;

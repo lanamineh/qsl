@@ -46,7 +46,7 @@ namespace qsl {
  * writeToFile.
  *
  */
-template<typename T, typename R>
+template<std::integral T, std::floating_point R>
 class Results
 {
     std::vector<std::string> meta; ///< Name of gate, sims being compared, etc.

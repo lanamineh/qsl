@@ -49,7 +49,7 @@ namespace qsl {
  * lightweight use" (C++ std library documentation).
  *
  */
-    template<typename Fp = double>
+    template<std::floating_point Fp = double>
     class Random
     {
 	std::mt19937 generator;
@@ -79,7 +79,7 @@ namespace qsl {
     };
 
 /// Deduction guide for Random class
-//template<typename Fp = double>
+//template<std::floating_point Fp = double>
 //Random(Fp, Fp) -> Random<Fp>;
 
 
@@ -101,7 +101,7 @@ enum class Restrictions
 /**
  * \brief Make a random state vector
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 std::vector<complex<Fp>> makeRandomState(std::uint8_t nqubits);
 
 /**
@@ -111,10 +111,10 @@ std::vector<complex<Fp>> makeRandomState(std::uint8_t nqubits);
  * number of ones between 1 and (nqubits-1) inclusive.
  * 
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 std::vector<complex<Fp>> makeRandomNPState(std::uint8_t nqubits);
 
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 std::vector<complex<Fp>> makeRandomNPState(std::uint8_t nqubits, unsigned nones);
 
 /**
@@ -122,10 +122,10 @@ std::vector<complex<Fp>> makeRandomNPState(std::uint8_t nqubits, unsigned nones)
  *
  *
  */
-template<typename Fp, Restrictions R> class RandomStateGen;
+template<std::floating_point Fp, Restrictions R> class RandomStateGen;
 
 /// No restrictions
-template<typename Fp>
+template<std::floating_point Fp>
 class RandomStateGen<Fp, Restrictions::None>
 {
     const std::vector<complex<Fp>> state;
@@ -137,7 +137,7 @@ public:
 };
 
 /// Number preserved
-template<typename Fp>
+template<std::floating_point Fp>
 class RandomStateGen<Fp, Restrictions::NumberPreserved>
 {
     const std::vector<complex<Fp>> state;
@@ -155,7 +155,7 @@ public:
  * tests
  *
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 std::vector<Fp> makeRandomPhases(int test_len);
 
 }

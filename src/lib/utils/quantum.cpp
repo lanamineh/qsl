@@ -31,7 +31,7 @@
 
 namespace qsl {
 
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 complex<Fp> innerProduct(const std::vector<complex<Fp>> & v,
 			 const std::vector<complex<Fp>> & w)
 {
@@ -51,7 +51,7 @@ complex<Fp> innerProduct(const std::vector<complex<Fp>> & v,
     return result;
 }
 
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 Fp norm(const std::vector<complex<Fp>> & v)
 {
     // Find the norm of the vector
@@ -82,7 +82,7 @@ double acosSafe(double value)
     }
 }
 
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 Fp fubiniStudy(const std::vector<complex<Fp>> & v,
 	       const std::vector<complex<Fp>> & w)
 {
@@ -91,7 +91,7 @@ Fp fubiniStudy(const std::vector<complex<Fp>> & v,
     return acosSafe(numerator/denominator);
 }
 
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 Fp normalise(std::vector<complex<Fp>> &state)
 {
     // Find the norm of the vector
@@ -106,7 +106,7 @@ Fp normalise(std::vector<complex<Fp>> &state)
     return factor;
 }
 
-template<typename Fp>
+template<std::floating_point Fp>
 unsigned checkStateSize(const std::vector<complex<Fp>> & state) {
 
     // Counts the number of ones in the binary representation of dim

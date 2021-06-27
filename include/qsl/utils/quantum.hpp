@@ -52,7 +52,7 @@ namespace qsl {
  * the projective space of physical states. 
  *
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 complex<Fp> innerProduct(const std::vector<complex<Fp>> & v,
 			 const std::vector<complex<Fp>> & w);
 
@@ -69,7 +69,7 @@ complex<Fp> innerProduct(const std::vector<complex<Fp>> & v,
  * which is derived from the inner product on the complex vector space.
  *
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 Fp norm(const std::vector<complex<Fp>> & v);
 
 /**
@@ -124,14 +124,14 @@ Fp norm(const std::vector<Fp> & v)
  * </a>
  *
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 Fp fubiniStudy(const std::vector<complex<Fp>> & v,
 	       const std::vector<complex<Fp>> & w);
 
 /**
  * \brief Normalise the state vector.
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 Fp normalise(std::vector<complex<Fp>> &state);
 
 /**
@@ -141,7 +141,7 @@ Fp normalise(std::vector<complex<Fp>> &state);
  * vector. If not, throw an exception.
  *
  */
-template<typename Fp = double>
+template<std::floating_point Fp = double>
 unsigned checkStateSize(const std::vector<complex<Fp>> & state);
 
     

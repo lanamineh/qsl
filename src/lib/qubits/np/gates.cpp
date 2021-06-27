@@ -33,7 +33,7 @@ namespace qsl {
 
 /* One-qubit gates ***************************************************/
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::NP, Fp>::phase(unsigned targ, Fp angle)
 {
     complex<Fp> phase = complex(std::cos(angle), std::sin(angle));
@@ -62,7 +62,7 @@ void Qubits<Type::NP, Fp>::phase(unsigned targ, Fp angle)
 
 /* Two-qubit gates ***************************************************/
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::NP, Fp>::controlPhase(unsigned ctrl, unsigned targ,
 					Fp angle)
 {
@@ -103,7 +103,7 @@ void Qubits<Type::NP, Fp>::controlPhase(unsigned ctrl, unsigned targ,
 }
 
 
-template<typename Fp>
+template<std::floating_point Fp>
 void Qubits<Type::NP, Fp>::swap(unsigned q1, unsigned q2)
 {
     // Find the bit positions of ctrl and targ

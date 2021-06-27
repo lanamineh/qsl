@@ -36,12 +36,12 @@
 
 namespace qsl {
 
-///\todo Write documentation
-enum class Test
-{
-    SingleSim,
-    MultiSim,
-};
+    ///\todo Write documentation
+    enum class Test
+    {
+	SingleSim,
+	MultiSim,
+    };
 
 ///\todo Get rid of all the Restrictions stuff. A much better
 /// method for adding in number preserving states would be to
@@ -49,8 +49,8 @@ enum class Test
 /// from the outside. This would make it the user's responsibility
 /// to pick the right state vector.
 
-template<Test T, typename Sim1, typename Sim2> class Compare;
-template<Test T, typename Sim, Restrictions Res> class Time;
+    template<Test T, typename Sim1, typename Sim2> class Compare;
+    template<Test T, typename Sim, Restrictions Res> class Time;
 
 /**
  * \brief Run benchmark comparing Qubits gate and Quest gate
@@ -89,9 +89,9 @@ template<Test T, typename Sim, Restrictions Res> class Time;
  * &Qubits<Type::Default>::pauliX
  *
  */
-template<typename F, typename G, typename... ArgsF, typename... ArgsG>
-void benchmark1(Gate<F, ArgsF...> fn, Gate<G, ArgsG...> gn,
-		unsigned nqubits, int test_len);
+    template<typename F, typename G, typename... ArgsF, typename... ArgsG>
+    void benchmark1(Gate<F, ArgsF...> fn, Gate<G, ArgsG...> gn,
+		    unsigned nqubits, int test_len);
 
 /**
  * \brief Run benchmark comparing gates without random state vectors
@@ -125,9 +125,9 @@ void benchmark1(Gate<F, ArgsF...> fn, Gate<G, ArgsG...> gn,
  * &Qubits<Type::Default>::pauliX
  * 
  */
-template<typename F, typename G, typename... ArgsF, typename... ArgsG>
-void benchmark2(Gate<F, ArgsF...> fn, Gate<G, ArgsG...> gn,
-		unsigned nqubits, int test_len);
+    template<typename F, typename G, typename... ArgsF, typename... ArgsG>
+    void benchmark2(Gate<F, ArgsF...> fn, Gate<G, ArgsG...> gn,
+		    unsigned nqubits, int test_len);
 
 
 /**
@@ -135,16 +135,16 @@ void benchmark2(Gate<F, ArgsF...> fn, Gate<G, ArgsG...> gn,
  *
  *
  */
-template<typename F, typename G>
-void benchmark1Measure(unsigned nqubits, int test_len);
+    template<typename F, typename G>
+    void benchmark1Measure(unsigned nqubits, int test_len);
 
 /**
  * \brief Benchmark the measurement function
  *
  *
  */
-template<typename F, typename G>
-void benchmark2Measure(unsigned nqubits, int test_len);
+    template<typename F, typename G>
+    void benchmark2Measure(unsigned nqubits, int test_len);
 
 /**
  * \brief Benchmkark the sampleAll function
@@ -166,11 +166,9 @@ void benchmark2Measure(unsigned nqubits, int test_len);
  * \param test_len The number of times to repeat each sampleAll call
  *
  */
-template<typename F, typename G>
-void benchmark1SampleAll(unsigned nqubits, int nsamples, int test_len = 1);
+    template<typename F, typename G>
+    void benchmark1SampleAll(unsigned nqubits, int nsamples, int test_len = 1);
 
-//#include "benchmark/bench1.tpp"
-//#include "benchmark/bench2.tpp"
 }
     
 #endif
