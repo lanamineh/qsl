@@ -44,7 +44,7 @@ namespace qsl {
      *    state vector;
      * 3) be copy-constructible and copy-assignable;
      * 4) have print, reset, getNumQubits and getState methods;
-     * 5) have a set state method.
+     * 5) have a setState method.
      *
      * 
      */
