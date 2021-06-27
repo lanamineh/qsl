@@ -34,6 +34,37 @@
 namespace qsl {
 
     /**
+     * \brief Simulator checker object concept
+     *
+     * All simulator checkers should conform to this specification.
+     * A simulator checker must
+     *
+     *   1) be templated on typename two qsl::Simulator types, Sim1 and
+     *      Sim2, the ones that are being checked
+     *   2) be default constructible
+     *   3) contain a bind(std::unique_ptr<Sim1>&, std::unique_ptr<Sim2>&)
+     *      function to attach two simulators to the checker. The simulators
+     *      are assumed to be initialised in equal states according to the
+     *      StateGen class
+     *   4) contain a checkAll() member function, which performs checks on
+     *      the simulators.
+     *
+     * The checker can optionally contain a configureChecker method with
+     * any parameter list
+     * 
+     */
+    template<typename T, typename Sim1, typename Sim2>
+    concept SimChecker = std::is_default_constructible<T>::value
+	&& qsl::Simulator<Sim1>
+	&& qsl::Simulator<Sim2> 
+    	&& requires(T t, std::unique_ptr<Sim1> p1, std::unique_ptr<Sim2> p2)
+    {
+    	// Required member functions
+    	t.bind(p1,p2);
+    };
+
+    
+    /**
      * \brief Function to calculate 2-sided z-value
      */
     double getZValue(double ci)

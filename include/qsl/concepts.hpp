@@ -31,6 +31,40 @@
 
 namespace qsl {
 
+    /**
+     * \brief Simulator object concept
+     *
+     * All simulators should conform to this specification.
+     * A simulator object T must:
+     *
+     * 1) have a constructor T(std::size_t) that constructs a 
+     *    default object from a given number of qubits;
+     * 2) have a constructor T(std::vector<qsl::complex<Fp>>)
+     *    which constructs a simulator object from a given
+     *    state vector;
+     * 3) be copy-constructible and copy-assignable;
+     * 4) have print, reset, getNumQubits and getState methods;
+     * 5) have a set state method.
+     *
+     * 
+     */
+    template<typename T>
+    concept Simulator = std::is_floating_point<typename T::Fp_type>::value
+	&& std::is_constructible<std::size_t>::value
+	&& std::is_constructible<std::vector<
+				     qsl::complex<typename T::Fp_type>>>::value
+	&& std::is_copy_constructible<T>::value
+	&& std::is_copy_assignable<T>::value
+    	&& requires(T t, std::vector<qsl::complex<typename T::Fp_type>> state)
+    {
+    	// Required member functions
+    	t.reset();
+    	t.getNumQubits();
+    	t.print();
+    	t.getState();
+	t.setState(state);
+    };
+    
     template<typename Sim>
     concept HasNPGates = requires (Sim sim, unsigned ctrl, unsigned targ,
 				   Sim::Fp_type param) {
@@ -38,7 +72,7 @@ namespace qsl {
 	sim.controlPhase(ctrl,targ,param);
 	// Swap too
     };
-
+    
     template<typename Sim>
     concept HasNonNPGates = requires (Sim sim, unsigned ctrl, unsigned targ,
 				      Sim::Fp_type param) {

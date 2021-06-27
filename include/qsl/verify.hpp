@@ -87,7 +87,8 @@ namespace qsl {
      *   5) (optionally) contains a configureChecker method (any parameter list)
      *
      */
-    template<HasMeasurement Sim1, HasMeasurement Sim2, typename StateGen,
+    template<qsl::Simulator Sim1, qsl::Simulator Sim2,
+	     typename StateGen,
 	     template<typename,typename> class... Checkers>
     class Verify
     {
