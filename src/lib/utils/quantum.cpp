@@ -143,4 +143,8 @@ namespace qsl {
     template unsigned checkStateSize(const std::vector<complex<float>> & state);
     template unsigned checkStateSize(const std::vector<complex<double>> & state);
 
+    template float norm(const std::vector<complex<float>> & v);
+    template double norm(const std::vector<complex<double>> & v);
+
+    
 }
