@@ -60,7 +60,7 @@ namespace qsl {
     template complex<float> operator - (const complex<float> & a,
 					const complex<float> & b);
     template complex<double> operator - (const complex<double> & a,
-					 const complex<double> & b)
+					 const complex<double> & b);
 	
     
 }
