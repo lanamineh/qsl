@@ -54,10 +54,15 @@ namespace qsl {
     template struct complex<float>;
     template struct complex<double>;
 
-
     template float abs(const complex<float> & a);
     template double abs(const complex<double> & a);
 
+    template complex<float> operator - (const complex<float> & a,
+					const complex<float> & b);
+    template complex<double> operator - (const complex<double> & a,
+					 const complex<double> & b)
+	
+    
 }
 
 template<std::floating_point Fp>
