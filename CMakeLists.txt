@@ -39,15 +39,15 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/include/)
 
 # add source directories
-add_subdirectory(src/lib EXCLUDE_FROM_ALL) # The main library directory for all the simulators
-add_subdirectory(src/tests EXCLUDE_FROM_ALL) # Small speed-testing directory 
+add_subdirectory(src EXCLUDE_FROM_ALL) # The main library directory for all the simulators
+add_subdirectory(other/tests EXCLUDE_FROM_ALL) # Small speed-testing directory 
 
 # Example
-add_executable(example src/example.cpp)
+add_executable(example examples/example.cpp)
 target_link_libraries(example PUBLIC qsl)
 
-add_executable(benchmark src/benchmark.cpp)
+add_executable(benchmark examples/benchmark.cpp)
 target_link_libraries(benchmark PUBLIC qsl)
 
-add_executable(verify src/verify.cpp)
+add_executable(verify examples/verify.cpp)
 target_link_libraries(verify PUBLIC qsl)
