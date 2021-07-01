@@ -302,7 +302,7 @@ namespace qsl {
 	 * \param outcome The outcome (0 or 1) we are calculating the probability of.
 	 * \return The probability of the qubit being measured in the given outcome.
 	 */
-	double prob(unsigned targ, unsigned outcome) const;
+	Fp prob(unsigned targ, unsigned outcome) const;
 
 	/**
 	 * \brief Perform a post-selection measurement. The state is collapsed 
@@ -318,7 +318,7 @@ namespace qsl {
 	 * \param outcome The outcome (0 or 1) to post select on.
 	 * \return The probability of measuring qubit targ in the given outcome.
 	 */
-	double postselect(unsigned targ, unsigned outcome);
+	Fp postselect(unsigned targ, unsigned outcome);
 
 	/**
 	 * \brief Sample measurement outcome for one qubit multiple times.
