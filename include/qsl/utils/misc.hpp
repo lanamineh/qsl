@@ -70,8 +70,7 @@ namespace qsl {
      */
     template<typename T>
     std::vector<T> operator - (const std::vector<T> & v, const std::vector<T> & w)
-    {
-    
+    {    
 	if(v.size() != w.size()) {
 	    std::string msg = "Cannot subtract vectors of different sizes: ";
 	    msg += std::to_string(v.size()) + " and " + std::to_string(w.size());
