@@ -1,5 +1,7 @@
 # An optimised quantum computer simulator
 
+[![CMake](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml/badge.svg?branch=master)](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml)
+
 This repository contains a quantum computer simulator which is optimised for a low to medium number of qubits (10-20, no more than about 28). The program will be able to simulate:
 
 - a range of single- and two-qubit gates
