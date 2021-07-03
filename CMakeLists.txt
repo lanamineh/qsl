@@ -1,3 +1,4 @@
+error
 cmake_minimum_required(VERSION 3.12.4) # To get std=c++20
 
 # set the project name
