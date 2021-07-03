@@ -51,14 +51,15 @@ TEST_CASE( "Test Fubini Study distance", "[quantum-utils]" )
     REQUIRE( std::abs(distance_a_b - scaled_distance_a_b) < 1e-13);
     
 }
-
-TEST_CASE( "Qubits object copy constructor", "[constructors]" ) {
+TEST_CASE( "Qubits object constructors", "[constructors]" ) {
 
     const unsigned num_qubits{ 5 };
     qsl::Qubits<qsl::Type::Default, double> q{ num_qubits };
 
     // Set q to a random state
-    q.setState(qsl::makeRandomState<double>(num_qubits));
+    const std::vector<qsl::complex<double>> state
+	= qsl::makeRandomState<double>(num_qubits);
+    q.setState(state);
 
     // Construct another object using the copy constructor
     qsl::Qubits<qsl::Type::Default, double> q_copy{ q };    
@@ -70,4 +71,11 @@ TEST_CASE( "Qubits object copy constructor", "[constructors]" ) {
     double distance = qsl::distance(q.getState(), q_copy.getState());
     REQUIRE(std::abs(distance) < 1e-10);
 
+    // Construct another object using initialisation from state vector
+    qsl::Qubits<qsl::Type::Default, double> q_from_state{ state };    
+
+    // Check that both objects have the same internal state
+    distance = qsl::distance(q.getState(), q_from_state.getState());
+    REQUIRE(std::abs(distance) < 1e-10);
+      
 }
