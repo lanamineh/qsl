@@ -55,7 +55,7 @@ target_link_libraries(verify PUBLIC qsl)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 if(CMAKE_COMPILER_IS_GNUCXX)
   include(CodeCoverage)
-  setup_target_for_coverage_gcovr_html(
+  setup_target_for_coverage_lcov(
     NAME coverage
     EXECUTABLE basic-tests
     BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
