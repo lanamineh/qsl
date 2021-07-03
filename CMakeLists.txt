@@ -70,7 +70,6 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
     EXCLUDE "dir2/*")
 
-
 endif()
  
 add_executable(basic-tests src/tests/basic-tests.cpp)
