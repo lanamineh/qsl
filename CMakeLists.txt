@@ -26,7 +26,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   # using GCC
-  set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -pg -O2 -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5")
+  set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -pg -O2 -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5 -fprofile-arcs -ftest-coverage")
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
   # using Intel C++
   set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -pg -O2 -fmax-errors=3 -fopenmp")
@@ -51,3 +51,17 @@ target_link_libraries(benchmark PUBLIC qsl)
 
 add_executable(verify examples/verify.cpp)
 target_link_libraries(verify PUBLIC qsl)
+
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+if(CMAKE_COMPILER_IS_GNUCXX)
+  include(CodeCoverage)
+  setup_target_for_coverage_gcovr_html(
+    NAME coverage
+    EXECUTABLE basic-tests
+    BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
+    EXCLUDE "dir2/*")
+endif()
+ 
+add_executable(basic-tests src/tests/basic-tests.cpp)
+target_include_directories(basic-tests PRIVATE src/)
+target_link_libraries(basic-tests PRIVATE qsl)
