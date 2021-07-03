@@ -61,14 +61,14 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     NAME coverage
     EXECUTABLE basic-tests
     BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-    EXCLUDE "dir2/*")
-
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2")
+    
   include(CodeCoverage)
   setup_target_for_coverage_gcovr_html(
     NAME coverage-html
     EXECUTABLE basic-tests
     BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-    EXCLUDE "dir2/*")
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2")
 
 endif()
  
