@@ -33,6 +33,7 @@ jobs:
     - name: Coverage
       # Build your program with the given configuration
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target coverage
+      run: bash <(curl -s https://codecov.io/bash) -f ${{github.workspace}}/build/coverage.info || echo "Codecov did not collect coverage reports"
       
     - name: Test
       working-directory: ${{github.workspace}}/build
