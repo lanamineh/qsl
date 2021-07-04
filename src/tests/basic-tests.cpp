@@ -6,6 +6,7 @@
 #include <qsl/utils/quantum.hpp>
 #include <qsl/utils/misc.hpp>
 #include <qsl/qubits.hpp>
+#include <qsl/verify.hpp>
 
 TEST_CASE ("Test the innerProduct function", "[quantum-utils]")
 {
@@ -51,10 +52,13 @@ TEST_CASE( "Test Fubini Study distance", "[quantum-utils]" )
     REQUIRE( std::abs(distance_a_b - scaled_distance_a_b) < 1e-13);
     
 }
-TEST_CASE( "Qubits object constructors", "[constructors]" ) {
+
+TEST_CASE( "Qubits<Default> object constructors", "[constructors]" )
+{
+    using Sim = qsl::Qubits<qsl::Type::Default, double>;
 
     const unsigned num_qubits{ 5 };
-    qsl::Qubits<qsl::Type::Default, double> q{ num_qubits };
+    Sim q{ num_qubits };
 
     // Set q to a random state
     const std::vector<qsl::complex<double>> state
@@ -62,7 +66,7 @@ TEST_CASE( "Qubits object constructors", "[constructors]" ) {
     q.setState(state);
 
     // Construct another object using the copy constructor
-    qsl::Qubits<qsl::Type::Default, double> q_copy{ q };    
+    Sim q_copy{ q };    
 
     // Check that the other properties are also the same
     REQUIRE(q.getNumQubits() == q_copy.getNumQubits());
@@ -72,10 +76,104 @@ TEST_CASE( "Qubits object constructors", "[constructors]" ) {
     REQUIRE(std::abs(distance) < 1e-10);
 
     // Construct another object using initialisation from state vector
-    qsl::Qubits<qsl::Type::Default, double> q_from_state{ state };    
+    Sim q_from_state{ state };    
 
     // Check that both objects have the same internal state
     distance = qsl::distance(q.getState(), q_from_state.getState());
     REQUIRE(std::abs(distance) < 1e-10);
       
+}
+
+TEST_CASE( "Qubits<OMP> object constructors", "[constructors]" )
+{
+    using Sim = qsl::Qubits<qsl::Type::Omp, double>;
+
+    const unsigned num_qubits{ 5 };
+    Sim q{ num_qubits };
+
+    // Set q to a random state
+    const std::vector<qsl::complex<double>> state
+	= qsl::makeRandomState<double>(num_qubits);
+    q.setState(state);
+
+    // Construct another object using the copy constructor
+    Sim q_copy{ q };    
+
+    // Check that the other properties are also the same
+    REQUIRE(q.getNumQubits() == q_copy.getNumQubits());
+    
+    // Check that both objects have the same internal state
+    double distance = qsl::distance(q.getState(), q_copy.getState());
+    REQUIRE(std::abs(distance) < 1e-10);
+
+    // Construct another object using initialisation from state vector
+    Sim q_from_state{ state };    
+
+    // Check that both objects have the same internal state
+    distance = qsl::distance(q.getState(), q_from_state.getState());
+    REQUIRE(std::abs(distance) < 1e-10);      
+}
+
+TEST_CASE( "Qubits<NP> object constructors", "[constructors]" )
+{
+    using Sim = qsl::Qubits<qsl::Type::NP, double>;
+
+    const unsigned num_qubits{ 5 };
+    Sim q{ num_qubits };
+
+    // Set q to a random state (number preserving
+    const std::vector<qsl::complex<double>> state
+	= qsl::makeRandomNPState<double>(num_qubits);
+    q.setState(state);
+
+    // Construct another object using the copy constructor
+    Sim q_copy{ q };    
+
+    // Check that the other properties are also the same
+    REQUIRE(q.getNumQubits() == q_copy.getNumQubits());
+    
+    // Check that both objects have the same internal state
+    double distance = qsl::distance(q.getState(), q_copy.getState());
+    REQUIRE(std::abs(distance) < 1e-10);
+
+    // Construct another object using initialisation from state vector
+    Sim q_from_state{ state };    
+
+    // Check that both objects have the same internal state
+    distance = qsl::distance(q.getState(), q_from_state.getState());
+    REQUIRE(std::abs(distance) < 1e-10);      
+}
+
+/// NOT TESTING ANYTHING YET
+TEST_CASE( "Qubits<Default> against Qubits<OMP>", "[compare]" )
+{
+    using Sim1 = qsl::Qubits<qsl::Type::Default, double>;
+    using Sim2 = qsl::Qubits<qsl::Type::Omp, double>;
+
+    qsl::Verify<Sim1, Sim2, qsl::DefaultStateGen<double>,
+		qsl::DefaultGateChecker> verify;
+    verify.configureState(8);
+    //verify.configureChecker<SampleAllChecker>(10000000, 0.99);
+    verify.checkAll();
+
+    ///\todo Need to get the verification to return the results so
+    /// they can be verified
+
+}
+
+/// NOT TESTING ANYTHING YET
+TEST_CASE( "Qubits<Default> against Qubits<NP>", "[compare]" )
+{
+    using Sim1 = qsl::Qubits<qsl::Type::Default, double>;
+    using Sim2 = qsl::Qubits<qsl::Type::NP, double>;
+
+    qsl::Verify<Sim1, Sim2, qsl::NPStateGen<double>,
+		qsl::NPGateChecker> verify;
+    verify.configureState(8, 5);
+    //verify.configureChecker<SampleAllChecker>(10000000, 0.99);
+    verify.checkAll();
+
+    ///\todo Need to get the verification to return the results so
+    /// they can be verified
+
 }
