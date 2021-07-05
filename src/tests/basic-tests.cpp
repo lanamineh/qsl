@@ -53,6 +53,30 @@ TEST_CASE( "Test Fubini Study distance", "[quantum-utils]" )
     
 }
 
+TEST_CASE( "Qubits<Default> basic functions", "[state-functions]" )
+{
+    using Sim = qsl::Qubits<qsl::Type::Default, double>;
+    
+    const unsigned num_qubits{ 3 };
+    Sim q{ num_qubits };
+    
+    // Set q to a random state
+    const std::vector<qsl::complex<double>> state
+	= qsl::makeRandomState<double>(num_qubits + 1);
+
+    // Can't assign state vector with a different number of qubits
+    CHECK_THROWS( q.setState(state) );
+
+    // Check that the basis states work
+    std::size_t index = 4; // Should choose a random value
+    q.setBasisState(index);
+    std::vector<qsl::complex<double>> basis_state = q.getState();
+
+    // Check that the right element is 1
+    REQUIRE(basis_state[index].real == 1);
+    REQUIRE(std::abs(norm(basis_state) - 1) < 1e-15);
+}
+
 TEST_CASE( "Qubits<Default> object constructors", "[constructors]" )
 {
     using Sim = qsl::Qubits<qsl::Type::Default, double>;
@@ -81,7 +105,17 @@ TEST_CASE( "Qubits<Default> object constructors", "[constructors]" )
     // Check that both objects have the same internal state
     distance = qsl::distance(q.getState(), q_from_state.getState());
     REQUIRE(std::abs(distance) < 1e-10);
-      
+
+    // Check that assignment works
+    Sim q_new{ num_qubits };
+    q_new = q; // Perform the test
+    distance = qsl::distance(q.getState(), q_new.getState());
+    REQUIRE(std::abs(distance) < 1e-10);
+
+    // Check that assignment fails for wrong number of qubits
+    Sim q_wrong{ num_qubits + 1};
+    CHECK_THROWS(q_wrong = q); // Perform the test
+
 }
 
 TEST_CASE( "Qubits<OMP> object constructors", "[constructors]" )
@@ -111,7 +145,17 @@ TEST_CASE( "Qubits<OMP> object constructors", "[constructors]" )
 
     // Check that both objects have the same internal state
     distance = qsl::distance(q.getState(), q_from_state.getState());
-    REQUIRE(std::abs(distance) < 1e-10);      
+    REQUIRE(std::abs(distance) < 1e-10);
+
+    // Check that assignment works
+    Sim q_new{ num_qubits };
+    q_new = q; // Perform the test
+    distance = qsl::distance(q.getState(), q_new.getState());
+    REQUIRE(std::abs(distance) < 1e-10);
+
+    // Check that assignment fails for wrong number of qubits
+    Sim q_wrong{ num_qubits + 1};
+    CHECK_THROWS(q_wrong = q); // Perform the test
 }
 
 TEST_CASE( "Qubits<NP> object constructors", "[constructors]" )
@@ -141,7 +185,18 @@ TEST_CASE( "Qubits<NP> object constructors", "[constructors]" )
 
     // Check that both objects have the same internal state
     distance = qsl::distance(q.getState(), q_from_state.getState());
-    REQUIRE(std::abs(distance) < 1e-10);      
+    REQUIRE(std::abs(distance) < 1e-10);
+    
+    // Check that assignment works
+    Sim q_new{ num_qubits };
+    q_new = q; // Perform the test
+    distance = qsl::distance(q.getState(), q_new.getState());
+    REQUIRE(std::abs(distance) < 1e-10);
+
+    // Check that assignment fails for wrong number of qubits
+    Sim q_wrong{ num_qubits + 1};
+    CHECK_THROWS(q_wrong = q); // Perform the test
+
 }
 
 /// NOT TESTING ANYTHING YET
