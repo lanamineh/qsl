@@ -61,15 +61,18 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     NAME coverage
     EXECUTABLE basic-tests
     BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2")
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/examples")
     
   include(CodeCoverage)
   setup_target_for_coverage_gcovr_html(
     NAME coverage-html
     EXECUTABLE basic-tests
     BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2")
-
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/examples")
 endif()
  
 add_executable(basic-tests src/tests/basic-tests.cpp)
