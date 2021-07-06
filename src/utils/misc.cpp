@@ -52,65 +52,6 @@ namespace qsl {
 	x = (t + 1) | (((~t & -~t) - 1) >> (ctz(x) + 1));  
     }
 
-    void printRow(std::string col1, double time1, double time2)
-    {   
-	double diff = time2 - time1;
-
-	// Compute the percentage slower or faster  
-	double percent = 100*time1/time2;
-
-	// Save iostream format flags
-	std::ios_base::fmtflags f( std::cout.flags() );
-    
-	// Print results
-	std::cout << col1 << ", "
-		  << std::fixed << std::setprecision(2)
-		  << 1000*time1 << "ms, " << 1000*time2 << "ms, ";
-	if(diff > 0) {
-	    std::cout << Colour::GREEN;
-	} else {
-	    std::cout << Colour::YELLOW;
-	}
-	std::cout << 1000*diff << std::fixed << "ms (" << percent << "%)"
-		  << Colour::RESET << std::endl;
-
-	// Restore iostream flags
-	std::cout.flags(f);
-    }
-
-    void printRow(double time1, double time2)
-    {   
-	double diff = time2 - time1;
-
-	// Compute the percentage slower or faster  
-	double percent = 100*time1/time2;
-
-	// Save iostream format flags
-	std::ios_base::fmtflags f( std::cout.flags() );
-    
-	// Print results
-	std::cout << std::fixed << std::setprecision(2)
-		  << 1000*time1 << "ms, " << 1000*time2 << "ms, ";
-
-	if(diff > 0) {
-	    std::cout << Colour::GREEN;
-	} else {
-	    std::cout << Colour::YELLOW;
-	}
-	std::cout << 1000*diff << std::fixed << "ms (" << percent << "%)"
-		  << Colour::RESET << std::endl;
-
-	// Restore iostream flags
-	std::cout.flags(f);
-    }
-
-
-    void printBin(const std::string & name, unsigned int x) {
-	std::cout << name << " = ";
-	std::cout << "0b" << std::bitset<10>(x) << std::endl;
-    }
-
-
     unsigned hammingWeight(std::size_t n)
     {
 	unsigned count = 0; 

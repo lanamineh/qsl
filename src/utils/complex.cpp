@@ -64,15 +64,3 @@ namespace qsl {
 	
     
 }
-
-template<std::floating_point Fp>
-std::ostream & operator<< (std::ostream & stream, qsl::complex<Fp> val)
-{
-    stream << "(" << val.real << ", " << val.imag << ")";
-    return stream;
-}
-
-template std::ostream & operator<< (std::ostream & stream,
-				    qsl::complex<float> val);
-template std::ostream & operator<< (std::ostream & stream,
-				    qsl::complex<double> val);

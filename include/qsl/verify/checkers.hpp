@@ -31,6 +31,7 @@
 #include <cmath>
 #include <functional>
 #include <map>
+#include <numeric>
 
 namespace qsl {
 
@@ -234,6 +235,140 @@ namespace qsl {
 	    }
     };
 
+    /**
+     * \brief Check the measure function
+     *
+     * This class checks the measure function. The measure function takes
+     * one argument, which is the qubit to be measured, and return either
+     * zero or one which is the measurement outcome. In addition, the
+     * state is collapsed according to the measurement outcome.
+     * 
+     */
+    template<qsl::Simulator Sim1, qsl::Simulator Sim2>
+    class MeasureChecker
+    {
+	std::size_t nsamples;
+	double ci; // confidence level
+	std::unique_ptr<Sim1> sim1;
+	std::unique_ptr<Sim2> sim2;
+
+    public:
+
+	MeasureChecker() : nsamples(100), ci{0.95} {}
+    
+	/**
+	 * \brief Check that the measure functions are the same
+	 *
+	 *
+	 */
+	void checkAll()
+	    {
+		if (not sim1 or not sim2) {
+		    throw std::logic_error(
+			"Cannot run check before binding simulators");
+		}
+
+		const unsigned nqubits = sim1->getNumQubits();
+
+		// Store copies of the simulators to repeat the test
+		Sim1 sim1_copy{ sim1->getNumQubits() };
+		sim1_copy.setState(sim1->getState());
+		Sim2 sim2_copy{ sim2->getNumQubits() };
+		sim2_copy.setState(sim2->getState());
+		
+		// Repeat the test 
+		
+		for (unsigned n = 0; n < nqubits; n++) {
+
+		    // Vectors to store the repeated measured results
+		    std::vector<int> outcomes1;
+		    std::vector<int> outcomes2;
+		    
+		    // Repeat the test nsamples times
+		    for (std::size_t k = 0; k < nsamples; k++) {
+
+			// Reset the simulators back to the copy
+			sim1->setState(sim1_copy.getState());
+			sim2->setState(sim2_copy.getState());
+			
+			// Call the measure function and store the result
+			outcomes1.push_back(sim1->measure(n));
+			outcomes2.push_back(sim2->measure(n));
+
+			// If the outcomes are the same, check that
+			// the state vectors are also the same
+			if (outcomes1.back() == outcomes2.back()) {
+			    auto state1 = sim1->getState();
+			    auto state2 = sim2->getState();
+			    double distance = fubiniStudy(state1, state2);
+			    //std::cout << "Distance = " << distance << std::endl; 
+			    ///\todo Count up how many times
+			}
+			
+		    }
+
+		    // Find the total number of ones by adding up all the
+		    // outcomes (the zeros contribute nothing). Then
+		    // compute the expected value of 1 (equal to Binomial p).
+		    // 
+		    unsigned sum1 = std::accumulate(std::begin(outcomes1),
+						    std::end(outcomes1),
+						    0);
+		    unsigned sum2 = std::accumulate(std::begin(outcomes2),
+						    std::end(outcomes2),
+						    0);
+		    double p1 = static_cast<double>(sum1)/nsamples;
+		    double p2 = static_cast<double>(sum2)/nsamples;
+		
+		    // Compute (half) the confidence interval width
+		    BinomialCI ci1{p1, ci, nsamples};
+		    BinomialCI ci2{p2, ci, nsamples};
+	       		
+		    // Check if confidence intervals overlap
+		    std::cout << "n = " << n << ": "
+			      << "p1 = " << p1 << ", p2 = " << p2 << ", "; 
+		    if (overlap(ci1, ci2)) {
+			// The ranges overlap
+			std::cout << "error < "
+				  << 100*maxRelativeError(ci1,ci2) << "%"
+				  << " (" << 100*ci*ci << "% level)"
+				  << std::endl; 
+		    } else {
+			// Ranges do not overlap. If p1 is in range 1
+			// with prob ci, and p2 is in range 2 with
+			// prob ci, then p1 != p2 with prob ci^2
+			std::cout << "p1 != p2 "
+				  << " (" << 100*ci*ci << "% level)"
+				  << std::endl;
+		    }
+		}
+		
+	    }
+
+	/// Set up the checker here
+	///\todo Work out the right name for the variable ci (confidence level?)
+	void configureChecker(std::size_t nsamples_in, double ci_in)
+	    {
+		std::cout << "Setting sample number (nsamples) = " << nsamples_in
+			  << std::endl;
+		nsamples = nsamples_in;
+
+		ci = ci_in;
+		std::cout << "Setting confidence limit to = "
+			  << ci*100 << "% (using z = " << getZValue(ci) << ")"
+			  << std::endl;
+	    }
+
+    
+	/// Attach simulator objects to this checker
+	void bind(std::unique_ptr<Sim1> & p1, std::unique_ptr<Sim2> & p2)
+	    {
+		std::swap(sim1, p1);
+		std::swap(sim2, p2);
+	    }
+    };
+
+    
     /// Check the sample function
     template<qsl::Simulator Sim1, qsl::Simulator Sim2>
     class SampleChecker
