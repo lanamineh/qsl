@@ -49,6 +49,11 @@ The following single qubit quantum gates are implemented by the simulator
 
   and is accessible using the ``hadamard`` member function. It can be written in terms of X- and Y-rotations as follows: :math:`H = R_y(\pi/2)\sigma_x`. THe Hadamard gate is mainly used for creating an equal superposition of states.
 
+* **Arbitary unitary**
+
+  The user can specify an arbitrary one-qubit unitary gate with the function
+  ``unitary``. 
+  
 Two-Qubit Gates
 ***************
 
@@ -82,10 +87,61 @@ Most two-qubit operations of interest for near-term devices are controlled opera
   
 * **Controlled-Z**
 
-  This is given by :math:`U=\sigma_z`. The corresponding function name is ``controlZ``.
+  This is given by :math:`U=\sigma_z`. The corresponding function name is
+  ``controlZ``.
+
+* **Controlled-unitary**
+
+  The user can specify an arbitrary controlled gate with a one-qubit unitary
+  with ``controlUnitary``.
 
 
 Number preserving
 -----------------
 
-* **Swap**
+The full Hilbert space :math:`\mathcal{H}` of :math:`n` qubits can be written as
+a direct sum of the Hilbert spaces :math:`\mathcal{H}_i` with a fixed Hamming
+weight :math:`i` for :math:`i=0,...,n`. Number preserving gates preserve
+these Hilbert spaces. For example, the gate :math:`\sigma_Z` is number
+preserving but :math:`\sigma_X` is not.
+
+An arbitrary one-qubit number preserving gate is the ``phase`` gate. An arbitary
+two-qubit number preserving gate preserves the :math:`|00\rangle`,
+:math:`\{|01\rangle, |10\rangle \}` and :math:`|11\rangle` subspaces and takes
+the form
+
+ .. math::
+    \begin{bmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & u_{00} & u_{01} & 0 \\
+    0 & u_{10} & u_{11} & 0 \\
+    0 & 0 & 0 & e^{i\theta}
+    \end{bmatrix}
+  
+where the 2x2 sub-matrix of :math:`u_{ij}` is a unitary matrix :math:`U`. Number
+preserving gates are useful when simulating quantum chemistry on a quantum
+computer and for this reason we also provide a number preserved simulator [link,
+will explain why useful with NP simulator]. 
+
+* **Number preserved X- and Y-rotations**
+
+  These gates use :math:`U = R_x(\theta)` and :math:`U = R_y(\theta)`. The
+  corresponding function names are ``npRotateX`` and ``npRotateY``. In the first
+  case, the gate is equivalent to :math:`e^{-i\theta/2(XX+YY)}` and in the
+  second :math:`e^{-i\theta/2(YX-XY)}`.
+  
+* **Swap and fermionic swap**
+
+  Taking :math:`U=\sigma_x` swaps the state of two qubits, the function name for
+  this is ``swap``. A fermionic swap gate acts as a swap gate but for fermions,
+  this is useful when using fermion-to-qubit mappings when simulating quantum
+  chemistry. It can be accessed with ``fswap`` and is equivalent to a swap gate
+  followed by a controlled-Z gate. 
+
+* **Number preserved Hadamard**
+
+  This is given by :math:`U=H` and can be accessed with ``npHadamard``.
+
+* **Arbitary number preserved gate**
+
+  The user can specify an arbitrary :math:`U` with ``npUnitary``.
