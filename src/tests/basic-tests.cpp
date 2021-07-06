@@ -246,6 +246,8 @@ TEST_CASE( "Qubits<Default> against Qubits<OMP>", "[compare]" )
     using Sim2 = qsl::Qubits<qsl::Type::Omp, double>;
 
     qsl::Verify<Sim1, Sim2, qsl::DefaultStateGen<double>,
+		qsl::MeasureChecker,
+		qsl::PostselectChecker,
 		qsl::SampleChecker,
 		qsl::SampleAllChecker,
 		qsl::ProbChecker,
@@ -265,6 +267,8 @@ TEST_CASE( "Qubits<Default> against Qubits<NP>", "[compare]" )
     using Sim2 = qsl::Qubits<qsl::Type::NP, double>;
 
     qsl::Verify<Sim1, Sim2, qsl::NPStateGen<double>,
+		qsl::MeasureChecker,
+		qsl::PostselectChecker,
 		qsl::SampleChecker,
 		qsl::SampleAllChecker,
 		qsl::ProbChecker,

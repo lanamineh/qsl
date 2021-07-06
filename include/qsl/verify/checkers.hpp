@@ -301,8 +301,9 @@ namespace qsl {
 			    auto state1 = sim1->getState();
 			    auto state2 = sim2->getState();
 			    double distance = fubiniStudy(state1, state2);
-			    //std::cout << "Distance = " << distance << std::endl; 
-			    ///\todo Count up how many times
+			    std::cout << "Distance = " << distance << std::endl; 
+			    ///\todo Count up how many times the distances
+			    /// are zero
 			}
 			
 		    }
