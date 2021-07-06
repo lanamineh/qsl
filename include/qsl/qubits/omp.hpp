@@ -264,6 +264,25 @@ namespace qsl {
 	void controlPhase(unsigned ctrl, unsigned targ, Fp angle);
 
 	/**
+	 * \brief Perform a swap gate on two qubits. 
+	 *
+	 * \ingroup qubits_gates_omp
+
+	 * \f[ 
+	 * CR_\theta = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 0 & 1 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & 0 & 1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param q1 The first qubit to swap.
+	 * \param q2 The second qubit to swap.
+	 */
+	void swap(unsigned q1, unsigned q2);
+	
+	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.
 	 * \ingroup qubits_meas
 	 *

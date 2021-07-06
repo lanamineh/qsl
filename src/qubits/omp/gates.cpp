@@ -198,6 +198,39 @@ void qsl::Qubits<qsl::Type::Omp, Fp>::controlPhase(unsigned ctrl,
     }
 }
 
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::swap(unsigned q1, unsigned q2)
+{
+#pragma omp parallel num_threads(nthreads)
+    {
+
+	std::size_t small_bit = 1 << std::min(q1, q2);
+	std::size_t large_bit = 1 << std::max(q1, q2);
+
+	std::size_t mid_incr = (small_bit << 1);
+	std::size_t high_incr = (large_bit << 1);
+	std::size_t q1_bit = (1 << q1);
+	std::size_t q2_bit = (1 << q2);
+
+#pragma omp for
+	// Increment through the indices above largest bit (ctrl or targ)
+	for (std::size_t i = 0; i < dim; i += high_incr) {
+	    // Increment through the middle set of bits
+	    for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+		// Increment through the low set of bits
+		for (std::size_t k = 0; k < small_bit; k++) {
+		    // Get the |01> and |11> indices
+		    std::size_t index1 = i + j + k + q1_bit;
+		    std::size_t index2 = i + j + k + q2_bit;
+
+		    std::swap(state[index1], state[index2]);
+		}
+	    }
+	}
+    }
+}
+
+
 
 // Explicit instantiations
 template class qsl::Qubits<qsl::Type::Omp, float>;
