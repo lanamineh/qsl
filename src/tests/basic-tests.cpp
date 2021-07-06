@@ -8,6 +8,46 @@
 #include <qsl/qubits.hpp>
 #include <qsl/verify.hpp>
 
+#include <sstream>
+
+TEST_CASE ("Test overloaded vector substraction function", "[misc-utils]")
+{
+    const unsigned num_qubits{ 5 };
+
+    const std::vector<qsl::complex<double>> state1
+	= qsl::makeRandomState<double>(num_qubits);
+
+    const std::vector<qsl::complex<double>> state2
+	= qsl::makeRandomState<double>(num_qubits + 1);
+
+    // Cannot subtract vectors of different sizes
+    CHECK_THROWS(state1 - state2);
+    
+}
+
+TEST_CASE ("Test the convertState function", "[misc-utils]")
+{
+    const unsigned num_qubits{ 5 };
+    
+    // Make a random state of doubles
+    const std::vector<qsl::complex<double>> state_double
+	= qsl::makeRandomState<double>(num_qubits);
+
+    // Convert it to floats
+    const std::vector<qsl::complex<float>> state_float
+	= qsl::convertState<float>(state_double);
+
+    // Check the two states are equal by verifying all 
+    double val = 0;
+    for (std::size_t n = 0; n < state_float.size(); n++) {
+	val += std::abs(state_double[n].real - state_float[n].real);
+	val += std::abs(state_double[n].imag - state_float[n].imag);
+    }
+
+    // What is a reasonable number to put here?
+    REQUIRE(val < 1e-5);
+}
+
 TEST_CASE ("Test the innerProduct function", "[quantum-utils]")
 {
     const std::vector<qsl::complex<double>> a{ {1,1.2}, {1.2,1}, {1,1.5} };
