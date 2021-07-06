@@ -247,6 +247,7 @@ TEST_CASE( "Qubits<Default> against Qubits<OMP>", "[compare]" )
 
     qsl::Verify<Sim1, Sim2, qsl::DefaultStateGen<double>,
 		qsl::SampleChecker,
+		qsl::SampleAllChecker,
 		qsl::ProbChecker,
 		qsl::DefaultGateChecker> verify;
     verify.configureState(8);
@@ -265,6 +266,7 @@ TEST_CASE( "Qubits<Default> against Qubits<NP>", "[compare]" )
 
     qsl::Verify<Sim1, Sim2, qsl::NPStateGen<double>,
 		qsl::SampleChecker,
+		qsl::SampleAllChecker,
 		qsl::ProbChecker,
 		qsl::NPGateChecker> verify;
     verify.configureState(8, 5);

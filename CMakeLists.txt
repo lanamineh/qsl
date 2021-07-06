@@ -65,6 +65,9 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2/*"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark/*"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/examples/*"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/utils/timer.hpp"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/timer.cpp"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/print.cpp"
     EXCLUDE "/usr/*")
     
   include(CodeCoverage)

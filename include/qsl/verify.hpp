@@ -70,7 +70,8 @@ namespace qsl {
     template<qsl::Simulator Sim1, qsl::Simulator Sim2, qsl::StateGenerator Gen,
 	     template<typename,typename> class... Checkers>
     // Constrain the Checkers type using the SimChecker concept
-    requires (qsl::SimChecker<Checkers<Sim1,Sim2>,Sim1,Sim2>>...)
+    ///\todo This causes a bug at the moment in the checkers
+    //requires (qsl::SimChecker<Checkers<Sim1,Sim2>,Sim1,Sim2>>...)
     class Verify
     {
 	Gen init;

@@ -1,6 +1,7 @@
 # Utilities source file list
 set(UTILS_SRC utils/complex.cpp utils/quantum.cpp
-  utils/timer.cpp utils/misc.cpp utils/random.cpp)
+  utils/timer.cpp utils/misc.cpp utils/random.cpp
+  utils/print.cpp)
 
 # Qubits object source file list
 set(QUBITS_SRC qubits/default/default.cpp qubits/default/gates.cpp qubits/default/measure.cpp qubits/omp/omp.cpp qubits/omp/gates.cpp qubits/omp/measure.cpp qubits/np/np.cpp qubits/np/gates.cpp qubits/np/measure.cpp)
