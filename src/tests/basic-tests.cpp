@@ -10,6 +10,14 @@
 
 #include <sstream>
 
+TEST_CASE("Test choose function", "[misc-utils]")
+{
+    REQUIRE(qsl::choose(1,1) == 1);
+    REQUIRE(qsl::choose(4,3) == 4);
+    REQUIRE(qsl::choose(10,3) == 120);
+    REQUIRE(qsl::choose(10,10) == 1);
+}
+
 TEST_CASE ("Test overloaded vector substraction function", "[misc-utils]")
 {
     const unsigned num_qubits{ 5 };

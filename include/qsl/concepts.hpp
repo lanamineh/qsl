@@ -70,7 +70,7 @@ namespace qsl {
 				   Sim::Fp_type param) {
 	sim.phase(targ,param);
 	sim.controlPhase(ctrl,targ,param);
-	// Swap too
+	sim.swap(ctrl,targ); // Actually q1 and q2, but still unsigned
     };
     
     template<typename Sim>
