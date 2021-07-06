@@ -125,6 +125,67 @@ TEST_CASE( "Qubits<Default> basic functions", "[state-functions]" )
     REQUIRE(std::abs(norm(basis_state) - 1) < 1e-15);
 }
 
+TEST_CASE( "Qubits<Omp> basic functions", "[state-functions]" )
+{
+    using Sim = qsl::Qubits<qsl::Type::Omp, double>;
+    
+    const unsigned num_qubits{ 3 };
+    Sim q{ num_qubits };
+    
+    // Set q to a random state
+    const std::vector<qsl::complex<double>> state
+	= qsl::makeRandomState<double>(num_qubits + 1);
+
+    // Can't assign state vector with a different number of qubits
+    CHECK_THROWS( q.setState(state) );
+
+    // Check that the basis states work
+    std::size_t index = 4; // Should choose a random value
+    q.setBasisState(index);
+    std::vector<qsl::complex<double>> basis_state = q.getState();
+
+    // Check that the right element is 1
+    REQUIRE(basis_state[index].real == 1);
+    REQUIRE(std::abs(norm(basis_state) - 1) < 1e-15);
+}
+
+TEST_CASE( "Qubits<NP> basic functions", "[state-functions]" )
+{
+    using Sim = qsl::Qubits<qsl::Type::NP, double>;
+
+    // Try to make an object with more ones than qubits
+    CHECK_THROWS(Sim(4,5));
+    
+    const unsigned num_qubits{ 4 };
+    const unsigned num_ones{ 2 };
+    Sim q{ num_qubits };
+
+    // Can't set number of ones more than number of qubits
+    CHECK_THROWS(q.setNumOnes(num_qubits + 1));
+
+    // Check that the returned number of ones is the same as that set
+    q.setNumOnes(num_ones);
+    REQUIRE(q.getNumOnes() == num_ones);
+    
+    // Set q to a random state
+    const std::vector<qsl::complex<double>> state
+	= qsl::makeRandomNPState<double>(num_qubits + 1);
+
+    // Can't assign state vector with a different number of qubits
+    CHECK_THROWS( q.setState(state) );
+
+    // Check that the basis states work
+    std::size_t index = 4; // Should choose a random value
+    q.setBasisState(index);
+    std::vector<qsl::complex<double>> basis_state = q.getState();
+
+    // Check that the right element is 1
+    REQUIRE(basis_state[index].real == 1);
+    REQUIRE(std::abs(norm(basis_state) - 1) < 1e-15);
+}
+
+
+
 TEST_CASE( "Qubits<Default> object constructors", "[constructors]" )
 {
     using Sim = qsl::Qubits<qsl::Type::Default, double>;

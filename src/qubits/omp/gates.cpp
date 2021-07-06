@@ -199,7 +199,7 @@ void qsl::Qubits<qsl::Type::Omp, Fp>::controlPhase(unsigned ctrl,
 }
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::Default, Fp>::swap(unsigned q1, unsigned q2)
+void qsl::Qubits<qsl::Type::Omp, Fp>::swap(unsigned q1, unsigned q2)
 {
 #pragma omp parallel num_threads(nthreads)
     {

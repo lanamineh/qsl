@@ -809,6 +809,8 @@ namespace qsl {
 	    this->check(&Sim1::phase, &Sim2::phase);
 	    std::cout << "Checking controlPhase" << std::endl;
 	    this->check(&Sim1::controlPhase, &Sim2::controlPhase);
+	    std::cout << "Checking swap" << std::endl;
+	    this->check(&Sim1::swap, &Sim2::swap);
 	}
     };
 
