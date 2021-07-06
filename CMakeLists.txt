@@ -57,22 +57,24 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 
   # Output is used by codecov
   include(CodeCoverage)
+  #set(COVERAGE_EXCLUDES "dir1/*" "dir2/*")
   setup_target_for_coverage_lcov(
     NAME coverage
     EXECUTABLE basic-tests
     BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2/*"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark/*"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/examples/*"
+    EXCLUDE "/usr/*")
     
   include(CodeCoverage)
   setup_target_for_coverage_gcovr_html(
     NAME coverage-html
     EXECUTABLE basic-tests
     BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/examples")
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2/*"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark/*"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/examples/*")
 endif()
  
 add_executable(basic-tests src/tests/basic-tests.cpp)
