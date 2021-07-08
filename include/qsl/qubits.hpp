@@ -50,6 +50,7 @@ namespace qsl {
 	Default, ///< The default simulator object (no inline assembly or threading)
 	Omp, ///< Simulator supporting multithreading based on OpenMP
 	NP, ///< Number preserving simulator
+	Resize, ///< Resizeable simulator
     };
 
     /**
@@ -70,6 +71,7 @@ namespace qsl {
 #include "qubits/default.hpp"
 #include "qubits/omp.hpp"
 #include "qubits/np.hpp"
+#include "qubits/resize.hpp"
 
 namespace qsl {
 

@@ -12,6 +12,10 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# Test install to build directory
+#set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/qsl-install-test)
+set(CMAKE_INSTALL_PREFIX /usr)
+
 find_package(OpenMP REQUIRED)
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -52,6 +56,9 @@ target_link_libraries(benchmark PUBLIC qsl)
 add_executable(verify examples/verify.cpp)
 target_link_libraries(verify PUBLIC qsl)
 
+add_executable(resize examples/resize.cpp)
+target_link_libraries(resize PUBLIC qsl)
+
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 if(CMAKE_COMPILER_IS_GNUCXX)
 
@@ -83,3 +90,6 @@ endif()
 add_executable(basic-tests src/tests/basic-tests.cpp)
 target_include_directories(basic-tests PRIVATE src/)
 target_link_libraries(basic-tests PRIVATE qsl)
+
+install(TARGETS qsl LIBRARY DESTINATION lib)
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/qsl DESTINATION include)

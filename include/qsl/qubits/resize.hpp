@@ -18,17 +18,17 @@
  */
 
 /**
- * \file qubits/default.hpp
- * \brief Contains the default simulator object for manipulating qubits
+ * \file qubits/resize.hpp
+ * \brief Contains the resizeable variant of the Qubits object
  * 
  */
 
-#ifndef QUBITS_DEFAULT_HPP
-#define QUBITS_DEFAULT_HPP
+#ifndef QUBITS_RESIZE_HPP
+#define QUBITS_RESIZE_HPP
 
 /**
  * \defgroup qubits_constructors Constructors
- * \brief Constructors for the default simulator object
+ * \brief Constructors for the resizeable simulator object
  */
 
 /**
@@ -58,10 +58,10 @@ namespace qsl {
      *
      */
     template<std::floating_point Fp>
-    class Qubits<Type::Default, Fp>
+    class Qubits<Type::Resize, Fp>
     {
-	const unsigned nqubits;
-	const std::size_t dim; ///< The length of the state vector
+	unsigned nqubits;
+	std::size_t dim; ///< The length of the state vector
 	std::vector<complex<Fp>> state; ///< State vector for the qubits
 
 	qsl::Random<Fp> random;
@@ -159,7 +159,23 @@ namespace qsl {
 
 	/// Set the state vector to a computational basis state
 	void setBasisState(std::size_t index);
-    
+
+	/**
+	 * \brief Add a qubit to the state vector
+	 *
+	 * This function adds a qubit to the end of the list of qubits.
+	 * The resulting state is a tensor product between the previous
+	 * state vector and the |0) state of the newly added qubit.
+	 *
+	 * The index of the new qubit is one larger than the index of
+	 * the largest qubit in the previous state vector.
+	 *
+	 * Calling getNumQubits() will return the new number of qubits,
+	 * which is one larger than before the function is called.
+	 *
+	 */
+	void addQubit();
+
 	/**
 	 * \brief Rotate around the x-axis of the Bloch sphere \f$ e^{-i\theta X/2} \f$
 	 *
@@ -182,22 +198,6 @@ namespace qsl {
 	void rotateX(unsigned targ, Fp angle);
 
 	/**
-	 * \brief Apply the Pauli X gate to qubit number targ.
-	 *
-	 * \ingroup qubits_gates
-	 *
-	 * \f[ 
-	 * X = \begin{pmatrix}
-	 *     0 & 1 \\
-	 *     1 & 0 \\
-	 *     \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param targ The target qubit.
-	 */
-	void pauliX(unsigned targ);
-
-	/**
 	 * \brief Apply the Hadamard gate to qubit number targ.
 	 *
 	 * \ingroup qubits_gates
@@ -213,6 +213,22 @@ namespace qsl {
 	 */
 	void hadamard(unsigned targ);
 	
+	/**
+	 * \brief Apply the Pauli X gate to qubit number targ.
+	 *
+	 * \ingroup qubits_gates
+	 *
+	 * \f[ 
+	 * X = \begin{pmatrix}
+	 *     0 & 1 \\
+	 *     1 & 0 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 */
+	void pauliX(unsigned targ);
+
 	/**
 	 * \brief Apply a phase shift to qubit number targ.
 	 *
@@ -311,6 +327,27 @@ namespace qsl {
 	 */
 	int measure(unsigned targ);
 
+	/**
+	 * \brief Measure a qubit and remove the qubit from the state vector.
+	 *
+	 * \ingroup qubits_meas
+	 *
+	 * This is not a reversible operation unlike applying quantum gates.
+	 * 
+	 * This member function has the same behaviour as the measure(unsigned)
+	 * function, but the measured qubit is also removed from the state
+	 * vector, and the number of qubits returned by getNumQubits() is reduced
+	 * by one. 
+	 *
+	 * The resulting state vector preserves the order of the other qubits,
+	 * meaning that a qubit at location index > targ will now be addressable
+	 * using index - 1.
+	 * 
+	 * \param targ The qubit to measure and remove.
+	 * \return The value of the measured qubit (0 or 1).
+	 */
+	int measureOut(unsigned targ);
+	
 	/**
 	 * \brief Measure all of the qubits at once and collapse to
 	 * the resulting computational basis state.

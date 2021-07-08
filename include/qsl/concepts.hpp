@@ -76,6 +76,7 @@ namespace qsl {
     template<typename Sim>
     concept HasNonNPGates = requires (Sim sim, unsigned ctrl, unsigned targ,
 				      Sim::Fp_type param) {
+	sim.hadamard(targ);
 	sim.pauliX(targ);
 	sim.rotateX(targ,param);
 	sim.controlNot(ctrl,targ);

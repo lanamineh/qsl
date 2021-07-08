@@ -68,6 +68,31 @@ void qsl::Qubits<qsl::Type::Omp, Fp>::pauliX(unsigned targ)
 }
 
 template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Omp, Fp>::hadamard(unsigned targ)
+{
+#pragma omp parallel num_threads(nthreads)
+    {
+	std::size_t k = 1 << targ;
+#pragma omp for
+	for (std::size_t s = 0; s < dim; s += 2*k) { 
+	    for (std::size_t r = 0; r < k; r++) {
+		// Get the indices that need to be modified
+		const std::size_t index1 = s + r;
+		const std::size_t index2 = s + k + r;
+		const qsl::complex<Fp> temp1 = state[index1];
+		const qsl::complex<Fp> temp2 = state[index2];
+		constexpr Fp sqrt2 = std::sqrt(2); 
+		state[index1].real = (temp1.real + temp2.real)/sqrt2;
+		state[index1].imag = (temp1.imag + temp2.imag)/sqrt2;
+		state[index2].real = (temp1.real - temp2.real)/sqrt2;
+		state[index2].imag = (temp1.imag - temp2.imag)/sqrt2;
+	    }
+	}
+    }
+}
+
+
+template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::Omp, Fp>::phase(unsigned targ, Fp angle)
 {
 #pragma omp parallel num_threads(nthreads)

@@ -191,6 +191,22 @@ namespace qsl {
 	void rotateX(unsigned targ, Fp angle);
 
 	/**
+	 * \brief Apply the Hadamard gate to qubit number targ.
+	 *
+	 * \ingroup qubits_gates
+	 *
+	 * \f[ 
+	 * H = \frac{1}{\sqrt{2}}\begin{pmatrix}
+	 *     1 & 1 \\
+	 *     1 & -1 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 */
+	void hadamard(unsigned targ);
+	
+	/**
 	 * \brief Apply the Pauli X gate to qubit number targ.
 	 * \ingroup qubits_omp_gates
 	 *

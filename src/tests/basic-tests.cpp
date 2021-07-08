@@ -10,6 +10,53 @@
 
 #include <sstream>
 
+TEST_CASE("Check the measureOut function", "[resize]")
+{
+    using Sim = qsl::Qubits<qsl::Type::Resize, double>;    
+
+    // Make a simulator in computational basis state
+    Sim q{ 4 };
+    
+    unsigned outcome = q.measureOut(0); 
+    REQUIRE(outcome == 0);
+    REQUIRE(q.getNumQubits() == 3);
+
+    std::vector<qsl::complex<double>> state = q.getState();
+    REQUIRE(state.size() == (1 << 3));
+    REQUIRE(qsl::norm(state) - 1 < 1e-10); // Check correct norm
+    
+    // Check that measuring out a Bell pair works
+    Sim q1{ 2 };
+    const double sqrt2 = std::sqrt(2);
+    q1.setState({{1/sqrt2,0}, {0,0}, {0,0}, {1/sqrt2,0}}); // Set Bell pair
+    outcome = q1.measureOut(1); // Measure out qubit 1
+    state = q1.getState();
+    REQUIRE(state.size() == 2);
+
+    std::vector<qsl::complex<double>> state_correct;
+    if (outcome == 0) {
+	state_correct.push_back({1,0});
+	state_correct.push_back({0,0});
+    } else {
+	state_correct.push_back({0,0});
+	state_correct.push_back({1,0});
+    } 
+    REQUIRE(distance(state_correct, state) < 1e-10);
+
+    // Check that you can add a qubit
+    q1.addQubit();
+    REQUIRE(q1.getNumQubits() == 2);
+    state = q1.getState();
+    // The correct state has new zeroes at the end
+    state_correct.push_back({0,0});
+    state_correct.push_back({0,0});
+
+    REQUIRE(distance(state_correct, state) < 1e-10);
+    REQUIRE(qsl::norm(state) - 1 < 1e-10); // Check correct norm
+
+    
+}
+
 TEST_CASE("Test choose function", "[misc-utils]")
 {
     REQUIRE(qsl::choose(1,1) == 1);
@@ -148,6 +195,31 @@ TEST_CASE( "Qubits<Omp> basic functions", "[state-functions]" )
     REQUIRE(basis_state[index].real == 1);
     REQUIRE(std::abs(norm(basis_state) - 1) < 1e-15);
 }
+
+TEST_CASE( "Qubits<Resize> basic functions", "[state-functions]" )
+{
+    using Sim = qsl::Qubits<qsl::Type::Resize, double>;
+    
+    const unsigned num_qubits{ 3 };
+    Sim q{ num_qubits };
+    
+    // Set q to a random state
+    const std::vector<qsl::complex<double>> state
+	= qsl::makeRandomState<double>(num_qubits + 1);
+
+    // Can't assign state vector with a different number of qubits
+    CHECK_THROWS( q.setState(state) );
+
+    // Check that the basis states work
+    std::size_t index = 4; // Should choose a random value
+    q.setBasisState(index);
+    std::vector<qsl::complex<double>> basis_state = q.getState();
+
+    // Check that the right element is 1
+    REQUIRE(basis_state[index].real == 1);
+    REQUIRE(std::abs(norm(basis_state) - 1) < 1e-15);
+}
+
 
 TEST_CASE( "Qubits<NP> basic functions", "[state-functions]" )
 {
@@ -342,7 +414,28 @@ TEST_CASE( "Qubits<Default> against Qubits<NP>", "[compare]" )
 		qsl::SampleAllChecker,
 		qsl::ProbChecker,
 		qsl::NPGateChecker> verify;
-    verify.configureState(8, 5);
+    verify.configureState(8, 5); // Pass number of ones as second argument
+    //verify.configureChecker<SampleAllChecker>(10000000, 0.99);
+    verify.checkAll();
+
+    ///\todo Need to get the verification to return the results so
+    /// they can be verified
+}
+
+/// NOT TESTING ANYTHING YET
+TEST_CASE( "Qubits<Default> against Qubits<Resize>", "[compare]" )
+{
+    using Sim1 = qsl::Qubits<qsl::Type::Default, double>;
+    using Sim2 = qsl::Qubits<qsl::Type::Resize, double>;
+
+    qsl::Verify<Sim1, Sim2, qsl::DefaultStateGen<double>,
+		qsl::MeasureChecker,
+		qsl::PostselectChecker,
+		qsl::SampleChecker,
+		qsl::SampleAllChecker,
+		qsl::ProbChecker,
+		qsl::DefaultGateChecker> verify;
+    verify.configureState(8);
     //verify.configureChecker<SampleAllChecker>(10000000, 0.99);
     verify.checkAll();
 

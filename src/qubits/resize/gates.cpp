@@ -20,7 +20,7 @@
 /**
  * \file gates.cpp
  * \brief Contains the implementation of the gates in the 
- *        Default qubits class.
+ *        Resize qubits class.
  */
 
 #include "qsl/qubits.hpp"
@@ -31,7 +31,7 @@
 /* One-qubit gates ***************************************************/
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::Default, Fp>::pauliX(unsigned targ)
+void qsl::Qubits<qsl::Type::Resize, Fp>::pauliX(unsigned targ)
 {
     std::size_t k = 1 << targ;
     for (std::size_t s = 0; s < dim; s += 2*k) { 
@@ -45,7 +45,24 @@ void qsl::Qubits<qsl::Type::Default, Fp>::pauliX(unsigned targ)
 }
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::Default, Fp>::hadamard(unsigned targ)
+void qsl::Qubits<qsl::Type::Resize, Fp>::phase(unsigned targ, Fp angle)
+{
+    qsl::complex<Fp> phase{std::cos(angle), std::sin(angle)};
+    std::size_t k = 1 << targ;
+    for (std::size_t s = 0; s < dim; s += 2*k) { 
+	for (std::size_t r = 0; r < k; r++) {
+	    // Get the index of |1>
+	    std::size_t index = s + k + r;
+	    // state[index] *= phase;
+	    qsl::complex<Fp> temp = state[index];
+	    state[index].real = phase.real * temp.real - phase.imag * temp.imag;
+	    state[index].imag = phase.real * temp.imag + phase.imag * temp.real;
+	}
+    }
+}
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Resize, Fp>::hadamard(unsigned targ)
 {
     std::size_t k = 1 << targ;
     for (std::size_t s = 0; s < dim; s += 2*k) { 
@@ -65,24 +82,7 @@ void qsl::Qubits<qsl::Type::Default, Fp>::hadamard(unsigned targ)
 }
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::Default, Fp>::phase(unsigned targ, Fp angle)
-{
-    qsl::complex<Fp> phase{std::cos(angle), std::sin(angle)};
-    std::size_t k = 1 << targ;
-    for (std::size_t s = 0; s < dim; s += 2*k) { 
-	for (std::size_t r = 0; r < k; r++) {
-	    // Get the index of |1>
-	    std::size_t index = s + k + r;
-	    // state[index] *= phase;
-	    qsl::complex<Fp> temp = state[index];
-	    state[index].real = phase.real * temp.real - phase.imag * temp.imag;
-	    state[index].imag = phase.real * temp.imag + phase.imag * temp.real;
-	}
-    }
-}
-
-template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::Default, Fp>::rotateX(unsigned targ, Fp angle)
+void qsl::Qubits<qsl::Type::Resize, Fp>::rotateX(unsigned targ, Fp angle)
 {
     // Store variables
     Fp cos = std::cos(angle/2);
@@ -115,7 +115,7 @@ void qsl::Qubits<qsl::Type::Default, Fp>::rotateX(unsigned targ, Fp angle)
 /* Two-qubit gates ***************************************************/
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::Default, Fp>::controlNot(unsigned ctrl, unsigned targ)
+void qsl::Qubits<qsl::Type::Resize, Fp>::controlNot(unsigned ctrl, unsigned targ)
 {
     std::size_t small_bit = 1 << std::min(ctrl, targ);
     std::size_t large_bit = 1 << std::max(ctrl, targ);
@@ -142,7 +142,7 @@ void qsl::Qubits<qsl::Type::Default, Fp>::controlNot(unsigned ctrl, unsigned tar
 }
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::Default, Fp>::controlPhase(unsigned ctrl,
+void qsl::Qubits<qsl::Type::Resize, Fp>::controlPhase(unsigned ctrl,
 					     unsigned targ,
 					     Fp angle)
 {
@@ -173,7 +173,7 @@ void qsl::Qubits<qsl::Type::Default, Fp>::controlPhase(unsigned ctrl,
 }
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::Default, Fp>::swap(unsigned q1, unsigned q2)
+void qsl::Qubits<qsl::Type::Resize, Fp>::swap(unsigned q1, unsigned q2)
 {
     std::size_t small_bit = 1 << std::min(q1, q2);
     std::size_t large_bit = 1 << std::max(q1, q2);
@@ -201,5 +201,5 @@ void qsl::Qubits<qsl::Type::Default, Fp>::swap(unsigned q1, unsigned q2)
 
 
 // Explicit instantiations
-template class qsl::Qubits<qsl::Type::Default, float>;
-template class qsl::Qubits<qsl::Type::Default, double>;
+template class qsl::Qubits<qsl::Type::Resize, float>;
+template class qsl::Qubits<qsl::Type::Resize, double>;
