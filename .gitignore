@@ -21,3 +21,5 @@ build/
 docs/doxy
 docs/html
 docs/doctrees
+
+docs/
