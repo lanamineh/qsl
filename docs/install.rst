@@ -5,7 +5,7 @@ Clone the git repository by running
 
 .. code-block:: console
 
-   $ git clone git@githome.gq:lanamineh/qsl.git
+   $ git clone https://github.com/lanamineh/qsl.git
 
 Documentation
 #############
