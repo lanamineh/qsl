@@ -29,7 +29,7 @@ SOURCEDIR     = docs
 BUILDDIR      = docs
 .PHONY: docs
 docs:
-	doxygen docs/Doxyfile
+#	doxygen docs/Doxyfile
 	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 .PHONY: clean
