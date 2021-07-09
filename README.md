@@ -2,7 +2,7 @@
 
 [![CMake](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml/badge.svg?branch=master)](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml) [![Documentation Status](https://readthedocs.org/projects/qsl/badge/?version=latest)](https://qsl.readthedocs.io/en/latest/?badge=latest) [![codecov](https://codecov.io/gh/lanamineh/qsl/branch/master/graph/badge.svg?token=VYUJ0OZIEZ)](https://codecov.io/gh/lanamineh/qsl)
 
-:warning: The project is not stable yet. The documentation and library interface is likely to change in the future. 
+:warning: **The project is not stable yet. The documentation and library interface is likely to change in the future.** 
 
 
 This repository contains a quantum computer simulator which is optimised for a low to medium number of qubits (10-20, no more than about 28). The program will be able to simulate:
