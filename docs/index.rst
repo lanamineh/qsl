@@ -4,7 +4,7 @@ Welcome to QSL's documentation!
 This is the home page for |project|, a C++ based quantum simulator for small quantum computers (no more than around 25 qubits).
 
 .. warning::
-   The project is not stable yet. The documentation and library interface may change in the future. 
+   The project is not stable yet. The documentation and library interface is likely to change in the future. 
    
 .. toctree::
    :maxdepth: 2
