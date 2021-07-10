@@ -33,8 +33,27 @@
 #include <map>
 #include <numeric>
 
+#include <qsl/benchmark/results.hpp>
+
 namespace qsl {
 
+    /// A null buffer for creating a null stream object
+    class NullBuffer : public std::streambuf
+    {
+    public:
+	int overflow(int c) { return c; }
+    };    
+
+    /**
+     * \brief A simple class for replacing std::cout to print nothing
+     */    
+    class NullStream : public std::ostream
+    {
+	qsl::NullBuffer null_buffer;
+    public:
+	NullStream() : std::ostream(&null_buffer) {}
+    };
+    
     /**
      * \brief Simulator checker object concept
      *
@@ -152,15 +171,25 @@ namespace qsl {
 
     public:
 
+	/**
+	 * \brief Class for holding results from the tests
+	 */
+	struct ResultData
+	{
+	    int thing;
+	};
+	
 	/// Do the check
-	void checkAll()
+	ResultData checkAll(std::ostream & os)
 	    {
 		if (not sim1 or not sim2) {
 		    throw std::logic_error(
 			"Cannot run check before binding simulators");
 		}
 
-		std::cout << "Put the check here" << std::endl;
+		os << "Put the check here" << std::endl;
+
+		return ResultData();
 	    }
 
 	/// Set up the checker here
@@ -199,8 +228,16 @@ namespace qsl {
 
     public:
 
+	/**
+	 * \brief Class for holding results from the tests
+	 */
+	struct ResultData
+	{
+	    int thingy;
+	};
+	
 	/// Do the check
-	void checkAll()
+	ResultData checkAll(std::ostream & os)
 	    {
 		if (not sim1 or not sim2) {
 		    throw std::logic_error(
@@ -214,11 +251,15 @@ namespace qsl {
 		    double p2_out0 = sim2->prob(n, 0);
 		    double p2_out1 = sim2->prob(n, 1);
 
-		    std::cout << "n = " << n << ": "
-			      << "prob 0 diff = " << p1_out0 - p2_out0
-			      << ", prob 1 diff = " << p1_out1 - p2_out1
-			      << std::endl;
+		    os << "n = " << n << ": "
+		       << "prob 0 diff = " << p1_out0 - p2_out0
+		       << ", prob 1 diff = " << p1_out1 - p2_out1
+		       << std::endl;
+		    
+		    
 		}
+
+		return ResultData();
 	    }
 
 	/// Set up the checker here
@@ -254,6 +295,14 @@ namespace qsl {
 
     public:
 
+	/**
+	 * \brief Class for holding results from the tests
+	 */
+	struct ResultData
+	{
+	    int thing;
+	};
+	
 	MeasureChecker() : nsamples(100), ci{0.95} {}
     
 	/**
@@ -261,7 +310,7 @@ namespace qsl {
 	 *
 	 *
 	 */
-	void checkAll()
+	ResultData checkAll(std::ostream & os)
 	    {
 		if (not sim1 or not sim2) {
 		    throw std::logic_error(
@@ -301,7 +350,7 @@ namespace qsl {
 			    auto state1 = sim1->getState();
 			    auto state2 = sim2->getState();
 			    double distance = fubiniStudy(state1, state2);
-			    std::cout << "Distance = " << distance << std::endl; 
+			    os << "Distance = " << distance << std::endl; 
 			    ///\todo Count up how many times the distances
 			    /// are zero
 			}
@@ -326,11 +375,11 @@ namespace qsl {
 		    BinomialCI ci2{p2, ci, nsamples};
 	       		
 		    // Check if confidence intervals overlap
-		    std::cout << "n = " << n << ": "
+		    os << "n = " << n << ": "
 			      << "p1 = " << p1 << ", p2 = " << p2 << ", "; 
 		    if (overlap(ci1, ci2)) {
 			// The ranges overlap
-			std::cout << "error < "
+			os << "error < "
 				  << 100*maxRelativeError(ci1,ci2) << "%"
 				  << " (" << 100*ci*ci << "% level)"
 				  << std::endl; 
@@ -338,11 +387,14 @@ namespace qsl {
 			// Ranges do not overlap. If p1 is in range 1
 			// with prob ci, and p2 is in range 2 with
 			// prob ci, then p1 != p2 with prob ci^2
-			std::cout << "p1 != p2 "
+			os << "p1 != p2 "
 				  << " (" << 100*ci*ci << "% level)"
 				  << std::endl;
 		    }
 		}
+
+
+		return ResultData();
 		
 	    }
 
@@ -381,6 +433,14 @@ namespace qsl {
 
     public:
 
+	/**
+	 * \brief Class for holding results from the tests
+	 */
+	struct ResultData
+	{
+	    int thing;
+	};
+	
 	SampleChecker() : nsamples(100), ci{0.95} {}
     
 	/**
@@ -402,7 +462,7 @@ namespace qsl {
 	 * is not what happens at the moment).
 	 *
 	 */
-	void checkAll()
+	ResultData checkAll(std::ostream & os)
 	    {
 		if (not sim1 or not sim2) {
 		    throw std::logic_error(
@@ -425,11 +485,11 @@ namespace qsl {
 		    BinomialCI ci2{p2, ci, nsamples};
 	       		
 		    // Check if confidence intervals overlap
-		    std::cout << "n = " << n << ": "
+		    os << "n = " << n << ": "
 			      << "p1 = " << p1 << ", p2 = " << p2 << ", "; 
 		    if (overlap(ci1, ci2)) {
 			// The ranges overlap
-			std::cout << "error < "
+			os << "error < "
 				  << 100*maxRelativeError(ci1,ci2) << "%"
 				  << " (" << 100*ci*ci << "% level)"
 				  << std::endl; 
@@ -437,12 +497,14 @@ namespace qsl {
 			// Ranges do not overlap. If p1 is in range 1
 			// with prob ci, and p2 is in range 2 with
 			// prob ci, then p1 != p2 with prob ci^2
-			std::cout << "p1 != p2 "
+			os << "p1 != p2 "
 				  << " (" << 100*ci*ci << "% level)"
 				  << std::endl;
 		    }
 
 		}
+
+		return ResultData();
 	    
 	    }
 
@@ -494,6 +556,14 @@ namespace qsl {
 
     public:
 
+	/**
+	 * \brief Class for holding results from the tests
+	 */
+	struct ResultData
+	{
+	    int thing;
+	};
+	
 	SampleAllChecker() : nsamples(100), ci{0.95} {}
     
 	/**
@@ -507,7 +577,7 @@ namespace qsl {
 	 * \todo Need to make the proportion of common outcomes symmetrical with
 	 * respect to sample2.
 	 */
-	void checkAll()
+	ResultData checkAll(std::ostream & os)
 	    {
 		if (not sim1 or not sim2) {
 		    throw std::logic_error(
@@ -559,7 +629,7 @@ namespace qsl {
 			
 
 		    } catch (const std::out_of_range & e) {
-			//std::cout << "Outcome not present in sample2"
+			//os << "Outcome not present in sample2"
 			//	  << std::endl;
 		    }
 		}
@@ -583,11 +653,13 @@ namespace qsl {
 		double common_rate
 		    = static_cast<double>(common_outcomes)/sample2.size();
 		
-		std::cout << "Mean error = "
+		os << "Mean error = "
 			  << 100*mean_relative_error << "%"
 			  << ", overlap = " << 100*overlap_rate << "%"
 			  << ", common = " << 100*common_rate << "%"
 			  << std::endl;
+
+		return ResultData();
 		
 	    }
 
@@ -637,19 +709,24 @@ namespace qsl {
 	std::unique_ptr<Sim2> sim2;
 
     public:
-    
+	
 	/// Implementation for one qubit gates with no arguments
-	void check(OneQubitGate<Sim1> fn, OneQubitGate<Sim2> gn)
+	Results<unsigned,double> check(std::ostream & os,
+				       OneQubitGate<Sim1> fn,
+				       OneQubitGate<Sim2> gn)
 	    {
-		unsigned nqubits = sim1->getNumQubits();
-	    
+		const unsigned nqubits = sim1->getNumQubits();
+		Results<unsigned, double> res{{"qubit", "distance"}};
+		res.addMeta("Distance between state vectors of each sim "
+			    "after applying the gate to the qubit number");
+		
 		// Loop through every pair of sim1
 		for (unsigned n = 0; n < nqubits; n++) {
 
 		    // equate the states
 		    sim2->setState(sim1->getState());
 
-		    std::cout << "Qubit no " << n << ": ";
+		    os << "Qubit no " << n << ": ";
 		
 		    // Apply the gates stored in member pointers fn and gn
 		    std::invoke(fn, sim1, n);
@@ -659,15 +736,23 @@ namespace qsl {
 		    double distance = fubiniStudy(sim1->getState(),
 						  sim2->getState());
 
-		    std::cout << "Distance = " << distance << std::endl;
+		    os << "Distance = " << distance << std::endl;
+		    res.addRow({n}, {distance});
 		}
+		return res;
 	    }
 
 	/// Checkementation for single qubit gates with one double argument
-	void check(OneQubitGate<Sim1, typename Sim1::Fp_type> fn,
-		   OneQubitGate<Sim2, typename Sim2::Fp_type> gn)
+	Results<unsigned, double>
+	check(std::ostream & os,
+	      OneQubitGate<Sim1, typename Sim1::Fp_type> fn,
+	      OneQubitGate<Sim2, typename Sim2::Fp_type> gn)
 	    {
-		unsigned nqubits = sim1->getNumQubits();
+		const unsigned nqubits = sim1->getNumQubits();
+		Results<unsigned, double> res{{"qubit", "distance"}};
+		res.addMeta("Distance between state vectors of each sim "
+			    "after applying the gate to the qubit number");
+
 		std::vector<typename Sim1::Fp_type> sim1_phase_list
 		    = makeRandomPhases<typename Sim1::Fp_type>(nqubits);
 		std::vector<typename Sim2::Fp_type> sim2_phase_list
@@ -679,7 +764,7 @@ namespace qsl {
 		    // equate the states
 		    sim2->setState(sim1->getState());
 
-		    std::cout << "Qubit no " << n << ": ";
+		    os << "Qubit no " << n << ": ";
 		    // Apply the gates stored in member pointers fn and gn
 		    std::invoke(fn, sim1, n, sim1_phase_list[n]);
 		    std::invoke(gn, sim2, n, sim2_phase_list[n]);
@@ -687,15 +772,22 @@ namespace qsl {
 		    ///\todo Should be float?
 		    double distance = fubiniStudy(sim1->getState(),
 						  sim2->getState());
-		    std::cout << "Distance = " << distance << std::endl;
+
+		    os << "Distance = " << distance << std::endl;
+		    res.addRow({n}, {distance});
 		}
+		return res;
 	    }
 
 	/// Checkementation for two qubit gates with no arguments
-	void check(TwoQubitGate<Sim1> fn, TwoQubitGate<Sim2> gn)
+	Results<unsigned,double>
+	check(std::ostream & os, TwoQubitGate<Sim1> fn, TwoQubitGate<Sim2> gn)
 	    {
-		unsigned nqubits = sim1->getNumQubits();
-    
+		const unsigned nqubits = sim1->getNumQubits();
+		Results<unsigned, double> res{{"qubit1", "qubit2", "distance"}};
+		res.addMeta("Distance between state vectors of each sim "
+			    "after applying the gate to the pair of qubits");
+		
 		// Loop through every pair of sim1
 		for (unsigned n = 0; n < nqubits; n++) {
 		    for (unsigned m = 0; m < nqubits; m++) {
@@ -704,7 +796,7 @@ namespace qsl {
 			sim2->setState(sim1->getState());
 
 			if (n != m) {
-			    std::cout << "Sim1 " << n  << " and " << m << ": ";
+			    os << "Sim1 " << n  << " and " << m << ": ";
 
 			    // Apply the gates stored in member pointers fn and gn
 			    std::invoke(fn, sim1, n, m);
@@ -712,18 +804,26 @@ namespace qsl {
 		
 			    double distance = fubiniStudy(sim1->getState(),
 							  sim2->getState());
-			    std::cout << "Distance = " << distance << std::endl;
+			    os << "Distance = " << distance << std::endl;
+			    res.addRow({n,m}, {distance});
 			}
 		    }
 		}
+		return res;
 	    }
 
 	/// Checkementation for two qubit gates with one double argument
-	void check(TwoQubitGate<Sim1, typename Sim1::Fp_type> fn,
-		   TwoQubitGate<Sim2, typename Sim2::Fp_type> gn)
+	Results<unsigned,double>       
+	check(std::ostream & os,
+	      TwoQubitGate<Sim1, typename Sim1::Fp_type> fn,
+	      TwoQubitGate<Sim2, typename Sim2::Fp_type> gn)
 	    {
 	
-		unsigned nqubits = sim1->getNumQubits();
+		const unsigned nqubits = sim1->getNumQubits();
+		Results<unsigned, double> res{{"qubit1", "qubit2", "distance"}};
+		res.addMeta("Distance between state vectors of each sim "
+			    "after applying the gate to the pair of qubits");
+
 		//std::vector<double> phase_list = makeRandomPhases(nqubits*nqubits);
 		std::vector<typename Sim1::Fp_type> sim1_phase_list
 		    = makeRandomPhases<typename Sim1::Fp_type>(nqubits*nqubits);
@@ -738,7 +838,7 @@ namespace qsl {
 			sim2->setState(sim1->getState());
 
 			if (n != m) {
-			    std::cout << "Sim1 " << n  << " and " << m << ": ";
+			    os << "Sim1 " << n  << " and " << m << ": ";
 
 			    // Apply the gates stored in member pointers fn and gn
 			    std::invoke(fn, sim1, n, m, sim1_phase_list[nqubits*n + m]);
@@ -747,10 +847,12 @@ namespace qsl {
 			    ///\todo Should be float or Fp_type?
 			    double distance = fubiniStudy(sim1->getState(),
 							  sim2->getState());
-			    std::cout << "Distance = " << distance << std::endl;
+			    os << "Distance = " << distance << std::endl;
+			    res.addRow({n,m}, {distance}); 
 			}
 		    }
 		}
+		return res;
 	    }
 
 
@@ -775,22 +877,57 @@ namespace qsl {
     class DefaultGateChecker : public GateChecker<Sim1,Sim2>
     {
     public:
-	void checkAll() {
 
-	    std::cout << "Checking pauliX" << std::endl;
-	    this->check(&Sim1::pauliX, &Sim2::pauliX);
-	    std::cout << "Checking rotateX" << std::endl;
-	    this->check(&Sim1::rotateX, &Sim2::rotateX);
-	    std::cout << "Checking phase" << std::endl;
-	    this->check(&Sim1::phase, &Sim2::phase);
-	    std::cout << "Checking controlNot" << std::endl;
-	    this->check(&Sim1::controlNot, &Sim2::controlNot);
-	    std::cout << "Checking controlPhase" << std::endl;
-	    this->check(&Sim1::controlPhase, &Sim2::controlPhase);
-	    std::cout << "Checking swap" << std::endl;
-	    this->check(&Sim1::swap, &Sim2::swap);
-	    std::cout << "Checking hadamard" << std::endl;
-	    this->check(&Sim1::hadamard, &Sim2::hadamard);
+	/**
+	 * \brief Class for holding results from the tests
+	 */
+	struct ResultData
+	{
+	    std::map<std::string, Results<unsigned,double>> distances;
+	};
+	
+	ResultData checkAll(std::ostream & os) {
+
+	    ResultData results;
+	    
+	    // Check one-qubit gates
+	    os << "Checking pauliX" << std::endl;
+	    results.distances.emplace(
+		"pauliX",
+		this->check(os, &Sim1::pauliX, &Sim2::pauliX));
+ 
+	    os << "Checking rotateX" << std::endl;
+	    results.distances.emplace(
+		"rotateX",
+		this->check(os, &Sim1::rotateX, &Sim2::rotateX));
+	    
+	    os << "Checking phase" << std::endl;
+	    results.distances.emplace(
+		"phase",
+		this->check(os, &Sim1::phase, &Sim2::phase));
+	    
+	    os << "Checking hadamard" << std::endl;
+	    results.distances.emplace(
+		"hadamard",
+		this->check(os, &Sim1::hadamard, &Sim2::hadamard));
+
+	    // Check two-qubit gates
+	    os << "Checking controlNot" << std::endl;
+	    results.distances.emplace(
+		"controlNot",
+		this->check(os, &Sim1::controlNot, &Sim2::controlNot));
+	    
+	    os << "Checking controlPhase" << std::endl;
+	    results.distances.emplace(
+		"controlPhase",
+		this->check(os, &Sim1::controlPhase, &Sim2::controlPhase));
+	    
+	    os << "Checking swap" << std::endl;
+	    results.distances.emplace(
+		"swap",
+		this->check(os, &Sim1::swap, &Sim2::swap));
+
+	    return results;
 	}
     };
 
@@ -805,13 +942,24 @@ namespace qsl {
     class NPGateChecker : public GateChecker<Sim1,Sim2>
     {
     public:
-	void checkAll() {
-	    std::cout << "Checking phase" << std::endl;
-	    this->check(&Sim1::phase, &Sim2::phase);
-	    std::cout << "Checking controlPhase" << std::endl;
-	    this->check(&Sim1::controlPhase, &Sim2::controlPhase);
-	    std::cout << "Checking swap" << std::endl;
-	    this->check(&Sim1::swap, &Sim2::swap);
+
+	/**
+	 * \brief Class for holding results from the tests
+	 */
+	struct ResultData
+	{
+	    int thing;
+	};
+	
+	ResultData checkAll(std::ostream & os) {
+	    os << "Checking phase" << std::endl;
+	    this->check(os, &Sim1::phase, &Sim2::phase);
+	    os << "Checking controlPhase" << std::endl;
+	    this->check(os, &Sim1::controlPhase, &Sim2::controlPhase);
+	    os << "Checking swap" << std::endl;
+	    this->check(os, &Sim1::swap, &Sim2::swap);
+
+	    return ResultData();
 	}
     };
 
@@ -834,11 +982,19 @@ namespace qsl {
     public:
 
 	/**
+	 * \brief Class for holding results from the tests
+	 */
+	struct ResultData
+	{
+	    int thing;
+	};
+	
+	/**
 	 * \brief Check postselection
 	 *
 	 * For concepts: requires copy assignment, copy, postselect and getState.
 	 */
-	void checkAll()
+	ResultData checkAll(std::ostream & os)
 	    {
 		if (not sim1 or not sim2) {
 		    throw std::logic_error(
@@ -846,12 +1002,12 @@ namespace qsl {
 		}
 	    
 		unsigned nqubits = sim1->getNumQubits();
-		std::cout << "============================================"
+		os << "============================================"
 			  << std::endl;
-		std::cout << "Verifying postselect on " << nqubits << " qubits."
+		os << "Verifying postselect on " << nqubits << " qubits."
 			  << std::endl;
 
-		std::cout << "Printing probabilities of collapsing to outcome"
+		os << "Printing probabilities of collapsing to outcome"
 			  << std::endl;
     
 		for (unsigned n = 0; n < nqubits; n++) {
@@ -876,7 +1032,7 @@ namespace qsl {
 		    double norm_1 = norm(q1.getState());
 		    double distance_1 = fubiniStudy(q1.getState(), q2.getState());
 	
-		    std::cout << "Qubit " << n
+		    os << "Qubit " << n
 			      << ": Qubits = [" << qubits_0 << ", " << qubits_1 << "]"
 			      << ", Quest = [" << quest_0 << ", " << quest_1 << "]"
 			      << std::endl
@@ -884,6 +1040,9 @@ namespace qsl {
 			      << ", Qubits norms = [" << norm_0 << ", "
 			      << norm_1 << "]" << std::endl;
 		}
+
+
+		return ResultData();
 	    }
 
 	/**

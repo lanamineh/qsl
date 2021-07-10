@@ -6,8 +6,13 @@ int main ()
     qsl::Verify<qsl::Qubits<qsl::Type::Default, double>,
 		qsl::Qubits<qsl::Type::Omp, double>,
 		qsl::DefaultStateGen<double>,
-		qsl::MeasureChecker> verify;
+		qsl::DefaultGateChecker> verify;
     verify.configureState(4);
-    verify.checkAll();
+    auto result = verify.check<qsl::DefaultGateChecker>();
+
+    for (const auto & [gate,results] : result.distances) {
+	std::cout << "Gate name: " << gate << std::endl;
+	results.print();
+    }
     
 }

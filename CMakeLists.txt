@@ -67,7 +67,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   #set(COVERAGE_EXCLUDES "dir1/*" "dir2/*")
   setup_target_for_coverage_lcov(
     NAME coverage
-    EXECUTABLE basic-tests
+    EXECUTABLE ctest
     BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2/*"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark/*"

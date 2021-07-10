@@ -81,15 +81,15 @@ namespace qsl {
 	 * \brief Initialise two simulators and run the checker
 	 */
 	template<template<typename,typename> class Checker>
-	void initAndCheck()
+	Checker<Sim1,Sim2>::ResultData initAndCheck(std::ostream & os)
 	    {
-		std::cout << "Resetting state vector" << std::endl;
+		os << "Resetting state vector" << std::endl;
 		std::unique_ptr<Sim1> sim1
 		    = std::make_unique<Sim1>(init.getState());
 		std::unique_ptr<Sim2> sim2
 		    = std::make_unique<Sim2>(init.getState());
 		std::get<Checker<Sim1,Sim2>>(checkers).bind(sim1, sim2);
-		std::get<Checker<Sim1,Sim2>>(checkers).checkAll();
+		return std::get<Checker<Sim1,Sim2>>(checkers).checkAll(os);
 	    }
     
     public:
@@ -105,12 +105,32 @@ namespace qsl {
 	    {
 		std::get<Checker<Sim1,Sim2>>(checkers).configureChecker(args...);
 	    }
+	
+	/**
+	 * \brief Run one of the checkers and get results
+	 *
+	 * This function is for the unit test, where you want to automatically
+	 * check the results of the checker rather than print them out.
+	 *
+	 * The returned type is specific to the checker and contains the
+	 * results of the tests. Look at the ResultData struct inside the
+	 * checker.
+	 */
+	template<template<typename,typename> class Checker, typename... Args>
+	Checker<Sim1,Sim2>::ResultData check()
+	    {
+		qsl::NullStream nul;
+		return initAndCheck<Checker>(nul); 
+	    }
 
-    
+	/** 
+	 * \brief Use this function to print the results to the screen
+	 *
+	 */
 	void checkAll()
 	    {
 		// Execute all the checks (C++17 fold expression)
-		(initAndCheck<Checkers>(), ...); 
+		(initAndCheck<Checkers>(std::cout), ...); 
 	    }	  
     };
 
