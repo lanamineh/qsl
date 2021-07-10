@@ -54,7 +54,6 @@ void qsl::Qubits<qsl::Type::Omp, Fp>::collapse(unsigned targ, unsigned outcome,
 	    state[index].imag = 0;
 	}
     }
-    
 }
 
 
@@ -132,8 +131,12 @@ Fp qsl::Qubits<qsl::Type::Omp, Fp>::prob(unsigned targ, unsigned outcome)
     
     std::size_t k = 1 << targ;
     std::size_t res = outcome * k;
-    
-#pragma omp parallel for num_threads(nthreads) 
+
+    // When a variable with global scope is increment inside an
+    // openmp for loop, it is necessary to use the reduction keyword
+    // so that each thread keeps a local variable which is incremented,
+    // and then all of them get summed at the end.
+#pragma omp parallel for num_threads(nthreads) reduction(+:probability)
     for (std::size_t s = 0; s < dim; s += 2*k) { 
 	for (std::size_t r = 0; r < k; r++) {
 	    // Get the indices that need to be added
@@ -196,7 +199,9 @@ std::vector<std::size_t> qsl::Qubits<qsl::Type::Omp, Fp>::sample(unsigned targ,
 {
     // Initialise an empty vector, results[0] will store the amount of
     // times that 0 was sampled. Similarly for results[1]
-    std::vector<std::size_t> results(2, 0);
+    //std::vector<std::size_t> results(2, 0);
+    std::size_t num0 = 0; // number of measured zeros
+    std::size_t num1 = 0; // number of measured ones
     
     // Calculate probabilty of measuring 0 on qubit targ
     Fp prob0 = prob(targ, 0);
@@ -204,18 +209,20 @@ std::vector<std::size_t> qsl::Qubits<qsl::Type::Omp, Fp>::sample(unsigned targ,
     // Generate a random number and use it to generate the outcome
     // If the random number is less than the probability of getting
     // 0, then the outcome is 0, otherwise it is 1.    
-#pragma omp parallel for num_threads(nthreads)
+#pragma omp parallel for num_threads(nthreads) reduction(+:num0,num1)
     for (std::size_t i = 0; i < nsamples; i++) {
 	Fp rand = random.getNum();
 	if (rand < prob0) {
-	    results[0]++;
+	    //results[0]++;
+	    num0++;
 	}
 	else {
-	    results[1]++;
+	    //results[1]++;
+	    num1++;
 	}
     }
 
-    return results;
+    return {num0,num1};
 }
 
 

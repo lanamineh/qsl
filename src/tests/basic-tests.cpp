@@ -397,6 +397,13 @@ TEST_CASE( "Qubits<Default> against Qubits<OMP>", "[compare]" )
     verify.configureChecker<qsl::SampleAllChecker>(1000000, 0.99);
     //verify.checkAll();
 
+    auto prob_result = verify.check<qsl::ProbChecker>();
+    // Check that the probabilities are equal
+    REQUIRE(std::abs(prob_result.mean<double>(1)) < 1e-10);
+    REQUIRE(prob_result.variance<double>(1) < 1e-10);
+    REQUIRE(std::abs(prob_result.mean<double>(2)) < 1e-10);
+    REQUIRE(prob_result.variance<double>(2) < 1e-10);
+    
     // Check the measurement
     auto measure_result = verify.check<qsl::MeasureChecker>();
     // Check that all the intervals overlap
@@ -410,10 +417,10 @@ TEST_CASE( "Qubits<Default> against Qubits<OMP>", "[compare]" )
     REQUIRE(std::abs(postselect_result.mean<double>(2)) < 1e-10);
     REQUIRE(postselect_result.variance<double>(2) < 1e-10);
     // Check that all the state distances are zero for both outcomes
-    REQUIRE(std::abs(postselect_result.mean<double>(3)) < 1e-10);
-    REQUIRE(postselect_result.variance<double>(3) < 1e-10);
-    REQUIRE(std::abs(postselect_result.mean<double>(4)) < 1e-10);
-    REQUIRE(postselect_result.variance<double>(4) < 1e-10);
+    REQUIRE(std::abs(postselect_result.mean<double>(3)) < 1e-7);
+    REQUIRE(postselect_result.variance<double>(3) < 1e-7);
+    REQUIRE(std::abs(postselect_result.mean<double>(4)) < 1e-7);
+    REQUIRE(postselect_result.variance<double>(4) < 1e-7);
     
     auto sample_result = verify.check<qsl::SampleChecker>();
     // Check that all the confidence intervals overlap
@@ -424,14 +431,7 @@ TEST_CASE( "Qubits<Default> against Qubits<OMP>", "[compare]" )
     REQUIRE(std::abs(sample_all_result.overlap_rate - 1) < 1e-10);
     // Check the mean relative error is less than 15%
     REQUIRE(std::abs(sample_all_result.mean_relative_error) < 0.15);
-    
-    auto prob_result = verify.check<qsl::ProbChecker>();
-    // Check that the probabilities are equal
-    REQUIRE(std::abs(prob_result.mean<double>(1)) < 1e-10);
-    REQUIRE(prob_result.variance<double>(1) < 1e-10);
-    REQUIRE(std::abs(prob_result.mean<double>(2)) < 1e-10);
-    REQUIRE(prob_result.variance<double>(2) < 1e-10);
-    
+        
     auto gate_result = verify.check<qsl::DefaultGateChecker>();
     for (const auto & [gate,table] : gate_result) {
 	// Check that all the distances are zero
