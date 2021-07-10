@@ -600,7 +600,32 @@ namespace qsl {
 	 */
 	struct ResultData
 	{
-	    int thing;
+	    /**
+	     * \brief The mean error across all estimated probabilities
+	     *
+	     * 
+	     */
+	    const double mean_relative_error;
+
+	    /**
+	     * \brief The proportion of outcomes whose CIs overlap
+	     *
+	     */
+	    const double overlap_rate;
+
+	    /**
+	     * \brief Proportion of outcomes common between the simulators
+	     *
+	     */
+	    const double common_rate;
+
+	    void print() {
+		std::cout << "Mean error = "
+			  << 100*mean_relative_error << "%"
+			  << ", overlap = " << 100*overlap_rate << "%"
+			  << ", common = " << 100*common_rate << "%"
+			  << std::endl;
+	    }
 	};
 	
 	SampleAllChecker() : nsamples(100), ci{0.95} {}
@@ -698,7 +723,11 @@ namespace qsl {
 			  << ", common = " << 100*common_rate << "%"
 			  << std::endl;
 
-		return ResultData();
+		return ResultData {
+		    .mean_relative_error = mean_relative_error,
+			.overlap_rate = overlap_rate,
+			.common_rate = common_rate
+		};
 		
 	    }
 
