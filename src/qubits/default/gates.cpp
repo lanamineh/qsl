@@ -111,6 +111,37 @@ void qsl::Qubits<qsl::Type::Default, Fp>::rotateX(unsigned targ, Fp angle)
     }
 }
 
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::rotateZ(unsigned targ, Fp angle)
+{
+    // Store variables
+    Fp cos = std::cos(angle/2);
+    Fp sin = std::sin(angle/2);
+    std::size_t k = 1 << targ;
+    for (std::size_t s = 0; s < dim; s += 2*k) { 
+	for (std::size_t r = 0; r < k; r++) {
+
+	    // Get the index of |0> and |1>
+	    std::size_t index_0 = s + r;
+	    std::size_t index_1 = s + k + r;
+
+	    // Store the values of |0> and |1> amplitudes
+	    qsl::complex<Fp> a0 = state[index_0];
+	    qsl::complex<Fp> a1 = state[index_1];
+
+	    // Write the new |0> amplitude
+	    state[index_0].real = a0.real * cos + a0.imag * sin;
+	    state[index_0].imag = a0.imag * cos - a0.real * sin;
+
+	    // Write the new |1> amplitude
+	    state[index_1].real = a1.real * cos - a1.imag * sin;
+	    state[index_1].imag = a1.imag * cos + a1.real * sin;
+	    
+	}
+    }
+}
+
+
 
 /* Two-qubit gates ***************************************************/
 

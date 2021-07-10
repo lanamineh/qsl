@@ -72,6 +72,7 @@ namespace qsl {
 	sim.controlPhase(ctrl,targ,param);
 	sim.swap(ctrl,targ); // Actually q1 and q2, but still unsigned
 	sim.controlZ(ctrl,targ);
+	sim.rotateZ(targ,param);
     };
     
     template<typename Sim>

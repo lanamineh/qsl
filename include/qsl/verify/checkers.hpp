@@ -793,6 +793,8 @@ namespace qsl {
 	    this->check(&Sim1::hadamard, &Sim2::hadamard);
 	    std::cout << "Checking controlZ" << std::endl;
 	    this->check(&Sim1::controlZ, &Sim2::controlZ);
+	    std::cout << "Checking rotateZ" << std::endl;
+	    this->check(&Sim1::rotateZ, &Sim2::rotateZ);
 	    
 	}
     };
@@ -817,6 +819,8 @@ namespace qsl {
 	    this->check(&Sim1::swap, &Sim2::swap);
 	    std::cout << "Checking controlZ" << std::endl;
 	    this->check(&Sim1::controlZ, &Sim2::controlZ);
+	    std::cout << "Checking rotateZ" << std::endl;
+	    this->check(&Sim1::rotateZ, &Sim2::rotateZ);
 	    
 	}
     };

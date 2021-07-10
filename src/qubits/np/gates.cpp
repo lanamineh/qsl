@@ -58,6 +58,48 @@ void qsl::Qubits<qsl::Type::NP, Fp>::phase(unsigned targ, Fp angle)
     }
 }
 
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::NP, Fp>::rotateZ(unsigned targ, Fp angle)
+{
+    Fp cos = std::cos(angle/2);
+    Fp sin = std::sin(angle/2);
+    
+    // Position of target qubit
+    std::size_t k = 1 << targ;
+
+    // Create masks for breaking up the number
+    std::size_t lower_mask = k - 1;
+    std::size_t upper_mask = ~lower_mask;
+
+    // Apply e^(-i*angle/2) to |0>
+    for (std::size_t i = 0; i < lookup.at({nqubits-1, nones}).size(); i++) {
+	std::size_t x = lookup.at({nqubits-1, nones})[i];
+	std::size_t lower = x & lower_mask;
+	std::size_t upper = x & upper_mask;
+	// Get index for 1 in target position
+	std::size_t index = lower + (upper << 1);
+
+	qsl::complex<Fp> temp = state[index];
+	state[index].real = cos * temp.real + sin * temp.imag;
+	state[index].imag = cos * temp.imag - sin * temp.real;
+    }
+
+    // Apply e^(i*angle/2) to |1>
+    for (std::size_t i = 0; i < lookup.at({nqubits-1, nones-1}).size(); i++) {
+	std::size_t x = lookup.at({nqubits-1, nones-1})[i];
+	std::size_t lower = x & lower_mask;
+	std::size_t upper = x & upper_mask;
+	// Get index for 1 in target position
+	std::size_t index = lower + k + (upper << 1);
+
+	qsl::complex<Fp> temp = state[index];
+	state[index].real = cos * temp.real - sin * temp.imag;
+	state[index].imag = cos * temp.imag + sin * temp.real;
+    }
+
+}
+
+
 /* Two-qubit gates ***************************************************/
 
 template<std::floating_point Fp>
