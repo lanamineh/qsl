@@ -230,11 +230,17 @@ namespace qsl {
 
 	/**
 	 * \brief Class for holding results from the tests
+	 *
+	 * This checker calls the prog(outcome) member function for each
+	 * qubit index, on both simulators, to obtain the probability
+	 * of getting the probability of getting either a zero or
+	 * a one on that qubit.
+	 *
+	 * The results object contains the difference between the
+	 * probabilies of zero or one for each qubit (diff0 and diff1).
+	 * They should all be zero for the test to succeed.
 	 */
-	struct ResultData
-	{
-	    int thingy;
-	};
+	using ResultData = Results<unsigned,double>;
 	
 	/// Do the check
 	ResultData checkAll(std::ostream & os)
@@ -244,6 +250,11 @@ namespace qsl {
 			"Cannot run check before binding simulators");
 		}
 
+		Results<unsigned,double> res{{"qubit", "diff0", "diff1"}};
+		res.addMeta("The difference between the probabilities returned "
+			    "by the prob() member function on each qubit, "
+			    "for each simulator object");
+
 		const unsigned nqubits = sim1->getNumQubits();
 		for (unsigned n = 0; n < nqubits; n++) {
 		    double p1_out0 = sim1->prob(n, 0);
@@ -251,15 +262,20 @@ namespace qsl {
 		    double p2_out0 = sim2->prob(n, 0);
 		    double p2_out1 = sim2->prob(n, 1);
 
+		    double diff0 = p1_out0 - p2_out0;
+		    double diff1 = p1_out1 - p2_out1;
+		    
 		    os << "n = " << n << ": "
-		       << "prob 0 diff = " << p1_out0 - p2_out0
-		       << ", prob 1 diff = " << p1_out1 - p2_out1
+		       << "prob 0 diff = " << diff0
+		       << ", prob 1 diff = " << diff1
 		       << std::endl;
+
+		    res.addRow({n},{diff0,diff1});
 		    
 		    
 		}
 
-		return ResultData();
+		return res;
 	    }
 
 	/// Set up the checker here
