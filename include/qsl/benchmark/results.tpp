@@ -119,6 +119,39 @@ namespace qsl {
 
     template<std::integral T, std::floating_point R>
     template<typename S>
+    S Results<T, R>::mean(const std::string & colname) const
+    {
+	// Look for colname index
+	for (std::size_t index = 0; index < head.size(); index++) {
+	    if (head[index] == colname) {
+		return mean<S>(index);
+	    }
+	}
+
+	// If you get here, the column name was not found
+	throw std::logic_error("No such column name '" + colname + "' in Results"
+			       " object");
+    }
+
+    template<std::integral T, std::floating_point R>
+    template<typename S>
+    S Results<T, R>::variance(const std::string & colname) const
+    {
+	// Look for colname index
+	for (std::size_t index = 0; index < head.size(); index++) {
+	    if (head[index] == colname) {
+		return variance<S>(index);
+	    }
+	}
+
+	// If you get here, the column name was not found
+	throw std::logic_error("No such column name '" + colname + "' in Results"
+			       " object");
+
+    }
+
+    template<std::integral T, std::floating_point R>
+    template<typename S>
     S Results<T, R>::mean(std::size_t index) const
     {
 	if (!(index < head.size())) {
