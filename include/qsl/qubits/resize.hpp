@@ -183,8 +183,6 @@ namespace qsl {
 	/**
 	 * \brief Rotate around the z-axis of the Bloch sphere \f$ e^{-i\theta Z/2} \f$
 	 *
-	 * \ingroup qubits_gates
-	 *
 	 * This single qubit gate applies the following 2x2 matrix to each
 	 * pair of \f$ |0\rangle \f$ and \f$ |1\rangle \f$ amplitudes for 
 	 * angle \f$ \theta \f$:

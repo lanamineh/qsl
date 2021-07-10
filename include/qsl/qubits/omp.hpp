@@ -343,7 +343,6 @@ namespace qsl {
 	
 	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.
-	 * \ingroup qubits_meas
 	 *
 	 * This is not a reversible operation unlike applying quantum gates.
 	 *
@@ -361,7 +360,6 @@ namespace qsl {
 	/**
 	 * \brief Measure all of the qubits at once and collapse to
 	 * the resulting computational basis state.
-	 * \ingroup qubits_meas
 	 *
 	 * Measuring all of the qubits at once is the same as measuring them 
 	 * one by one. 
@@ -374,8 +372,6 @@ namespace qsl {
 	 * \brief Calculate the probability of qubit targ being measured 
 	 * in the given outcome (0 or 1).
 	 *
-	 * \ingroup qubits_meas
-	 *
 	 * \param targ The qubit to calculate the probability for.
 	 * \param outcome The outcome (0 or 1) we are calculating the probability of.
 	 * \return The probability of the qubit being measured in the given outcome.
@@ -385,7 +381,6 @@ namespace qsl {
 	/**
 	 * \brief Perform a post-selection measurement. The state is collapsed 
 	 * to the given outcome for the given qubit. 
-	 * \ingroup qubits_meas
 	 *
 	 * This is not a reversible operation unlike applying quantum gates.
 	 * The state vector is collapsed by zeroing out all the amplitudes 
@@ -400,8 +395,6 @@ namespace qsl {
 
 	/**
 	 * \brief Sample measurement outcome for one qubit multiple times.
-	 * 
-	 * \ingroup qubits_meas
 	 *
 	 * \param targ The qubit to measure.
 	 * \param nsamples The number of samples to draw.
@@ -412,8 +405,6 @@ namespace qsl {
 	/**
 	 * \brief Sample measurement outcome for all of the qubits 
 	 * at once multiple times.
-	 *
-	 * \ingroup qubits_meas
 	 *
 	 * Measuring all of the qubits at once is the same as measuring them 
 	 * one by one. This function implements a very efficient way of
