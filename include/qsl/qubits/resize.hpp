@@ -26,21 +26,6 @@
 #ifndef QUBITS_RESIZE_HPP
 #define QUBITS_RESIZE_HPP
 
-/**
- * \defgroup qubits_constructors Constructors
- * \brief Constructors for the resizeable simulator object
- */
-
-/**
- * \defgroup qubits_gates Quantum gates
- * \brief One- and two- qubit gates in the Qubits class
- */
-
-/**
- * \defgroup qubits_meas Measurement
- * \brief Functions related to measurement, probabilities, etc.
- */
-
 #include <cstddef>
 #include <cstdint>
 #include <vector>
@@ -98,7 +83,6 @@ namespace qsl {
 
 	/**
 	 * \brief Initialise the class with a fixed number of qubits
-	 * \ingroup qubits_constructors
 	 *
 	 * This function constructors an object with the specified 
 	 * number of qubits. The simulator is initialised in the
@@ -110,7 +94,7 @@ namespace qsl {
 
 	/**
 	 * \brief  Initialise the class from a pre-prepared state vector
-	 * \ingroup qubits_constructors
+	 *
 	 *
 	 * This function constructs an object with the given initial
 	 * state vector. The  state vector must have a length which 
@@ -124,7 +108,7 @@ namespace qsl {
 
 	/**
 	 * \brief Copy constructor
-	 * \ingroup qubits_constructors
+	 *
 	 *
 	 * You can make copies of this object by constructing from an 
 	 * object of the same type.
@@ -133,7 +117,7 @@ namespace qsl {
 
 	/**
 	 * \brief Copy-assignment operator
-	 * \ingroup qubits_constructors
+	 *
 	 *
 	 * You can assign one Qubits object to another, provided that they both
 	 * represent the same number of qubits. In this case, this operation
@@ -179,7 +163,6 @@ namespace qsl {
 	/**
 	 * \brief Rotate around the x-axis of the Bloch sphere \f$ e^{-i\theta X/2} \f$
 	 *
-	 * \ingroup qubits_gates
 	 *
 	 * This single qubit gate applies the following 2x2 matrix to each
 	 * pair of \f$ |0\rangle \f$ and \f$ |1\rangle \f$ amplitudes for 
@@ -200,7 +183,6 @@ namespace qsl {
 	/**
 	 * \brief Apply the Hadamard gate to qubit number targ.
 	 *
-	 * \ingroup qubits_gates
 	 *
 	 * \f[ 
 	 * H = \frac{1}{\sqrt{2}}\begin{pmatrix}
@@ -216,7 +198,6 @@ namespace qsl {
 	/**
 	 * \brief Apply the Pauli X gate to qubit number targ.
 	 *
-	 * \ingroup qubits_gates
 	 *
 	 * \f[ 
 	 * X = \begin{pmatrix}
@@ -232,7 +213,6 @@ namespace qsl {
 	/**
 	 * \brief Apply a phase shift to qubit number targ.
 	 *
-	 * \ingroup qubits_gates
 	 *
 	 * \f[ 
 	 * R_\theta = \begin{pmatrix}
@@ -249,7 +229,6 @@ namespace qsl {
 	/**
 	 * \brief Perform the controlled Not (CNOT) gate on two qubits.
 	 *
-	 * \ingroup qubits_gates
 	 *
 	 * Controlled on the first qubit, the matrix is:
 	 * \f[ 
@@ -270,7 +249,6 @@ namespace qsl {
 	/**
 	 * \brief Perform a controlled phase shift on two qubits. 
 	 *
-	 * \ingroup qubits_gates
 	 *
 	 * A phase is added if both qubits are in the \f$ |1\rangle \f$ state. 
 	 *
@@ -293,8 +271,7 @@ namespace qsl {
 	/**
 	 * \brief Perform a swap gate on two qubits. 
 	 *
-	 * \ingroup qubits_gates
-
+	 *
 	 * \f[ 
 	 * CR_\theta = \begin{pmatrix}
 	 *             1 & 0 & 0 & 0 \\
@@ -312,7 +289,6 @@ namespace qsl {
 	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.
 	 *
-	 * \ingroup qubits_meas
 	 *
 	 * This is not a reversible operation unlike applying quantum gates.
 	 *
@@ -330,7 +306,6 @@ namespace qsl {
 	/**
 	 * \brief Measure a qubit and remove the qubit from the state vector.
 	 *
-	 * \ingroup qubits_meas
 	 *
 	 * This is not a reversible operation unlike applying quantum gates.
 	 * 
@@ -352,7 +327,6 @@ namespace qsl {
 	 * \brief Measure all of the qubits at once and collapse to
 	 * the resulting computational basis state.
 	 *
-	 * \ingroup qubits_meas
 	 *
 	 * Measuring all of the qubits at once is the same as measuring them 
 	 * one by one. 
@@ -365,7 +339,6 @@ namespace qsl {
 	 * \brief Calculate the probability of qubit targ being measured 
 	 * in the given outcome (0 or 1).
 	 *
-	 * \ingroup qubits_meas
 	 *
 	 * \param targ The qubit to calculate the probability for.
 	 * \param outcome The outcome (0 or 1) we are calculating the probability of.
@@ -377,7 +350,6 @@ namespace qsl {
 	 * \brief Perform a post-selection measurement. The state is collapsed 
 	 * to the given outcome for the given qubit. 
 	 *
-	 * \ingroup qubits_meas
 	 *
 	 * This is not a reversible operation unlike applying quantum gates.
 	 * The state vector is collapsed by zeroing out all the amplitudes 
@@ -393,7 +365,6 @@ namespace qsl {
 	/**
 	 * \brief Sample measurement outcome for one qubit multiple times.
 	 * 
-	 * \ingroup qubits_meas
 	 *
 	 * \param targ The qubit to measure.
 	 * \param nsamples The number of samples to draw.
@@ -405,7 +376,6 @@ namespace qsl {
 	 * \brief Sample measurement outcome for all of the qubits 
 	 * at once multiple times.
 	 *
-	 * \ingroup qubits_meas
 	 *
 	 * Measuring all of the qubits at once is the same as measuring them 
 	 * one by one. This function implements a very efficient way of
@@ -423,7 +393,6 @@ namespace qsl {
 	 * \brief Sample measurement outcome for all of the qubits 
 	 * at once multiple times.
 	 *
-	 * \ingroup qubits_meas
 	 *
 	 * Testing implementing sampling using the method in qsim. 
 	 *
@@ -439,8 +408,8 @@ namespace qsl {
     // compiler warnings in clang, when template instantiations
     // appear in another translation unit
 #ifdef __clang__
-    template<> const std::string Qubits<Type::Default, double>::name;
-    template<> const std::string Qubits<Type::Default, float>::name;
+    template<> const std::string Qubits<Type::Resize, double>::name;
+    template<> const std::string Qubits<Type::Resize, float>::name;
 #endif
 
 }
