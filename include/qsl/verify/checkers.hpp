@@ -1070,11 +1070,22 @@ namespace qsl {
 
 	/**
 	 * \brief Class for holding results from the tests
+	 *
+	 * The postselect checker calls the postselect function on 
+	 * every qubit, for the 0 and 1 outcomes, for each simulator,
+	 * and checks that the probability of zero and one are the
+	 * same for both simulators. The difference between the probabilities
+	 * is stored as diff0 and diff1 in the results table, which 
+	 * should be zero for the test to pass
+	 *
+	 * The function also checks that the simulators collapse to the
+	 * same state, with norm one. The distance between the states is
+	 * stored as distance0 and distance1.
+	 *
+	 * \todo Should also check the norms here
+	 *
 	 */
-	struct ResultData
-	{
-	    int thing;
-	};
+	using ResultData = Results<unsigned,double>;
 	
 	/**
 	 * \brief Check postselection
@@ -1087,8 +1098,10 @@ namespace qsl {
 		    throw std::logic_error(
 			"Cannot run check before binding simulators");
 		}
-	    
+
 		unsigned nqubits = sim1->getNumQubits();
+		Results<unsigned, double> res{{"qubit", "diff0", "diff1", "distance0", "distance1"}};
+
 		os << "============================================"
 			  << std::endl;
 		os << "Verifying postselect on " << nqubits << " qubits."
@@ -1104,8 +1117,9 @@ namespace qsl {
 		    Sim2 q2(*sim2); // Make a local copy
 	
 		    // Postselect on 0
-		    double qubits_0 = q1.postselect(n, 0);
-		    double quest_0 = q2.postselect(n, 0);
+		    double sim1_prob0 = q1.postselect(n, 0);
+		    double sim2_prob0 = q2.postselect(n, 0);
+		    double diff_0 = sim1_prob0 - sim2_prob0; 
 		    double norm_0 = norm(q1.getState());
 		    double distance_0 = fubiniStudy(q1.getState(), q2.getState());
 
@@ -1114,22 +1128,27 @@ namespace qsl {
 		    q2 = *sim2;
 
 		    // Postselect on 1
-		    double qubits_1 = q1.postselect(n, 1);
-		    double quest_1 = q2.postselect(n, 1);
+		    double sim1_prob1 = q1.postselect(n, 1);
+		    double sim2_prob1 = q2.postselect(n, 1);
+		    double diff_1 = sim1_prob1 - sim2_prob1; 
 		    double norm_1 = norm(q1.getState());
 		    double distance_1 = fubiniStudy(q1.getState(), q2.getState());
 	
 		    os << "Qubit " << n
-			      << ": Qubits = [" << qubits_0 << ", " << qubits_1 << "]"
-			      << ", Quest = [" << quest_0 << ", " << quest_1 << "]"
-			      << std::endl
-			      << "Qubits = [" << distance_0 << ", " << distance_1 << "]"
-			      << ", Qubits norms = [" << norm_0 << ", "
-			      << norm_1 << "]" << std::endl;
+		       << ": Sim1 = [" << sim1_prob0
+		       << ", " << sim1_prob1 << "]"
+		       << ", Sim2 = [" << sim2_prob0
+		       << ", " << sim2_prob1 << "]"
+		       << std::endl
+		       << "Qubits = [" << distance_0 << ", " << distance_1 << "]"
+		       << ", Qubits norms = [" << norm_0 << ", "
+		       << norm_1 << "]" << std::endl;
+
+		    res.addRow({n},{diff_0,diff_1, distance_0,distance_1});
 		}
+		
 
-
-		return ResultData();
+		return res;
 	    }
 
 	/**
