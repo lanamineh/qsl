@@ -191,9 +191,30 @@ namespace qsl {
 	void rotateX(unsigned targ, Fp angle);
 
 	/**
+	 * \brief Rotate around the z-axis of the Bloch sphere \f$ e^{-i\theta Z/2} \f$
+	 *
+	 * \ingroup qubits_omp_gates
+	 *
+	 * This single qubit gate applies the following 2x2 matrix to each
+	 * pair of \f$ |0\rangle \f$ and \f$ |1\rangle \f$ amplitudes for 
+	 * angle \f$ \theta \f$:
+	 * 
+	 * \f[ 
+	 * R_x = \begin{pmatrix}
+	 *       e^{-i\theta/2} & 0 \\
+	 *       0 & e^{i\theta/2} \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by.
+	 */
+	void rotateZ(unsigned targ, Fp angle);
+	
+	/**
 	 * \brief Apply the Hadamard gate to qubit number targ.
 	 *
-	 * \ingroup qubits_gates
+	 * \ingroup qubits_omp_gates
 	 *
 	 * \f[ 
 	 * H = \frac{1}{\sqrt{2}}\begin{pmatrix}
@@ -282,7 +303,7 @@ namespace qsl {
 	/**
 	 * \brief Perform a swap gate on two qubits. 
 	 *
-	 * \ingroup qubits_gates_omp
+	 * \ingroup qubits_omp_gates
 
 	 * \f[ 
 	 * CR_\theta = \begin{pmatrix}
@@ -297,10 +318,31 @@ namespace qsl {
 	 * \param q2 The second qubit to swap.
 	 */
 	void swap(unsigned q1, unsigned q2);
+
+	/**
+	 * \brief Perform a controlled Z gate on two qubits. 
+	 *
+	 * \ingroup qubits_omp_gates
+	 *
+	 *
+	 * \f[ 
+	 * CR_\theta = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & 1 & 0 \\
+	 *             0 & 0 & 0 & -1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param ctrl The control qubit, Z is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
+	void controlZ(unsigned ctrl, unsigned targ);
+
 	
 	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.
-	 * \ingroup qubits_meas
 	 *
 	 * This is not a reversible operation unlike applying quantum gates.
 	 *
@@ -318,7 +360,6 @@ namespace qsl {
 	/**
 	 * \brief Measure all of the qubits at once and collapse to
 	 * the resulting computational basis state.
-	 * \ingroup qubits_meas
 	 *
 	 * Measuring all of the qubits at once is the same as measuring them 
 	 * one by one. 
@@ -331,8 +372,6 @@ namespace qsl {
 	 * \brief Calculate the probability of qubit targ being measured 
 	 * in the given outcome (0 or 1).
 	 *
-	 * \ingroup qubits_meas
-	 *
 	 * \param targ The qubit to calculate the probability for.
 	 * \param outcome The outcome (0 or 1) we are calculating the probability of.
 	 * \return The probability of the qubit being measured in the given outcome.
@@ -342,7 +381,6 @@ namespace qsl {
 	/**
 	 * \brief Perform a post-selection measurement. The state is collapsed 
 	 * to the given outcome for the given qubit. 
-	 * \ingroup qubits_meas
 	 *
 	 * This is not a reversible operation unlike applying quantum gates.
 	 * The state vector is collapsed by zeroing out all the amplitudes 
@@ -357,8 +395,6 @@ namespace qsl {
 
 	/**
 	 * \brief Sample measurement outcome for one qubit multiple times.
-	 * 
-	 * \ingroup qubits_meas
 	 *
 	 * \param targ The qubit to measure.
 	 * \param nsamples The number of samples to draw.
@@ -369,8 +405,6 @@ namespace qsl {
 	/**
 	 * \brief Sample measurement outcome for all of the qubits 
 	 * at once multiple times.
-	 *
-	 * \ingroup qubits_meas
 	 *
 	 * Measuring all of the qubits at once is the same as measuring them 
 	 * one by one. This function implements a very efficient way of

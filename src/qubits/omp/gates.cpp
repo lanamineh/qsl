@@ -153,6 +153,41 @@ void qsl::Qubits<qsl::Type::Omp, Fp>::rotateX(unsigned targ, Fp angle)
     }
 }
 
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Omp, Fp>::rotateZ(unsigned targ, Fp angle)
+{
+#pragma omp parallel num_threads(nthreads)
+    {    
+	// Store variables
+	Fp cos = std::cos(angle/2);
+	Fp sin = std::sin(angle/2);
+	std::size_t k = 1 << targ;
+#pragma omp for
+	for (std::size_t s = 0; s < dim; s += 2*k) { 
+	    for (std::size_t r = 0; r < k; r++) {
+
+		// Get the index of |0> and |1>
+		std::size_t index_0 = s + r;
+		std::size_t index_1 = s + k + r;
+
+		// Store the values of |0> and |1> amplitudes
+		qsl::complex<Fp> a0 = state[index_0];
+		qsl::complex<Fp> a1 = state[index_1];
+
+		// Write the new |0> amplitude
+		state[index_0].real = a0.real * cos + a0.imag * sin;
+		state[index_0].imag = a0.imag * cos - a0.real * sin;
+
+		// Write the new |1> amplitude
+		state[index_1].real = a1.real * cos - a1.imag * sin;
+		state[index_1].imag = a1.imag * cos + a1.real * sin;
+	    
+	    }
+	}
+    }
+}
+
+
 /* Two-qubit gates ***************************************************/
 
 template<std::floating_point Fp>
@@ -255,6 +290,35 @@ void qsl::Qubits<qsl::Type::Omp, Fp>::swap(unsigned q1, unsigned q2)
     }
 }
 
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Omp, Fp>::controlZ(unsigned ctrl,
+					       unsigned targ)
+{
+#pragma omp parallel num_threads(nthreads)
+    {
+	std::size_t small_bit = 1 << std::min(ctrl, targ);
+	std::size_t large_bit = 1 << std::max(ctrl, targ);
+
+	std::size_t mid_incr = (small_bit << 1);
+	std::size_t high_incr = (large_bit << 1);
+
+	std::size_t outcome = (1 << targ) + (1 << ctrl);
+
+#pragma omp for
+	// Increment through the indices above largest bit (ctrl or targ)
+	for (std::size_t i = 0; i < dim; i += high_incr) {
+	    // Increment through the middle set of bits
+	    for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+		// Increment through the low set of bits
+		for (std::size_t k = 0; k < small_bit; k++) {
+		    std::size_t index = i + j + k + outcome;
+		    state[index].real *= -1;
+		    state[index].imag *= -1;
+		}
+	    }
+	}
+    }
+}
 
 
 // Explicit instantiations

@@ -25,48 +25,44 @@
 #include "qsl/utils/timer.hpp"
 #include <ctime>
 
-namespace qsl {
+void qsl::Timer::start()
+{
+    time1 = clock_t::now();
+}
 
-    void Timer::start()
-    {
-	time1 = clock_t::now();
-    }
+void qsl::Timer::stop()
+{
+    time2 = clock_t::now();
+    elapsed = std::chrono::duration_cast<second_t>(time2 - time1).count();
+}
 
-    void Timer::stop()
-    {
-	time2 = clock_t::now();
-	elapsed = std::chrono::duration_cast<second_t>(time2 - time1).count();
-    }
+double qsl::Timer::getElapsed()
+{
+    return elapsed;
+}
 
-    double Timer::getElapsed()
-    {
-	return elapsed;
-    }
-
-    std::string Timer::printElapsed()
-    {
-	auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(time2 - time1);
-	auto h = std::chrono::duration_cast<std::chrono::hours>(ms);
-	ms -= h;
-	auto m = std::chrono::duration_cast<std::chrono::minutes>(ms);
-	ms -= m;
-	auto s = std::chrono::duration_cast<std::chrono::seconds>(ms);
-	ms -= s;
+std::string qsl::Timer::printElapsed()
+{
+    auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(time2 - time1);
+    auto h = std::chrono::duration_cast<std::chrono::hours>(ms);
+    ms -= h;
+    auto m = std::chrono::duration_cast<std::chrono::minutes>(ms);
+    ms -= m;
+    auto s = std::chrono::duration_cast<std::chrono::seconds>(ms);
+    ms -= s;
     
-	std::string timeTaken;
-	timeTaken = std::to_string(h.count()) + "h "
-	    + std::to_string(m.count()) + "m "
-	    + std::to_string(s.count()) + "s "
-	    + std::to_string(ms.count()) + "ms";
+    std::string timeTaken;
+    timeTaken = std::to_string(h.count()) + "h "
+	+ std::to_string(m.count()) + "m "
+	+ std::to_string(s.count()) + "s "
+	+ std::to_string(ms.count()) + "ms";
 
-	return timeTaken;
-    }
+    return timeTaken;
+}
 
-    std::string Timer::getCurrentTime()
-    {
-	auto timenow = clock_t::to_time_t(clock_t::now());
-	return std::string(ctime(&timenow));
-    }
+std::string qsl::Timer::getCurrentTime()
+{
+    auto timenow = clock_t::to_time_t(clock_t::now());
+    return std::string(ctime(&timenow));
+}
 
-
-}    

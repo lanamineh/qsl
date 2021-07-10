@@ -58,6 +58,48 @@ void qsl::Qubits<qsl::Type::NP, Fp>::phase(unsigned targ, Fp angle)
     }
 }
 
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::NP, Fp>::rotateZ(unsigned targ, Fp angle)
+{
+    Fp cos = std::cos(angle/2);
+    Fp sin = std::sin(angle/2);
+    
+    // Position of target qubit
+    std::size_t k = 1 << targ;
+
+    // Create masks for breaking up the number
+    std::size_t lower_mask = k - 1;
+    std::size_t upper_mask = ~lower_mask;
+
+    // Apply e^(-i*angle/2) to |0>
+    for (std::size_t i = 0; i < lookup.at({nqubits-1, nones}).size(); i++) {
+	std::size_t x = lookup.at({nqubits-1, nones})[i];
+	std::size_t lower = x & lower_mask;
+	std::size_t upper = x & upper_mask;
+	// Get index for 1 in target position
+	std::size_t index = lower + (upper << 1);
+
+	qsl::complex<Fp> temp = state[index];
+	state[index].real = cos * temp.real + sin * temp.imag;
+	state[index].imag = cos * temp.imag - sin * temp.real;
+    }
+
+    // Apply e^(i*angle/2) to |1>
+    for (std::size_t i = 0; i < lookup.at({nqubits-1, nones-1}).size(); i++) {
+	std::size_t x = lookup.at({nqubits-1, nones-1})[i];
+	std::size_t lower = x & lower_mask;
+	std::size_t upper = x & upper_mask;
+	// Get index for 1 in target position
+	std::size_t index = lower + k + (upper << 1);
+
+	qsl::complex<Fp> temp = state[index];
+	state[index].real = cos * temp.real - sin * temp.imag;
+	state[index].imag = cos * temp.imag + sin * temp.real;
+    }
+
+}
+
+
 /* Two-qubit gates ***************************************************/
 
 template<std::floating_point Fp>
@@ -129,6 +171,42 @@ void qsl::Qubits<qsl::Type::NP, Fp>::swap(unsigned q1, unsigned q2)
 	std::size_t index10 = lower + (mid << 1) + large_bit + (upper << 2);
 
 	std::swap(state[index01], state[index10]);
+    }
+}
+
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::NP, Fp>::controlZ(unsigned ctrl, unsigned targ)
+{
+    // Gate does nothing if there is only one 1.
+    if (nones < 2) {
+	return;
+    }
+
+    // Find the bit positions of ctrl and targ
+    std::size_t small_bit = 1 << std::min(ctrl, targ);
+    std::size_t large_bit = 1 << std::max(ctrl, targ);
+
+    // Create masks for the 3 sections that the bit string will be broken into 
+    std::size_t lower_mask = small_bit - 1;
+    std::size_t mid_mask = ((large_bit >> 1) - 1) ^ lower_mask;
+    std::size_t upper_mask = ~(lower_mask | mid_mask);
+        
+    // Loop through all the other numbers with num_ones 1s 
+    // then break down that number into 3 parts to go on either side
+    // of q1 and q2
+    for (std::size_t i = 0; i < lookup.at({nqubits-2, nones-2}).size(); i++) {
+	std::size_t x = lookup.at({nqubits-2, nones-2})[i];
+	std::size_t lower = x & lower_mask;
+	std::size_t mid = x & mid_mask;
+	std::size_t upper = x & upper_mask;
+
+	// Calculate the index by adding together the 3 shifted sections
+	// of x and small_bit and large_bit (which represent having 1
+	// on ctrl and targ).
+	std::size_t index = lower + small_bit + (mid << 1) + large_bit + (upper << 2);
+	state[index].real *= -1; 
+	state[index].imag *= -1;
     }
 }
 

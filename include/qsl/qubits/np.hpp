@@ -193,6 +193,27 @@ namespace qsl {
 	void phase(unsigned targ, Fp angle);
 
 	/**
+	 * \brief Rotate around the z-axis of the Bloch sphere \f$ e^{-i\theta Z/2} \f$
+	 *
+	 * \ingroup qubits_gates_np
+	 *
+	 * This single qubit gate applies the following 2x2 matrix to each
+	 * pair of \f$ |0\rangle \f$ and \f$ |1\rangle \f$ amplitudes for 
+	 * angle \f$ \theta \f$:
+	 * 
+	 * \f[ 
+	 * R_x = \begin{pmatrix}
+	 *       e^{-i\theta/2} & 0 \\
+	 *       0 & e^{i\theta/2} \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by.
+	 */
+	void rotateZ(unsigned targ, Fp angle);
+	
+	/**
 	 * \brief Perform a controlled phase shift on two qubits. 
 	 *
 	 * \ingroup qubits_gates_np
@@ -234,6 +255,27 @@ namespace qsl {
 	 * \param q2 The second qubit to swap.
 	 */
 	void swap(unsigned q1, unsigned q2);
+
+	/**
+	 * \brief Perform a controlled Z gate on two qubits. 
+	 *
+	 * \ingroup qubits_gates_np
+	 *
+	 *
+	 * \f[ 
+	 * CR_\theta = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & 1 & 0 \\
+	 *             0 & 0 & 0 & -1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param ctrl The control qubit, Z is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
+	void controlZ(unsigned ctrl, unsigned targ);
 
     
 	/**
