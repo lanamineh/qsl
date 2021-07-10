@@ -791,6 +791,9 @@ namespace qsl {
 	    this->check(&Sim1::swap, &Sim2::swap);
 	    std::cout << "Checking hadamard" << std::endl;
 	    this->check(&Sim1::hadamard, &Sim2::hadamard);
+	    std::cout << "Checking controlZ" << std::endl;
+	    this->check(&Sim1::controlZ, &Sim2::controlZ);
+	    
 	}
     };
 
@@ -812,6 +815,9 @@ namespace qsl {
 	    this->check(&Sim1::controlPhase, &Sim2::controlPhase);
 	    std::cout << "Checking swap" << std::endl;
 	    this->check(&Sim1::swap, &Sim2::swap);
+	    std::cout << "Checking controlZ" << std::endl;
+	    this->check(&Sim1::controlZ, &Sim2::controlZ);
+	    
 	}
     };
 

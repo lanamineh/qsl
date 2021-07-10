@@ -292,6 +292,28 @@ namespace qsl {
 	 * \param q2 The second qubit to swap.
 	 */
 	void swap(unsigned q1, unsigned q2);
+
+	/**
+	 * \brief Perform a controlled Z gate on two qubits. 
+	 *
+	 * \ingroup qubits_gates
+	 *
+	 *
+	 * \f[ 
+	 * CR_\theta = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & 1 & 0 \\
+	 *             0 & 0 & 0 & -1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param ctrl The control qubit, Z is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
+	void controlZ(unsigned ctrl, unsigned targ);
+
 	
 	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.

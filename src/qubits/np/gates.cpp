@@ -133,6 +133,42 @@ void qsl::Qubits<qsl::Type::NP, Fp>::swap(unsigned q1, unsigned q2)
 }
 
 
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::NP, Fp>::controlZ(unsigned ctrl, unsigned targ)
+{
+    // Gate does nothing if there is only one 1.
+    if (nones < 2) {
+	return;
+    }
+
+    // Find the bit positions of ctrl and targ
+    std::size_t small_bit = 1 << std::min(ctrl, targ);
+    std::size_t large_bit = 1 << std::max(ctrl, targ);
+
+    // Create masks for the 3 sections that the bit string will be broken into 
+    std::size_t lower_mask = small_bit - 1;
+    std::size_t mid_mask = ((large_bit >> 1) - 1) ^ lower_mask;
+    std::size_t upper_mask = ~(lower_mask | mid_mask);
+        
+    // Loop through all the other numbers with num_ones 1s 
+    // then break down that number into 3 parts to go on either side
+    // of q1 and q2
+    for (std::size_t i = 0; i < lookup.at({nqubits-2, nones-2}).size(); i++) {
+	std::size_t x = lookup.at({nqubits-2, nones-2})[i];
+	std::size_t lower = x & lower_mask;
+	std::size_t mid = x & mid_mask;
+	std::size_t upper = x & upper_mask;
+
+	// Calculate the index by adding together the 3 shifted sections
+	// of x and small_bit and large_bit (which represent having 1
+	// on ctrl and targ).
+	std::size_t index = lower + small_bit + (mid << 1) + large_bit + (upper << 2);
+	state[index].real *= -1; 
+	state[index].imag *= -1;
+    }
+}
+
+
 // Explicit instantiations
 template class qsl::Qubits<qsl::Type::NP, float>;
 template class qsl::Qubits<qsl::Type::NP, double>;
