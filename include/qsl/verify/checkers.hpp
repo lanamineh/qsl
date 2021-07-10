@@ -313,18 +313,30 @@ namespace qsl {
 
 	/**
 	 * \brief Class for holding results from the tests
+	 *
+	 * The measure checker repeats
+	 * 
 	 */
-	struct ResultData
-	{
-	    int thing;
-	};
+	using ResultData = Results<unsigned,double>;
 	
 	MeasureChecker() : nsamples(100), ci{0.95} {}
     
 	/**
 	 * \brief Check that the measure functions are the same
 	 *
-	 *
+	 * The measure function calls the measure() function on
+	 * the two simulators for each qubit and records the number
+	 * of times it produces zero and one. It calculates a
+	 * for the confidence interval for the estimated probability
+	 * of getting 1 from the function, and checks if the intervals
+	 * for each simulator overlap. If they do, the maximum relative
+	 * error between the estimates is computed.
+	 * 
+	 * The results table contains a row for each qubit number,
+	 * an integer value for whether the intervals overlap (1 if
+	 * they do, 0 if not), the value of the relative error
+	 * and the confidence level of the estimate. 
+	 * 
 	 */
 	ResultData checkAll(std::ostream & os)
 	    {
@@ -334,15 +346,15 @@ namespace qsl {
 		}
 
 		const unsigned nqubits = sim1->getNumQubits();
-
+		Results<unsigned,double> res{{"n", "overlap", "p1", "p2", "relerror", "level"}};
+		
 		// Store copies of the simulators to repeat the test
 		Sim1 sim1_copy{ sim1->getNumQubits() };
 		sim1_copy.setState(sim1->getState());
 		Sim2 sim2_copy{ sim2->getNumQubits() };
 		sim2_copy.setState(sim2->getState());
 		
-		// Repeat the test 
-		
+		// Repeat the test		
 		for (unsigned n = 0; n < nqubits; n++) {
 
 		    // Vectors to store the repeated measured results
@@ -391,13 +403,19 @@ namespace qsl {
 		    BinomialCI ci2{p2, ci, nsamples};
 	       		
 		    // Check if confidence intervals overlap
+		    unsigned overlap_flag = 0;
+		    double rel_error = 0;
+		    double clevel = 0; // Confidence level
 		    os << "n = " << n << ": "
-			      << "p1 = " << p1 << ", p2 = " << p2 << ", "; 
+		       << "p1 = " << p1 << ", p2 = " << p2 << ", "; 
 		    if (overlap(ci1, ci2)) {
 			// The ranges overlap
+			overlap_flag = 1;
+			rel_error = maxRelativeError(ci1,ci2);
+			clevel = ci*ci;
 			os << "error < "
-				  << 100*maxRelativeError(ci1,ci2) << "%"
-				  << " (" << 100*ci*ci << "% level)"
+				  << 100*rel_error << "%"
+				  << " (" << 100*clevel << "% level)"
 				  << std::endl; 
 		    } else {
 			// Ranges do not overlap. If p1 is in range 1
@@ -407,11 +425,12 @@ namespace qsl {
 				  << " (" << 100*ci*ci << "% level)"
 				  << std::endl;
 		    }
+
+		    res.addRow({n,overlap_flag},{p1,p2,rel_error,clevel});
 		}
 
 
-		return ResultData();
-		
+		return res;
 	    }
 
 	/// Set up the checker here

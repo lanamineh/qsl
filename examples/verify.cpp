@@ -6,9 +6,10 @@ int main ()
     qsl::Verify<qsl::Qubits<qsl::Type::Default, double>,
 		qsl::Qubits<qsl::Type::Omp, double>,
 		qsl::DefaultStateGen<double>,
-		qsl::ProbChecker> verify;
+		qsl::MeasureChecker> verify;
     verify.configureState(4);
-    auto result = verify.check<qsl::ProbChecker>();
+    verify.configureChecker<qsl::MeasureChecker>(10000, 0.95);
+    auto result = verify.check<qsl::MeasureChecker>();
     //verify.checkAll();
     result.print();
     
