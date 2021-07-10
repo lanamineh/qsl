@@ -880,11 +880,12 @@ namespace qsl {
 
 	/**
 	 * \brief Class for holding results from the tests
+	 *
+	 * For this checker, the results are stored in a standard map
+	 * which associated a Results table to the name of the gate.
+	 *
 	 */
-	struct ResultData
-	{
-	    std::map<std::string, Results<unsigned,double>> distances;
-	};
+	using ResultData = std::map<std::string, Results<unsigned,double>>;
 	
 	ResultData checkAll(std::ostream & os) {
 
@@ -892,38 +893,38 @@ namespace qsl {
 	    
 	    // Check one-qubit gates
 	    os << "Checking pauliX" << std::endl;
-	    results.distances.emplace(
+	    results.emplace(
 		"pauliX",
 		this->check(os, &Sim1::pauliX, &Sim2::pauliX));
  
 	    os << "Checking rotateX" << std::endl;
-	    results.distances.emplace(
+	    results.emplace(
 		"rotateX",
 		this->check(os, &Sim1::rotateX, &Sim2::rotateX));
 	    
 	    os << "Checking phase" << std::endl;
-	    results.distances.emplace(
+	    results.emplace(
 		"phase",
 		this->check(os, &Sim1::phase, &Sim2::phase));
 	    
 	    os << "Checking hadamard" << std::endl;
-	    results.distances.emplace(
+	    results.emplace(
 		"hadamard",
 		this->check(os, &Sim1::hadamard, &Sim2::hadamard));
 
 	    // Check two-qubit gates
 	    os << "Checking controlNot" << std::endl;
-	    results.distances.emplace(
+	    results.emplace(
 		"controlNot",
 		this->check(os, &Sim1::controlNot, &Sim2::controlNot));
 	    
 	    os << "Checking controlPhase" << std::endl;
-	    results.distances.emplace(
+	    results.emplace(
 		"controlPhase",
 		this->check(os, &Sim1::controlPhase, &Sim2::controlPhase));
 	    
 	    os << "Checking swap" << std::endl;
-	    results.distances.emplace(
+	    results.emplace(
 		"swap",
 		this->check(os, &Sim1::swap, &Sim2::swap));
 
@@ -945,21 +946,39 @@ namespace qsl {
 
 	/**
 	 * \brief Class for holding results from the tests
+	 *
+	 * For this checker, the results are stored in a standard map
+	 * which associated a Results table to the name of the gate.
+	 *
+	 * The table contains columns for the qubit indices (one for
+	 * one-qubit gates and two for two-qubit gates), and a distance
+	 * column for the Fubini-Study distance between the state 
+	 * vectors of the two simulators under test, after the gate 
+	 * has been performed.
+	 *
 	 */
-	struct ResultData
-	{
-	    int thing;
-	};
-	
-	ResultData checkAll(std::ostream & os) {
-	    os << "Checking phase" << std::endl;
-	    this->check(os, &Sim1::phase, &Sim2::phase);
-	    os << "Checking controlPhase" << std::endl;
-	    this->check(os, &Sim1::controlPhase, &Sim2::controlPhase);
-	    os << "Checking swap" << std::endl;
-	    this->check(os, &Sim1::swap, &Sim2::swap);
+	using ResultData = std::map<std::string, Results<unsigned,double>>;
 
-	    return ResultData();
+	ResultData checkAll(std::ostream & os) {
+
+	    ResultData results;
+	    
+	    os << "Checking phase" << std::endl;
+	    results.emplace(
+		"phase",
+		this->check(os, &Sim1::phase, &Sim2::phase));
+
+	    os << "Checking controlPhase" << std::endl;
+	    results.emplace(
+		"controlPhase",
+		this->check(os, &Sim1::controlPhase, &Sim2::controlPhase));
+
+	    os << "Checking swap" << std::endl;
+	    results.emplace(
+		"swap",
+		this->check(os, &Sim1::swap, &Sim2::swap));
+
+	    return results;
 	}
     };
 

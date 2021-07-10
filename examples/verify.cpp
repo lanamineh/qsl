@@ -4,15 +4,15 @@
 int main ()
 {
     qsl::Verify<qsl::Qubits<qsl::Type::Default, double>,
-		qsl::Qubits<qsl::Type::Omp, double>,
-		qsl::DefaultStateGen<double>,
-		qsl::DefaultGateChecker> verify;
-    verify.configureState(4);
-    auto result = verify.check<qsl::DefaultGateChecker>();
+		qsl::Qubits<qsl::Type::NP, double>,
+		qsl::NPStateGen<double>,
+		qsl::NPGateChecker> verify;
+    verify.configureState(4, 2);
+    auto result = verify.check<qsl::NPGateChecker>();
 
-    for (const auto & [gate,results] : result.distances) {
+    for (const auto & [gate,table] : result) {
 	std::cout << "Gate name: " << gate << std::endl;
-	results.print();
+        table.print();
     }
     
 }
