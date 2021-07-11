@@ -5,9 +5,9 @@
 
 TEST(OneQubitGates, pauliX)
 {
-    const unsigned num_qubits = 10;
-    const unsigned targ = 7;
-    using Fp = float;
+    const unsigned num_qubits = 8;
+    const unsigned targ = 4;
+    using Fp = double;
 
     // Make a random state
     qsl::Qubits<qsl::Type::Default, Fp> q{num_qubits};
@@ -26,16 +26,18 @@ TEST(OneQubitGates, pauliX)
     q.pauliX(targ);
 
     // Create gate in armadillo
-    arma::SpMat<Fp> X(2, 2);
+    arma::SpMat<std::complex<Fp>> X(2, 2);
     X(0, 1) = 1;
     X(1, 0) = 1;
     // Sizes of idenity matrix padding
     std::size_t pre = 1 << targ;
     std::size_t post = 1 << (num_qubits - targ - 1);
     // Tensor to make the gate
-    arma::SpMat<Fp> gate = arma::speye<arma::SpMat<Fp>>(pre, pre);
+    arma::SpMat<std::complex<Fp>> gate =
+	arma::speye<arma::SpMat<std::complex<Fp>>>(pre, pre);
     gate = arma::kron(X, gate);
-    gate = arma::kron(arma::speye<arma::SpMat<Fp>>(post, post), gate);
+    gate = arma::kron(arma::speye<arma::SpMat<std::complex<Fp>>>(post, post),
+		      gate);
 
     // Apply gate in armadillo
     v = gate * v;
