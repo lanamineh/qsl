@@ -27,7 +27,7 @@
 #include <vector>
 #include <string>
 #include "qsl/utils/complex.hpp"
-//#include <cmath>
+#include "qsl/utils/misc.hpp"
 
 namespace qsl {
 
@@ -131,6 +131,31 @@ namespace qsl {
 
     }
 
+    template<std::floating_point Fp>
+    unsigned checkStateNP(const std::vector<qsl::complex<Fp>> & state)
+    {
+	unsigned nones = 0;
+	bool found = false;
+    
+	for (std::size_t i = 0; i < state.size(); i++) {
+	    Fp amp = state[i].real * state[i].real +
+		state[i].imag * state[i].imag;
+	    // If amplitude is non-zero store the number of ones
+	    if (amp != 0) {
+		unsigned weight = qsl::hammingWeight(i);
+		if (found == false) {
+		    nones = weight;
+		    found = true;
+		}
+		else if (nones != weight) {
+		    throw std::logic_error("Input state is not number preserving.");
+		}
+	    }
+	}
+
+	return nones;
+    }
+
     /// Explicit instantiations
     template float fubiniStudy(const std::vector<complex<float>> & v,
 			       const std::vector<complex<float>> & w);
@@ -142,6 +167,9 @@ namespace qsl {
 
     template unsigned checkStateSize(const std::vector<complex<float>> & state);
     template unsigned checkStateSize(const std::vector<complex<double>> & state);
+
+    template unsigned checkStateNP(const std::vector<complex<float>> & state);
+    template unsigned checkStateNP(const std::vector<complex<double>> & state);
 
     template float norm(const std::vector<complex<float>> & v);
     template double norm(const std::vector<complex<double>> & v);

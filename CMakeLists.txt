@@ -40,6 +40,21 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   #set(CMAKE_CXX_FLAGS "/EHsc /std:c++17")
 endif()
 
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+  )
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(run-gtest src/gtest/utils.cpp)
+target_link_libraries(run-gtest gtest_main qsl)
+
+include(GoogleTest)
+gtest_discover_tests(run-gtest)
+
 include_directories(${PROJECT_SOURCE_DIR}/include/)
 
 # add source directories
@@ -67,29 +82,18 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   #set(COVERAGE_EXCLUDES "dir1/*" "dir2/*")
   setup_target_for_coverage_lcov(
     NAME coverage
-    EXECUTABLE ./bin/basic-tests
+    EXECUTABLE ./bin/run-gtest
     BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2/*"
+    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/gtest/*"
+    EXCLUDE "${CMAKE_BINARY_DIR}/*"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark/*"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/examples/*"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/utils/timer.hpp"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/timer.cpp"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/print.cpp"
     EXCLUDE "/usr/*")
-    
-  include(CodeCoverage)
-  setup_target_for_coverage_gcovr_html(
-    NAME coverage-html
-    EXECUTABLE basic-tests
-    BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2/*"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark/*"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/examples/*")
 endif()
- 
-add_executable(basic-tests src/tests/basic-tests.cpp)
-target_include_directories(basic-tests PRIVATE src/)
-target_link_libraries(basic-tests PRIVATE qsl)
 
 install(TARGETS qsl LIBRARY DESTINATION lib)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/qsl DESTINATION include)

@@ -47,7 +47,7 @@ namespace qsl {
 
 
     template<std::floating_point Fp>
-    std::vector<complex<Fp>> makeRandomState(std::uint8_t nqubits)
+    std::vector<complex<Fp>> makeRandomState(unsigned nqubits)
     {
 	std::size_t dim = 1 << nqubits;
 
@@ -70,18 +70,24 @@ namespace qsl {
 
     ///\todo This needs testing
     template<std::floating_point Fp>
-    std::vector<complex<Fp>> makeRandomNPState(std::uint8_t nqubits)
+    std::vector<complex<Fp>> makeRandomNPState(unsigned nqubits)
     {
-	std::size_t dim = 1 << nqubits;
-
-	qsl::Random<Fp> random(-1,1);
-
 	// Make a random number of ones
 	std::random_device r;    
 	std::mt19937 generator{r()};
 	std::uniform_int_distribution<unsigned> distribution(1,nqubits-1);
-	unsigned nones = nqubits/2;//distribution(generator);
+	unsigned nones = distribution(generator);
 
+	return makeRandomNPState<Fp>(nqubits,nones);
+    }
+
+    ///\todo This needs testing
+    template<std::floating_point Fp>
+    std::vector<complex<Fp>> makeRandomNPState(unsigned nqubits, unsigned nones)
+    {
+	Random<Fp> random{-1,1};
+	
+	std::size_t dim = 1 << nqubits;
 	std::size_t x = (1ULL << nones) - 1;
 	std::size_t end = x << (nqubits - nones);
 
@@ -102,6 +108,7 @@ namespace qsl {
 	return state;
     }
 
+    
 
     template<std::floating_point Fp>
     std::vector<Fp> makeRandomPhases(int test_len)
@@ -120,12 +127,18 @@ namespace qsl {
     template class qsl::Random<float>;
     template class qsl::Random<double>;
 
-    template std::vector<complex<float>> makeRandomState(std::uint8_t nqubits);
-    template std::vector<complex<double>> makeRandomState(std::uint8_t nqubits);
+    template std::vector<complex<float>> makeRandomState(unsigned nqubits);
+    template std::vector<complex<double>> makeRandomState(unsigned nqubits);
 
-    template std::vector<complex<float>> makeRandomNPState(std::uint8_t nqubits);
-    template std::vector<complex<double>> makeRandomNPState(std::uint8_t nqubits);
+    template std::vector<complex<float>> makeRandomNPState(unsigned nqubits);
+    template std::vector<complex<double>> makeRandomNPState(unsigned nqubits);
 
+    template std::vector<complex<float>> makeRandomNPState(unsigned nqubits,
+							   unsigned nones);
+    template std::vector<complex<double>> makeRandomNPState(unsigned nqubits,
+							    unsigned nones);
+
+    
     template std::vector<float> makeRandomPhases(int nqubits);
     template std::vector<double> makeRandomPhases(int nqubits);
 

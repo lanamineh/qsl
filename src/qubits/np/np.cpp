@@ -55,41 +55,6 @@ qsl::Qubits<qsl::Type::NP, Fp>::Qubits(unsigned nqubits_in, unsigned nones_in)
     reset();   
 }
 
-
-/**
- * \brief Check if the state is number preserving and find the number
- * of ones if it is.
- *
- * This function is probably inefficient - needs improving.
- * Also might make it a member function of the class 
- */
-template<std::floating_point Fp>
-unsigned checkStateNP(const std::vector<qsl::complex<Fp>> & state)
-{
-    unsigned nones = 0;
-    bool found = false;
-    
-    for (std::size_t i = 0; i < state.size(); i++) {
-	Fp amp = state[i].real * state[i].real +
-	    state[i].imag * state[i].imag;
-	// If amplitude is non-zero store the number of ones
-	if (amp != 0) {
-	    unsigned weight = qsl::hammingWeight(i);
-	    if (found == false) {
-		nones = weight;
-		found = true;
-	    }
-	    else if (nones != weight) {
-		throw std::logic_error("Input state is not number preserving.");
-	    }
-	}
-    }
-
-    return nones;
-}
-
-
-
 template<std::floating_point Fp>
 qsl::Qubits<qsl::Type::NP, Fp>::Qubits(const std::vector<qsl::complex<Fp>> & state)
     : nqubits{ qsl::checkStateSize(state) }, dim{ state.size() },

@@ -144,6 +144,17 @@ namespace qsl {
     template<std::floating_point Fp = double>
     unsigned checkStateSize(const std::vector<complex<Fp>> & state);
 
+    /**
+     * \brief Check if the state is number preserving and find the number
+     * of ones if it is.
+     *
+     * This function is probably inefficient - needs improving.
+     * Also might make it a member function of the class.
+     *
+     * Throws std::logic_error if state is not number preserving.
+     */
+    template<std::floating_point Fp = double>
+    unsigned checkStateNP(const std::vector<qsl::complex<Fp>> & state);
     
 }
     

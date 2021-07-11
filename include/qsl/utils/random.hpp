@@ -102,7 +102,7 @@ namespace qsl {
      * \brief Make a random state vector
      */
     template<std::floating_point Fp = double>
-    std::vector<complex<Fp>> makeRandomState(std::uint8_t nqubits);
+    std::vector<complex<Fp>> makeRandomState(unsigned nqubits);
 
     /**
      * \brief Make a random number preserved state vector
@@ -112,10 +112,10 @@ namespace qsl {
      * 
      */
     template<std::floating_point Fp = double>
-    std::vector<complex<Fp>> makeRandomNPState(std::uint8_t nqubits);
+    std::vector<complex<Fp>> makeRandomNPState(unsigned nqubits);
 
     template<std::floating_point Fp = double>
-    std::vector<complex<Fp>> makeRandomNPState(std::uint8_t nqubits, unsigned nones);
+    std::vector<complex<Fp>> makeRandomNPState(unsigned nqubits, unsigned nones);
 
     /**
      * \brief Generate a random state vector
