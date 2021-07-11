@@ -79,6 +79,22 @@ TEST(Utilities, ConvertStateTest)
     EXPECT_NEAR(val,0,1e-5);
 }
 
+/// Test the convertVector function
+TEST(Utilities, ConvertVectorTest)
+{
+    // Make a test vector
+    const std::vector<double> vec{ 1,3.2,3,4.9,3.2 }; 
+    const std::vector<float> copy{ qsl::convertVector<float>(vec) };
+
+    // Check that the two are equal
+    EXPECT_EQ(copy.size(), vec.size());
+    for (std::size_t n = 0; n < vec.size(); n++) {
+	EXPECT_FLOAT_EQ(vec[n], copy[n]);
+    }
+    
+}
+
+
 /// Test the innerProduct function
 TYPED_TEST(FpUtilities, InnerProductTest)
 {
