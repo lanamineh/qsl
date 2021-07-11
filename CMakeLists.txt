@@ -49,8 +49,8 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(run-gtest src/gtest/utils.cpp src/gtest/sim-constructors.cpp)
-target_link_libraries(run-gtest gtest_main qsl)
+add_executable(run-gtest src/gtest/utils.cpp src/gtest/sim-constructors.cpp src/gtest/one-qubit-gates.cpp)
+target_link_libraries(run-gtest gtest_main qsl armadillo)
 
 include(GoogleTest)
 gtest_discover_tests(run-gtest)
