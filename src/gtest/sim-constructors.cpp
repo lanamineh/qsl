@@ -242,7 +242,7 @@ TEST(ResizeSim, MeasureOutTest)
 	state_correct.push_back({0,0});
 	state_correct.push_back({1,0});
     } 
-    EXPECT_FLOAT_EQ(distance(state_correct, state), 0);
+    EXPECT_NEAR(distance(state_correct, state), 0, 1e-10);
 
     // Check that you can add a qubit
     q1.addQubit();
@@ -252,7 +252,7 @@ TEST(ResizeSim, MeasureOutTest)
     state_correct.push_back({0,0});
     state_correct.push_back({0,0});
 
-    EXPECT_FLOAT_EQ(distance(state_correct, state), 0);
+    EXPECT_NEAR(distance(state_correct, state), 0, 1e-10);
     EXPECT_FLOAT_EQ(qsl::norm(state), 1); // Check correct norm
 
     

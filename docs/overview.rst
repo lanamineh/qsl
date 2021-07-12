@@ -47,7 +47,7 @@ The following single qubit quantum gates are implemented by the simulator
   .. math::
      H = \frac{1}{\sqrt{2}}\begin{bmatrix}1&1\\1&-1\end{bmatrix},\\
 
-  and is accessible using the ``hadamard`` member function. It can be written in terms of X- and Y-rotations as follows: :math:`H = R_y(\pi/2)\sigma_x`. THe Hadamard gate is mainly used for creating an equal superposition of states.
+  and is accessible using the ``hadamard`` member function. It can be written in terms of X- and Y-rotations as follows: :math:`H = \sigma_xR_y(\pi/2)`. THe Hadamard gate is mainly used for creating an equal superposition of states.
 
 * **Arbitary unitary**
 
