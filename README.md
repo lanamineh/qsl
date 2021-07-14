@@ -63,5 +63,3 @@ make
 ## Source code documentation
 
 To read the (doxygen generated) documentation, clone the repository and run `make docs` inside the top level directory. The documentation will be created in a folder called html (navigate to `html/index.html`.
-
-test change
