@@ -64,35 +64,34 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::collapseOut(unsigned targ,
 						     unsigned outcome,
 						     Fp factor)
 {
-    // Collapse to outcome and renormalise the state vector simultaneously   
+    // Collapse to outcome and renormalise the state vector   
     std::size_t k = 1 << targ;
-    std::size_t res = outcome * k;
-    std::size_t not_res = (outcome ^ 1) * k;
-     // Iterator pointing to start of state
-    const auto it{ std::begin(state) };
+    std::size_t not_res = (outcome ^ 1) * k; 
 
-    // Loop through the state vector and renormalise amplitudes associated with
-    // the correct outcome and zero out those with the opposite outcome.
+    // Remove the qubit by deleting all the state vector
+    // amplitudes which do not correspond to the measured
+    // qubit outcome
+    const auto it{ std::begin(state) }; // Iterator pointing to start of state
 
-    // Traverse backwards through the state vector as it is
-    // easier for removing elements
+    // Traverse backwards through the state vector to erase elements
     for (int s = dim-2*k; s >= 0; s -= 2*k) {
 	for (int r = k-1; r >= 0; r--) {
-	    // Get the indices that need to be renormalised
-	    std::size_t keepIdx = s + res + r;
-	    state[keepIdx].real *= factor;
-	    state[keepIdx].imag *= factor;
-	    
 	    // Get the indices that need to be erased
-	    auto delIdx = it + s + not_res + r;
-	    state.erase(delIdx);
+	    auto index = it + s + not_res + r;
+	    state.erase(index);
 	}
     }
-    
+
     // update the dimension and the number of qubits
     nqubits--;
     dim = state.size();
 
+    // Renormalise everything in the compressed state vector
+    for (std::size_t i = 0; i < dim; i++) {
+	state[i].real *= factor;
+	state[i].imag *= factor;
+    }
+    
 }
 
 
