@@ -47,6 +47,69 @@ using NPSimTypes = ::testing::Types<Sim7,Sim8>;
 TYPED_TEST_SUITE(OneQubitGates, SimTypes);
 TYPED_TEST_SUITE(NPOneQubitGates, SimTypes);
 
+/// Gets the bit in the nth position of val
+unsigned getBit(unsigned val, unsigned n)
+{
+    return 1 & (val >> n);
+}
+
+/// Set the nth bit of val to b
+unsigned setBit(unsigned val, unsigned n, unsigned b)
+{
+    if (b == 0) {
+	val &= ~(1 << n);
+    } else {
+	val |= (1 << n);
+    }
+    return val;
+}
+
+
+/// Good luck...
+template<std::floating_point Fp>
+arma::SpMat<std::complex<Fp>>
+makeMatrix(const arma::Mat<std::complex<Fp>> & gate, unsigned nqubits,
+	   unsigned ctrl, unsigned targ)
+{
+    const std::size_t dim{ 1ULL << nqubits };
+    arma::SpMat<std::complex<Fp>> mat(dim,dim);    
+
+    // Write columns of mat
+    for (std::size_t col = 0; col < dim; col++) {
+
+	// Get column bitstring and find the value of the ctrl and targ bits
+	const unsigned ctrl_val = getBit(col, ctrl);
+	const unsigned targ_val = getBit(col, targ);
+
+	// Write rows of mat. For each row index, 
+	for (std::size_t n = 0; n < gate.n_rows; n++) {
+
+	    // Make the row index
+	    std::size_t row = col;
+	    row = setBit(row, ctrl, getBit(n,0));
+	    row = setBit(row, targ, getBit(n,1));
+
+	    // Make the column index for the small matrix
+	    std::size_t k = (targ_val << 1) | ctrl_val;
+	    mat(row,col) = gate(n,k);
+	}
+    }
+    return mat;
+}
+
+TEST(Thingy,mabob)
+{
+    
+    arma::Mat<std::complex<double>> gate(4, 4, arma::fill::zeros);
+    gate(0,0) = 1;
+    gate(1,1) = 1;
+    gate(2,3) = 1;
+    gate(3,2) = 1;
+    
+    std::cout << makeMatrix(gate, 3, 2, 1) << std::endl;
+
+}
+
 TYPED_TEST(OneQubitGates, OneQubitNoArg)
 {   
     const unsigned num_qubits = 8;
