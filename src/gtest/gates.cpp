@@ -45,6 +45,7 @@ using Sim8 = SimWrapper<qsl::Qubits<qsl::Type::NP, double>>;
 using NPSimTypes = ::testing::Types<Sim7,Sim8>;
 
 TYPED_TEST_SUITE(OneQubitGates, SimTypes);
+TYPED_TEST_SUITE(NPOneQubitGates, SimTypes);
 
 TYPED_TEST(OneQubitGates, OneQubitNoArg)
 {   
@@ -117,6 +118,89 @@ TYPED_TEST(OneQubitGates, OneQubitNoArg)
 		       };
     gates.push_back({fn_rotateX, rotateX});
     
+    
+    for (const auto & [fn, mat] : gates) {    
+
+	// Make a random state
+	Sim q{num_qubits};
+	const std::vector<qsl::complex<Fp>> state
+	    = qsl::makeRandomState<Fp>(num_qubits);
+	q.setState(state);
+
+	// Set an armadillo vector to the same state
+	std::size_t dim = 1 << num_qubits;
+	arma::Col<std::complex<Fp>> v(dim);
+	for (std::size_t i = 0; i < dim; i++) {
+	    v(i) = std::complex<Fp>{state[i].real, state[i].imag};
+	}
+
+	// Apply gate to qubits
+	std::invoke(fn, q, targ);
+
+	// Create gate in armadillo
+	// Sizes of idenity matrix padding
+	std::size_t pre = 1 << targ;
+	std::size_t post = 1 << (num_qubits - targ - 1);
+
+	// Tensor to make the gate
+	arma::SpMat<std::complex<Fp>> gate =
+	    arma::speye<arma::SpMat<std::complex<Fp>>>(pre, pre);
+	gate = arma::kron(mat, gate);
+	gate = arma::kron(arma::speye<arma::SpMat<std::complex<Fp>>>(post, post),
+			  gate);
+
+	// Apply gate in armadillo
+	v = gate * v;
+
+	// Read qubit state into armadillo
+	std::vector<qsl::complex<Fp>> res = q.getState();
+	arma::Col<std::complex<Fp>> qubit_v(dim);
+	for (std::size_t i = 0; i < dim; i++) {
+	    qubit_v(i) = std::complex<Fp>{res[i].real, res[i].imag};
+	}
+    
+    	EXPECT_TRUE(arma::approx_equal(v, qubit_v, "both", 1e-6, 1e-8));
+    }
+}
+
+TYPED_TEST(NPOneQubitGates, OneQubitNoArg)
+{   
+    const unsigned num_qubits = 8;
+    const unsigned targ = 4;
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+
+    // Create list of gates mapped to matrices
+    std::vector<std::pair<std::function<void(Sim &, unsigned)>, 
+			  arma::SpMat<std::complex<Fp>>>> gates;
+
+    // PauliZ
+    arma::SpMat<std::complex<Fp>> pauliZ(2, 2);
+    pauliZ(0, 0) = 1;
+    pauliZ(1, 1) = -1;
+    auto fn_pauliZ = [](Sim & sim, unsigned targ) {
+			 sim.pauliZ(targ);
+		     };
+    gates.push_back({fn_pauliZ, pauliZ});
+    
+    // phase shift
+    Fp angle = 0.4;
+    arma::SpMat<std::complex<Fp>> phase(2, 2);
+    phase(0, 0) = 1;
+    phase(1, 1) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
+    auto fn_phase = [=](Sim & sim, unsigned targ) {
+			sim.phase(targ, angle);
+		       };
+    gates.push_back({fn_phase, phase});
+
+    // rotateZ    
+    arma::SpMat<std::complex<Fp>> rotateZ(2, 2);
+    rotateZ(0, 0) = std::complex<Fp>{std::cos(angle/2), std::sin(-angle/2)};
+    rotateZ(1, 1) = std::complex<Fp>{std::cos(angle/2), std::sin(angle/2)};
+    auto fn_rotateZ = [=](Sim & sim, unsigned targ) {
+			sim.rotateZ(targ, angle);
+		       };
+    gates.push_back({fn_rotateZ, rotateZ});
     
     for (const auto & [fn, mat] : gates) {    
 
