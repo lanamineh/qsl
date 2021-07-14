@@ -33,8 +33,8 @@
 
 template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::Resize, Fp>::collapse(unsigned targ,
-						   unsigned outcome,
-						   Fp factor)
+						  unsigned outcome,
+						  Fp factor)
 {
     // Collapse to outcome and renormalise the state vector simultaneously   
     std::size_t k = 1 << targ;
@@ -57,6 +57,48 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::collapse(unsigned targ,
 	}
     }
     
+}
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Resize, Fp>::collapseOut(unsigned targ,
+						     unsigned outcome,
+						     Fp factor)
+{
+    // Collapse to outcome and renormalise the state vector simultaneously   
+    std::size_t k = 1 << targ;
+    std::size_t res = outcome * k;
+    std::size_t not_res = (outcome ^ 1) * k; 
+    
+    // Loop through the state vector and renormalise amplitudes associated with
+    // the correct outcome and zero out those with the opposite outcome.
+    for (std::size_t s = 0; s < dim; s += 2*k) { 
+	for (std::size_t r = 0; r < k; r++) {
+	    // Get the indices that need to be renormalised
+	    std::size_t index = s + res + r;
+	    state[index].real *= factor;
+	    state[index].imag *= factor;
+	}
+    }
+
+    // Now remove the qubit by deleting all the state vector
+    // amplitudes which do not correspond to the measured
+    // qubit outcome
+    
+    const auto it{ std::begin(state) }; // Iterator pointing to start of state
+
+    // Traverse backwards through the state vector to erase elements
+    for (int s = dim-2*k; s >= 0; s -= 2*k) {
+	for (int r = k-1; r >= 0; r--) {
+	    // Get the indices that need to be erased
+	    auto index = it + s + not_res + r;
+	    state.erase(index);
+	}
+    }
+
+    // update the dimension and the number of qubits
+    nqubits--;
+    dim = state.size();
+
 }
 
 
@@ -132,36 +174,7 @@ int qsl::Qubits<qsl::Type::Resize, Fp>::measureOut(unsigned targ)
     }
     
     // Collapse to outcome
-    collapse(targ, outcome, factor);
-
-    // Now remove the qubit by deleting all the state vector
-    // amplitudes which do not correspond to the measured
-    // qubit outcome
-    //
-    // You need the offset because as you remove elements from the
-    // state vector, the next indices you need to remove have moved.
-    // The offset corrects for this.
-    //
-    ///\todo It would be better to traverse the state backwards, the
-    /// the indices wouldn't change was you go.
-    // 
-    const auto it{ std::begin(state) }; // Iterator pointing to start of state
-    std::size_t offset = 0; // Keep track of removed elements
-    const std::size_t k = 1 << targ;
-    const std::size_t outcome_k =  (1 - outcome) << targ;
-    for (std::size_t s = 0; s < dim; s += 2*k) { 
-    	for (std::size_t r = 0; r < k; r++) {
-    	    // Get the index that needs to be removed
-    	    auto index = it + s + outcome_k + r - offset++;
-    	    state.erase(index);
-    	}
-    }
-
-    // update the dimension and the number of qubits
-    nqubits--;
-    dim = state.size();
-
-    // Re-normalise the state vector
+    collapseOut(targ, outcome, factor);
     
     return outcome;
 }
@@ -207,7 +220,7 @@ Fp qsl::Qubits<qsl::Type::Resize, Fp>::prob(unsigned targ, unsigned outcome)
 
 template<std::floating_point Fp>
 Fp qsl::Qubits<qsl::Type::Resize, Fp>::postselect(unsigned targ,
-						   unsigned outcome)
+						  unsigned outcome)
 {
     // Calculate renormalisation factor
     Fp probability = prob(targ, outcome);
@@ -215,6 +228,21 @@ Fp qsl::Qubits<qsl::Type::Resize, Fp>::postselect(unsigned targ,
 
     // Collapse to outcome
     collapse(targ, outcome, factor);
+
+    return probability;
+}
+
+
+template<std::floating_point Fp>
+Fp qsl::Qubits<qsl::Type::Resize, Fp>::postselectOut(unsigned targ,
+						     unsigned outcome)
+{
+    // Calculate renormalisation factor
+    Fp probability = prob(targ, outcome);
+    Fp factor = 1 / std::sqrt(probability);
+
+    // Collapse to outcome
+    collapseOut(targ, outcome, factor);
 
     return probability;
 }
