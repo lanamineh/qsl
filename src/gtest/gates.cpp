@@ -215,7 +215,6 @@ TEST(GateTests,MakeMatrixTestsSwap)
 
 TEST(GateTests,MakeMatrixTestsCHadamard)
 {
-
     // Controlled Hadamard gate, qubit 1 is ctrl, qubit 0 is targ
     arma::Mat<std::complex<double>> gate(4, 4, arma::fill::zeros);
     double one_sqrt2{1/std::sqrt(2)};
@@ -272,6 +271,43 @@ TEST(GateTests,MakeMatrixTestsCHadamard)
     EXPECT_EQ(m1(0b111,0b011), val);
     EXPECT_EQ(m1(0b111,0b111), -val);
 
+}
+
+/// Test the makeMatrix function against tensor product matrix
+TEST(GateTests,MakeMatrixTestsTensor)
+{
+    const unsigned num_qubits{ 8 };
+    unsigned ctrl = 6;
+    unsigned targ = 5;
+    
+    // Controlled Hadamard gate, qubit 1 is ctrl, qubit 0 is targ
+    arma::Mat<std::complex<double>> mat(4, 4, arma::fill::zeros);
+    double one_sqrt2{1/std::sqrt(2)};
+    mat(0b00,0b00) = 1;
+    mat(0b01,0b01) = 1;
+    mat(0b10,0b10) = one_sqrt2;
+    mat(0b10,0b11) = one_sqrt2;
+    mat(0b11,0b10) = one_sqrt2;
+    mat(0b11,0b11) = -one_sqrt2;
+
+    // Make identity gate
+    // Create gate in armadillo
+    // Sizes of idenity matrix padding
+    std::size_t pre = 1 << targ;
+    std::size_t post = 1 << (num_qubits - ctrl - 1);
+
+    // Tensor to make the gate. Have fun with these lines...
+    arma::SpMat<std::complex<double>> gate =
+	arma::speye<arma::SpMat<std::complex<double>>>(pre, pre);
+    gate = arma::kron(arma::conv_to<arma::SpMat<std::complex<double>>>::from(mat),
+		      gate);
+    gate = arma::kron(arma::speye<arma::SpMat<std::complex<double>>>(post, post),
+		      gate);
+
+
+    // Compute the same matrix using the makeMatrix function
+    const auto gate2{ makeMatrix(mat, num_qubits, ctrl, targ) };
+    EXPECT_TRUE(arma::approx_equal(gate2, gate, "absdiff", 1e-8));    
 }
 
 
