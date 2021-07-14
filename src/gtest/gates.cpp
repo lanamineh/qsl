@@ -69,11 +69,18 @@ unsigned setBit(unsigned val, unsigned n, unsigned b)
 template<std::floating_point Fp>
 arma::SpMat<std::complex<Fp>>
 makeMatrix(const arma::Mat<std::complex<Fp>> & gate, unsigned nqubits,
-	   unsigned ctrl, unsigned targ)
+	   const std::vector<unsigned> & indices)
 {
+    // Check that the gate size matches the length of the indices
+    if ((1ULL << indices.size()) != gate.n_rows) {
+	throw std::logic_error("Length of indices vector does not "
+			       "match the size of the gate in call "
+			       "to makeMatrix()");
+    }
+
     const std::size_t dim{ 1ULL << nqubits };
     arma::SpMat<std::complex<Fp>> mat(dim,dim);    
-
+	
     // Write columns of mat. The columns of the matrix
     // correspond to the images of the basis states under
     // the action of the unitary matrix. 
@@ -83,9 +90,15 @@ makeMatrix(const arma::Mat<std::complex<Fp>> & gate, unsigned nqubits,
 	// The values of the bits of col in the ctrl and targ positions
 	// fix which column of the small matrix is used in populating
 	// values of the big matrix at column col.
-	const unsigned ctrl_val = getBit(col, ctrl);
-	const unsigned targ_val = getBit(col, targ);
-
+	//
+	// Generalised for standard vector of qubit positions. 
+	//const unsigned ctrl_val = getBit(col, ctrl);
+	//const unsigned targ_val = getBit(col, targ);
+	std::vector<unsigned> vals;
+	for (std::size_t k = 0; k < indices.size(); k++) {
+	    vals.push_back(getBit(col, indices[k]));
+	}
+	
 	// Write rows of mat. For each row index, 
 	for (std::size_t n = 0; n < gate.n_rows; n++) {
 
@@ -95,15 +108,54 @@ makeMatrix(const arma::Mat<std::complex<Fp>> & gate, unsigned nqubits,
 	    // positions. There, they take every possible ctrl and
 	    // targ value.
 	    std::size_t row = col;
-	    row = setBit(row, ctrl, getBit(n,1));
-	    row = setBit(row, targ, getBit(n,0));
+	    //row = setBit(row, ctrl, getBit(n,1));
+	    //row = setBit(row, targ, getBit(n,0));
+	    for (std::size_t k = 0; k < indices.size(); k++) {
+		row = setBit(row, indices[k], getBit(n,k));
+	    }
 
 	    // Make the column index for the small matrix
-	    std::size_t k = (ctrl_val << 1) | targ_val;
-	    mat(row,col) = gate(n,k);
+	    //std::size_t k = (ctrl_val << 1) | targ_val;
+	    std::size_t m = 0;
+	    for (std::size_t k = 0; k < vals.size(); k++) {
+		m = setBit(m, k, vals[k]);
+	    }
+
+	    mat(row,col) = gate(n,m);
 	}
     }
     return mat;
+}
+
+TEST(GateTests, MakeMatrixTestsPauliX)
+{
+    // Pauli gate, targ = 4
+    const unsigned num_qubits{ 7 };
+    const unsigned targ{ 4 };
+    arma::Mat<std::complex<double>> mat(2, 2, arma::fill::zeros);
+    mat(0b0,0b1) = 1;
+    mat(0b1,0b0) = 1;
+    
+    // Make identity gate
+    // Create gate in armadillo
+    // Sizes of idenity matrix padding
+    std::size_t pre = 1 << targ;
+    std::size_t post = 1 << (num_qubits - targ - 1);
+
+    // Tensor to make the gate. Have fun with these lines...
+    arma::SpMat<std::complex<double>> gate =
+	arma::speye<arma::SpMat<std::complex<double>>>(pre, pre);
+    gate = arma::kron(arma::conv_to<arma::SpMat<std::complex<double>>>::from(mat),
+		      gate);
+    gate = arma::kron(arma::speye<arma::SpMat<std::complex<double>>>(post, post),
+		      gate);
+
+    // Compute the same matrix using the makeMatrix function
+    const auto gate2{ makeMatrix(mat, num_qubits, {targ}) };
+    EXPECT_TRUE(arma::approx_equal(gate2, gate, "absdiff", 1e-8));    
+
+
+
 }
 
 TEST(GateTests,MakeMatrixTestsCnot)
@@ -119,7 +171,7 @@ TEST(GateTests,MakeMatrixTestsCnot)
     // Apply CNOT to qubits ctrl = 1, targ = 0
     unsigned ctrl = 1;
     unsigned targ = 0;
-    const auto m0 = makeMatrix(gate, 3, ctrl, targ);
+    const auto m0 = makeMatrix(gate, 3, {targ, ctrl});
     std::cout << m0 << std::endl;
     // Check all the basis states
     const std::complex<double> one{1,0};
@@ -135,7 +187,7 @@ TEST(GateTests,MakeMatrixTestsCnot)
     // Apply CNOT to qubits ctrl = 0, targ = 2
     ctrl = 0;
     targ = 2;
-    const auto m1 = makeMatrix(gate, 3, ctrl, targ);
+    const auto m1 = makeMatrix(gate, 3, {targ, ctrl});
     std::cout << m1 << std::endl;
     // Check all the basis states
     EXPECT_EQ(m1(0b000,0b000), one); 
@@ -150,7 +202,7 @@ TEST(GateTests,MakeMatrixTestsCnot)
     // Check the degnerate cases
     ctrl = 0;
     targ = 1;
-    const auto m2 = makeMatrix(gate, 2, ctrl, targ);
+    const auto m2 = makeMatrix(gate, 2, {targ, ctrl});
     std::cout << m2 << std::endl;
     // Check all the basis states
     EXPECT_EQ(m2(0b00,0b00), one); 
@@ -161,7 +213,7 @@ TEST(GateTests,MakeMatrixTestsCnot)
     // Check the degnerate case the other way round
     ctrl = 1;
     targ = 0;
-    const auto m3 = makeMatrix(gate, 2, ctrl, targ);
+    const auto m3 = makeMatrix(gate, 2, {targ, ctrl});
     std::cout << m3 << std::endl;
     // Check all the basis states
     EXPECT_EQ(m3(0b00,0b00), one); 
@@ -183,7 +235,7 @@ TEST(GateTests,MakeMatrixTestsSwap)
     // Apply SWAP to qubits ctrl = 1, targ = 0
     unsigned ctrl = 1;
     unsigned targ = 0;
-    const auto m0 = makeMatrix(gate, 3, ctrl, targ);
+    const auto m0 = makeMatrix(gate, 3, {targ, ctrl});
     std::cout << m0 << std::endl;
     // Check all the basis states
     const std::complex<double> one{1,0};
@@ -199,7 +251,7 @@ TEST(GateTests,MakeMatrixTestsSwap)
     // Apply SWAP to qubits ctrl = 0, targ = 2
     ctrl = 0;
     targ = 2;
-    const auto m1 = makeMatrix(gate, 3, ctrl, targ);
+    const auto m1 = makeMatrix(gate, 3, {targ, ctrl});
     std::cout << m1 << std::endl;
     // Check all the basis states
     EXPECT_EQ(m1(0b000,0b000), one);
@@ -228,7 +280,7 @@ TEST(GateTests,MakeMatrixTestsCHadamard)
     // Apply controlled Hadamard to qubits ctrl = 1, targ = 0
     unsigned ctrl = 1;
     unsigned targ = 0;
-    const auto m0 = makeMatrix(gate, 3, ctrl, targ);
+    const auto m0 = makeMatrix(gate, 3, {targ, ctrl});
     std::cout << m0 << std::endl;
     // Check all the basis states
     const std::complex<double> one{1,0};
@@ -249,7 +301,7 @@ TEST(GateTests,MakeMatrixTestsCHadamard)
     // Apply controlled Hadamard to qubits ctrl = 1, targ = 0
     ctrl = 0;
     targ = 2;
-    const auto m1 = makeMatrix(gate, 3, ctrl, targ);
+    const auto m1 = makeMatrix(gate, 3, {targ, ctrl});
     std::cout << m1 << std::endl;
 
     // Check all the basis states
@@ -304,9 +356,8 @@ TEST(GateTests,MakeMatrixTestsTensor)
     gate = arma::kron(arma::speye<arma::SpMat<std::complex<double>>>(post, post),
 		      gate);
 
-
     // Compute the same matrix using the makeMatrix function
-    const auto gate2{ makeMatrix(mat, num_qubits, ctrl, targ) };
+    const auto gate2{ makeMatrix(mat, num_qubits, {targ, ctrl}) };
     EXPECT_TRUE(arma::approx_equal(gate2, gate, "absdiff", 1e-8));    
 }
 
