@@ -65,7 +65,9 @@ unsigned setBit(unsigned val, unsigned n, unsigned b)
 }
 
 
-/// Good luck...
+/**
+ * \brief Construct an armadillo matrix to apply an arbitrary gate
+ */
 template<std::floating_point Fp>
 arma::SpMat<std::complex<Fp>>
 makeMatrix(const arma::Mat<std::complex<Fp>> & gate, unsigned nqubits,
@@ -92,8 +94,6 @@ makeMatrix(const arma::Mat<std::complex<Fp>> & gate, unsigned nqubits,
 	// values of the big matrix at column col.
 	//
 	// Generalised for standard vector of qubit positions. 
-	//const unsigned ctrl_val = getBit(col, ctrl);
-	//const unsigned targ_val = getBit(col, targ);
 	std::vector<unsigned> vals;
 	for (std::size_t k = 0; k < indices.size(); k++) {
 	    vals.push_back(getBit(col, indices[k]));
@@ -108,14 +108,11 @@ makeMatrix(const arma::Mat<std::complex<Fp>> & gate, unsigned nqubits,
 	    // positions. There, they take every possible ctrl and
 	    // targ value.
 	    std::size_t row = col;
-	    //row = setBit(row, ctrl, getBit(n,1));
-	    //row = setBit(row, targ, getBit(n,0));
 	    for (std::size_t k = 0; k < indices.size(); k++) {
 		row = setBit(row, indices[k], getBit(n,k));
 	    }
 
 	    // Make the column index for the small matrix
-	    //std::size_t k = (ctrl_val << 1) | targ_val;
 	    std::size_t m = 0;
 	    for (std::size_t k = 0; k < vals.size(); k++) {
 		m = setBit(m, k, vals[k]);
