@@ -369,10 +369,10 @@ TYPED_TEST(OneQubitGates, OneQubitNoArg)
 
     // Create list of gates mapped to matrices
     std::vector<std::pair<std::function<void(Sim &, unsigned)>, 
-			  arma::SpMat<std::complex<Fp>>>> gates;
+			  arma::Mat<std::complex<Fp>>>> gates;
 
     // PauliX 
-    arma::SpMat<std::complex<Fp>> pauliX(2, 2);
+    arma::Mat<std::complex<Fp>> pauliX(2, 2, arma::fill::zeros);
     pauliX(0, 1) = 1;
     pauliX(1, 0) = 1;
     auto fn_pauliX = [](Sim & sim, unsigned targ) {
@@ -381,7 +381,7 @@ TYPED_TEST(OneQubitGates, OneQubitNoArg)
     gates.push_back({fn_pauliX, pauliX});
 
     // PauliZ
-    arma::SpMat<std::complex<Fp>> pauliZ(2, 2);
+    arma::Mat<std::complex<Fp>> pauliZ(2, 2, arma::fill::zeros);
     pauliZ(0, 0) = 1;
     pauliZ(1, 1) = -1;
     auto fn_pauliZ = [](Sim & sim, unsigned targ) {
@@ -390,7 +390,7 @@ TYPED_TEST(OneQubitGates, OneQubitNoArg)
     gates.push_back({fn_pauliZ, pauliZ});
     
     // Hadamard
-    arma::SpMat<std::complex<Fp>> hadamard(2, 2);
+    arma::Mat<std::complex<Fp>> hadamard(2, 2, arma::fill::zeros);
     Fp sqrt2 = 1/std::sqrt(2);
     hadamard(0, 0) = sqrt2;
     hadamard(0, 1) = sqrt2;
@@ -403,7 +403,7 @@ TYPED_TEST(OneQubitGates, OneQubitNoArg)
 
     // phase shift
     Fp angle = 0.4;
-    arma::SpMat<std::complex<Fp>> phase(2, 2);
+    arma::Mat<std::complex<Fp>> phase(2, 2, arma::fill::zeros);
     phase(0, 0) = 1;
     phase(1, 1) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
     auto fn_phase = [=](Sim & sim, unsigned targ) {
@@ -412,7 +412,7 @@ TYPED_TEST(OneQubitGates, OneQubitNoArg)
     gates.push_back({fn_phase, phase});
 
     // rotateZ    
-    arma::SpMat<std::complex<Fp>> rotateZ(2, 2);
+    arma::Mat<std::complex<Fp>> rotateZ(2, 2, arma::fill::zeros);
     rotateZ(0, 0) = std::complex<Fp>{std::cos(angle/2), std::sin(-angle/2)};
     rotateZ(1, 1) = std::complex<Fp>{std::cos(angle/2), std::sin(angle/2)};
     auto fn_rotateZ = [=](Sim & sim, unsigned targ) {
@@ -421,7 +421,7 @@ TYPED_TEST(OneQubitGates, OneQubitNoArg)
     gates.push_back({fn_rotateZ, rotateZ});
     
     // rotateX
-    arma::SpMat<std::complex<Fp>> rotateX(2, 2);
+    arma::Mat<std::complex<Fp>> rotateX(2, 2, arma::fill::zeros);
     rotateX(0, 0) = std::cos(angle/2);
     rotateX(0, 1) = std::complex<Fp>{0,-std::sin(angle/2)};
     rotateX(1, 0) = std::complex<Fp>{0,-std::sin(angle/2)};
@@ -450,20 +450,8 @@ TYPED_TEST(OneQubitGates, OneQubitNoArg)
 	// Apply gate to qubits
 	std::invoke(fn, q, targ);
 
-	// Create gate in armadillo
-	// Sizes of idenity matrix padding
-	std::size_t pre = 1 << targ;
-	std::size_t post = 1 << (num_qubits - targ - 1);
-
-	// Tensor to make the gate
-	arma::SpMat<std::complex<Fp>> gate =
-	    arma::speye<arma::SpMat<std::complex<Fp>>>(pre, pre);
-	gate = arma::kron(mat, gate);
-	gate = arma::kron(arma::speye<arma::SpMat<std::complex<Fp>>>(post, post),
-			  gate);
-
 	// Apply gate in armadillo
-	v = gate * v;
+	v = makeMatrix(mat, num_qubits, {targ}) * v;
 
 	// Read qubit state into armadillo
 	std::vector<qsl::complex<Fp>> res = q.getState();
