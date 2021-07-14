@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <qsl/qubits.hpp>
+#include <qsl/concepts.hpp>
 #include <armadillo>
 #include <complex>
 #include <list>
@@ -45,14 +46,166 @@ using NPSimTypes = ::testing::Types<Sim7,Sim8>;
 
 TYPED_TEST_SUITE(OneQubitGates, SimTypes);
 
+/**
+ * \brief A class for holding the 
+ *
+ *
+ */
+template<qsl::Simulator Sim, typename... Args>
+class GateAndMatrix
+{
+    /**
+     * \brief The gate member function to execute
+     *
+     * Args is either one or two unsigned arguments,
+     * depending if the gate is a one-qubit gate
+     * or a two-qubit gate.
+     *
+     */
+    std::function<void(Sim &, Args... args)> gate;
+
+    /**
+     * \brief The armadillo matrix for the gate
+     * 
+     * This member holds the armadillo matrix for the one-
+     * or two-qubit gate.
+     */
+    arma::SpMat<std::complex<typename Sim::Fp_type>> mat;
+
+public:
+
+    /**
+     * \brief Return the small armadillo matrix
+     */
+    arma::SpMat<std::complex<typename Sim::Fp_type>> getMat() const
+	{
+	    return mat;
+	}
+    
+    using Fp = Sim::Fp_type;
+    
+    GateAndMatrix(std::function<void(Sim &, Args... args)> gate_in,
+		  arma::SpMat<std::complex<Fp>> mat_in)
+	: gate{gate_in}, mat{mat_in}
+	{}
+
+    /**
+     * \brief Run the gate on the simulator
+     * 
+     * Pass either one or two unsigned arguments, which correspond to
+     * the qubit indices of the gate which is applied.
+     *
+     * \return The vector  
+     * 
+     */
+     std::vector<qsl::complex<Fp>> runGate(Sim & sim, Args... args)
+	{
+	    std::invoke(sim, gate, args...);
+	    return sim.getState();
+	}
+
+    /**
+     * \brief Run the armadillo matrix multiplication
+     *
+     * Multiply the big armadillo matrix by the state vector. This 
+     * function has a different implementation for one- and two-qubit
+     * gates, because in the case of two-qubit gates the
+     * state vector must be rearranged before the multiplication.
+     */
+    virtual arma::Col<std::complex<Fp>>
+    runArma(arma::Col<std::complex<Fp>>,
+	    unsigned num_qubits, Args... args) = 0;
+};
+
+
+template<qsl::Simulator Sim>
+class OneQubit : public GateAndMatrix<Sim,unsigned>
+{
+    using Fp = GateAndMatrix<Sim,unsigned>::Fp;
+    
+    /**
+     * \brief Create armadillo gate
+     *
+     * This function creates the big armadillo matrix which
+     * gets multipled my the state vector. For the single
+     * qubit gate you Tensor product the small gate together
+     * 
+     */
+    arma::SpMat<std::complex<Fp>> makeArmaGate(unsigned targ,
+					       unsigned num_qubits) const
+	{
+	    // Create gate in armadillo
+	    // Sizes of idenity matrix padding
+	    std::size_t pre = 1 << targ;
+	    std::size_t post = 1 << (num_qubits - targ - 1);
+
+	    arma::SpMat<std::complex<typename Sim::Fp_type>> mat{
+		this->getMat()
+	    };
+	    
+	    // Tensor to make the gate
+	    arma::SpMat<std::complex<Fp>> gate =
+		arma::speye<arma::SpMat<std::complex<Fp>>>(pre, pre);
+	    gate = arma::kron(mat, gate);
+	    gate =
+		arma::kron(arma::speye<arma::SpMat<std::complex<Fp>>>(post, post),
+			   gate);
+	    return gate;
+	}
+    
+public:
+
+    OneQubit(std::function<void(Sim &, unsigned)> gate_in,
+	     arma::SpMat<std::complex<Fp>> mat_in)
+	: GateAndMatrix<Sim,unsigned>{gate_in, mat_in}
+	{}
+    
+    /**
+     * \brief Run the armadillo matrix multiplication
+     *
+     * Multiply the big armadillo matrix by the state vector.
+     */
+    arma::Col<std::complex<Fp>> runArma(const arma::Col<std::complex<Fp>> & v,
+					unsigned num_qubits, unsigned targ)
+	{
+	    return makeArmaGate(targ, num_qubits) * v;
+	}
+};
+
+template<qsl::Simulator Sim>
+class PauliX : public OneQubit<Sim>
+{
+
+    arma::SpMat<std::complex<Fp>> makeMat() const
+	{
+	    arma::SpMat<std::complex<Fp>> pauliX(2, 2);
+	    pauliX(0, 1) = 1;
+	    pauliX(1, 0) = 1;
+	    return pauliX;
+
+	}
+
+    auto makeFn() const
+	{
+	    auto fn = [](Sim & sim, unsigned targ) {
+			  sim.pauliX(targ);
+		      };
+	    return fn;
+	}
+    
+public:
+    PauliX()
+	: 
+    
+};
+
 TYPED_TEST(OneQubitGates, OneQubitNoArg)
 {   
     const unsigned num_qubits = 8;
     const unsigned targ = 4;
-    using Sim = TypeParam::Sim;//qsl::Qubits<qsl::Type::Default, Fp>; 
+    using Sim = TypeParam::Sim;
     using Fp = TypeParam::Sim::Fp_type;
 
-   
     // Create list of gates mapped to matrices
     std::vector<std::pair<std::function<void(Sim &, unsigned)>, 
 			  arma::SpMat<std::complex<Fp>>>> gates;
@@ -119,6 +272,7 @@ TYPED_TEST(OneQubitGates, OneQubitNoArg)
     
     
     for (const auto & [fn, mat] : gates) {    
+
 	// Make a random state
 	Sim q{num_qubits};
 	const std::vector<qsl::complex<Fp>> state
@@ -139,6 +293,7 @@ TYPED_TEST(OneQubitGates, OneQubitNoArg)
 	// Sizes of idenity matrix padding
 	std::size_t pre = 1 << targ;
 	std::size_t post = 1 << (num_qubits - targ - 1);
+
 	// Tensor to make the gate
 	arma::SpMat<std::complex<Fp>> gate =
 	    arma::speye<arma::SpMat<std::complex<Fp>>>(pre, pre);
