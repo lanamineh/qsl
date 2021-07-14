@@ -74,41 +74,207 @@ makeMatrix(const arma::Mat<std::complex<Fp>> & gate, unsigned nqubits,
     const std::size_t dim{ 1ULL << nqubits };
     arma::SpMat<std::complex<Fp>> mat(dim,dim);    
 
-    // Write columns of mat
+    // Write columns of mat. The columns of the matrix
+    // correspond to the images of the basis states under
+    // the action of the unitary matrix. 
     for (std::size_t col = 0; col < dim; col++) {
 
-	// Get column bitstring and find the value of the ctrl and targ bits
+	// Get column bitstring and find the value of the ctrl and targ bits.
+	// The values of the bits of col in the ctrl and targ positions
+	// fix which column of the small matrix is used in populating
+	// values of the big matrix at column col.
 	const unsigned ctrl_val = getBit(col, ctrl);
 	const unsigned targ_val = getBit(col, targ);
 
 	// Write rows of mat. For each row index, 
 	for (std::size_t n = 0; n < gate.n_rows; n++) {
 
-	    // Make the row index
+	    // Make the row index. The rows that are non-zero in a
+	    // particular column are the ones whose bits agree with
+	    // the bits in the col, apart from at the ctrl and targ
+	    // positions. There, they take every possible ctrl and
+	    // targ value.
 	    std::size_t row = col;
-	    row = setBit(row, ctrl, getBit(n,0));
-	    row = setBit(row, targ, getBit(n,1));
+	    row = setBit(row, ctrl, getBit(n,1));
+	    row = setBit(row, targ, getBit(n,0));
 
 	    // Make the column index for the small matrix
-	    std::size_t k = (targ_val << 1) | ctrl_val;
+	    std::size_t k = (ctrl_val << 1) | targ_val;
 	    mat(row,col) = gate(n,k);
 	}
     }
     return mat;
 }
 
-TEST(Thingy,mabob)
+TEST(GateTests,MakeMatrixTestsCnot)
 {
-    
+
+    // CNOT gate, qubit 1 is ctrl, qubit 0 is targ
     arma::Mat<std::complex<double>> gate(4, 4, arma::fill::zeros);
-    gate(0,0) = 1;
-    gate(1,1) = 1;
-    gate(2,3) = 1;
-    gate(3,2) = 1;
-    
-    std::cout << makeMatrix(gate, 3, 2, 1) << std::endl;
+    gate(0b00,0b00) = 1;
+    gate(0b01,0b01) = 1;
+    gate(0b10,0b11) = 1;
+    gate(0b11,0b10) = 1;
+
+    // Apply CNOT to qubits ctrl = 1, targ = 0
+    unsigned ctrl = 1;
+    unsigned targ = 0;
+    const auto m0 = makeMatrix(gate, 3, ctrl, targ);
+    std::cout << m0 << std::endl;
+    // Check all the basis states
+    const std::complex<double> one{1,0};
+    EXPECT_EQ(m0(0b000,0b000), one); // |000) -> |000) 
+    EXPECT_EQ(m0(0b001,0b001), one); // |001) -> |001) 
+    EXPECT_EQ(m0(0b010,0b011), one); // |010) -> |011) 
+    EXPECT_EQ(m0(0b011,0b010), one); // |011) -> |010) 
+    EXPECT_EQ(m0(0b100,0b100), one); // |100) -> |100) 
+    EXPECT_EQ(m0(0b101,0b101), one); // |101) -> |101) 
+    EXPECT_EQ(m0(0b110,0b111), one); // |110) -> |111) 
+    EXPECT_EQ(m0(0b111,0b110), one); // |111) -> |110) 
+
+    // Apply CNOT to qubits ctrl = 0, targ = 2
+    ctrl = 0;
+    targ = 2;
+    const auto m1 = makeMatrix(gate, 3, ctrl, targ);
+    std::cout << m1 << std::endl;
+    // Check all the basis states
+    EXPECT_EQ(m1(0b000,0b000), one); 
+    EXPECT_EQ(m1(0b001,0b101), one);
+    EXPECT_EQ(m1(0b010,0b010), one);
+    EXPECT_EQ(m1(0b011,0b111), one);
+    EXPECT_EQ(m1(0b100,0b100), one);
+    EXPECT_EQ(m1(0b101,0b001), one);
+    EXPECT_EQ(m1(0b110,0b110), one);
+    EXPECT_EQ(m1(0b111,0b011), one);
+
+    // Check the degnerate cases
+    ctrl = 0;
+    targ = 1;
+    const auto m2 = makeMatrix(gate, 2, ctrl, targ);
+    std::cout << m2 << std::endl;
+    // Check all the basis states
+    EXPECT_EQ(m2(0b00,0b00), one); 
+    EXPECT_EQ(m2(0b01,0b11), one);
+    EXPECT_EQ(m2(0b10,0b10), one);
+    EXPECT_EQ(m2(0b11,0b01), one);
+
+    // Check the degnerate case the other way round
+    ctrl = 1;
+    targ = 0;
+    const auto m3 = makeMatrix(gate, 2, ctrl, targ);
+    std::cout << m3 << std::endl;
+    // Check all the basis states
+    EXPECT_EQ(m3(0b00,0b00), one); 
+    EXPECT_EQ(m3(0b01,0b01), one);
+    EXPECT_EQ(m3(0b10,0b11), one);
+    EXPECT_EQ(m3(0b11,0b10), one);
+}
+
+TEST(GateTests,MakeMatrixTestsSwap)
+{
+
+    // SWAP gate, qubit 1 is ctrl, qubit 0 is targ
+    arma::Mat<std::complex<double>> gate(4, 4, arma::fill::zeros);
+    gate(0b00,0b00) = 1;
+    gate(0b01,0b10) = 1;
+    gate(0b10,0b01) = 1;
+    gate(0b11,0b11) = 1;
+
+    // Apply SWAP to qubits ctrl = 1, targ = 0
+    unsigned ctrl = 1;
+    unsigned targ = 0;
+    const auto m0 = makeMatrix(gate, 3, ctrl, targ);
+    std::cout << m0 << std::endl;
+    // Check all the basis states
+    const std::complex<double> one{1,0};
+    EXPECT_EQ(m0(0b000,0b000), one); // |000) -> |000) 
+    EXPECT_EQ(m0(0b001,0b010), one); // |001) -> |010) 
+    EXPECT_EQ(m0(0b010,0b001), one); // |010) -> |001) 
+    EXPECT_EQ(m0(0b011,0b011), one); // |011) -> |011) 
+    EXPECT_EQ(m0(0b100,0b100), one); // |100) -> |100) 
+    EXPECT_EQ(m0(0b101,0b110), one); // |101) -> |110) 
+    EXPECT_EQ(m0(0b110,0b101), one); // |110) -> |101) 
+    EXPECT_EQ(m0(0b111,0b111), one); // |111) -> |111) 
+
+    // Apply SWAP to qubits ctrl = 0, targ = 2
+    ctrl = 0;
+    targ = 2;
+    const auto m1 = makeMatrix(gate, 3, ctrl, targ);
+    std::cout << m1 << std::endl;
+    // Check all the basis states
+    EXPECT_EQ(m1(0b000,0b000), one);
+    EXPECT_EQ(m1(0b001,0b100), one);
+    EXPECT_EQ(m1(0b010,0b010), one);
+    EXPECT_EQ(m1(0b011,0b110), one);
+    EXPECT_EQ(m1(0b100,0b001), one);
+    EXPECT_EQ(m1(0b101,0b101), one);
+    EXPECT_EQ(m1(0b110,0b011), one);
+    EXPECT_EQ(m1(0b111,0b111), one);
 
 }
+
+TEST(GateTests,MakeMatrixTestsCHadamard)
+{
+
+    // Controlled Hadamard gate, qubit 1 is ctrl, qubit 0 is targ
+    arma::Mat<std::complex<double>> gate(4, 4, arma::fill::zeros);
+    double one_sqrt2{1/std::sqrt(2)};
+    gate(0b00,0b00) = 1;
+    gate(0b01,0b01) = 1;
+    gate(0b10,0b10) = one_sqrt2;
+    gate(0b10,0b11) = one_sqrt2;
+    gate(0b11,0b10) = one_sqrt2;
+    gate(0b11,0b11) = -one_sqrt2;
+
+    // Apply controlled Hadamard to qubits ctrl = 1, targ = 0
+    unsigned ctrl = 1;
+    unsigned targ = 0;
+    const auto m0 = makeMatrix(gate, 3, ctrl, targ);
+    std::cout << m0 << std::endl;
+    // Check all the basis states
+    const std::complex<double> one{1,0};
+    const std::complex<double> val{one_sqrt2,0};
+    EXPECT_EQ(m0(0b000,0b000), one); // |000) -> |000) 
+    EXPECT_EQ(m0(0b001,0b001), one); // |001) -> |010) 
+    EXPECT_EQ(m0(0b010,0b010), val); // |010) -> [ |010) + |011) ] / sqrt2 
+    EXPECT_EQ(m0(0b010,0b011), val);
+    EXPECT_EQ(m0(0b011,0b010), val); // |011) -> [ |010) - |011) ] / sqrt2 
+    EXPECT_EQ(m0(0b011,0b011), -val);
+    EXPECT_EQ(m0(0b100,0b100), one); // |100) -> |100) 
+    EXPECT_EQ(m0(0b101,0b101), one); // |101) -> |110) 
+    EXPECT_EQ(m0(0b110,0b110), val); // |110) -> [ |110) + |111) ] / sqrt2 
+    EXPECT_EQ(m0(0b110,0b111), val);
+    EXPECT_EQ(m0(0b111,0b110), val); // |111) -> [ |110) - |111) ] / sqrt2 
+    EXPECT_EQ(m0(0b111,0b111), -val);
+
+    // Apply controlled Hadamard to qubits ctrl = 1, targ = 0
+    ctrl = 0;
+    targ = 2;
+    const auto m1 = makeMatrix(gate, 3, ctrl, targ);
+    std::cout << m1 << std::endl;
+
+    // Check all the basis states
+    // Identity
+    EXPECT_EQ(m1(0b000,0b000), one);
+    EXPECT_EQ(m1(0b010,0b010), one);
+    EXPECT_EQ(m1(0b100,0b100), one);
+    EXPECT_EQ(m1(0b110,0b110), one);
+
+    // To the plus state
+    EXPECT_EQ(m1(0b001,0b001), val);
+    EXPECT_EQ(m1(0b001,0b101), val);
+    EXPECT_EQ(m1(0b011,0b011), val);
+    EXPECT_EQ(m1(0b011,0b111), val);
+
+    // To the minus state
+    EXPECT_EQ(m1(0b101,0b001), val);
+    EXPECT_EQ(m1(0b101,0b101), -val);
+    EXPECT_EQ(m1(0b111,0b011), val);
+    EXPECT_EQ(m1(0b111,0b111), -val);
+
+}
+
+
 
 TYPED_TEST(OneQubitGates, OneQubitNoArg)
 {   
