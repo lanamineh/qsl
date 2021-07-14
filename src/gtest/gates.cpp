@@ -2,13 +2,55 @@
 #include <qsl/qubits.hpp>
 #include <armadillo>
 #include <complex>
+#include <list>
 
-TEST(Gates, OneQubitNoArg)
+template<typename T>
+struct SimWrapper
+{
+    using Sim = T;
+};
+
+/**
+ * \brief Typed test suite for one-qubit gates
+ */
+template <typename T>
+class OneQubitGates : public testing::Test {
+public:
+    using List = std::list<T>;
+    static T shared_;
+    T value_;
+};
+
+template <typename T>
+class NPOneQubitGates : public testing::Test {
+public:
+    using List = std::list<T>;
+    static T shared_;
+    T value_;
+};
+
+
+/// List of simulator types to check
+using Sim1 = SimWrapper<qsl::Qubits<qsl::Type::Default, float>>;
+using Sim2 = SimWrapper<qsl::Qubits<qsl::Type::Default, double>>;
+using Sim3 = SimWrapper<qsl::Qubits<qsl::Type::Omp, float>>;
+using Sim4 = SimWrapper<qsl::Qubits<qsl::Type::Omp, double>>;
+using Sim5 = SimWrapper<qsl::Qubits<qsl::Type::Resize, float>>;
+using Sim6 = SimWrapper<qsl::Qubits<qsl::Type::Resize, double>>;
+using SimTypes = ::testing::Types<Sim1, Sim2, Sim3, Sim4, Sim5, Sim6>;
+
+using Sim7 = SimWrapper<qsl::Qubits<qsl::Type::NP, float>>;
+using Sim8 = SimWrapper<qsl::Qubits<qsl::Type::NP, double>>;
+using NPSimTypes = ::testing::Types<Sim7,Sim8>;
+
+TYPED_TEST_SUITE(OneQubitGates, SimTypes);
+
+TYPED_TEST(OneQubitGates, OneQubitNoArg)
 {   
     const unsigned num_qubits = 8;
     const unsigned targ = 4;
-    using Fp = double;
-    using Sim = qsl::Qubits<qsl::Type::Default, Fp>; 
+    using Sim = TypeParam::Sim;//qsl::Qubits<qsl::Type::Default, Fp>; 
+    using Fp = TypeParam::Sim::Fp_type;
 
    
     // Create list of gates mapped to matrices
@@ -24,6 +66,15 @@ TEST(Gates, OneQubitNoArg)
 		     };
     gates.push_back({fn_pauliX, pauliX});
 
+    // PauliZ
+    arma::SpMat<std::complex<Fp>> pauliZ(2, 2);
+    pauliZ(0, 0) = 1;
+    pauliZ(1, 1) = -1;
+    auto fn_pauliZ = [](Sim & sim, unsigned targ) {
+			 sim.pauliZ(targ);
+		     };
+    gates.push_back({fn_pauliZ, pauliZ});
+    
     // Hadamard
     arma::SpMat<std::complex<Fp>> hadamard(2, 2);
     Fp sqrt2 = 1/std::sqrt(2);
@@ -37,7 +88,7 @@ TEST(Gates, OneQubitNoArg)
     gates.push_back({fn_hadamard, hadamard});
 
     // phase shift
-    double angle = 0.4;
+    Fp angle = 0.4;
     arma::SpMat<std::complex<Fp>> phase(2, 2);
     phase(0, 0) = 1;
     phase(1, 1) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
@@ -105,6 +156,6 @@ TEST(Gates, OneQubitNoArg)
 	    qubit_v(i) = std::complex<Fp>{res[i].real, res[i].imag};
 	}
     
-    	EXPECT_TRUE(arma::approx_equal(v, qubit_v, "both", 1e-8, 1e-10));
+    	EXPECT_TRUE(arma::approx_equal(v, qubit_v, "both", 1e-6, 1e-8));
     }
 }
