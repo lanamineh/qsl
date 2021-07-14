@@ -76,7 +76,6 @@ target_link_libraries(resize PUBLIC qsl)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 if(CMAKE_COMPILER_IS_GNUCXX)
-
   # Output is used by codecov
   include(CodeCoverage)
   #set(COVERAGE_EXCLUDES "dir1/*" "dir2/*")

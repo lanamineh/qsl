@@ -10,24 +10,63 @@ TEST(Gates, OneQubitNoArg)
     using Fp = double;
     using Sim = qsl::Qubits<qsl::Type::Default, Fp>; 
 
-    // Create armadillo matrices
+   
+    // Create list of gates mapped to matrices
+    std::vector<std::pair<std::function<void(Sim &, unsigned)>, 
+			  arma::SpMat<std::complex<Fp>>>> gates;
+
+    // PauliX 
     arma::SpMat<std::complex<Fp>> pauliX(2, 2);
     pauliX(0, 1) = 1;
     pauliX(1, 0) = 1;
-    
+    auto fn_pauliX = [](Sim & sim, unsigned targ) {
+			 sim.pauliX(targ);
+		     };
+    gates.push_back({fn_pauliX, pauliX});
+
+    // Hadamard
     arma::SpMat<std::complex<Fp>> hadamard(2, 2);
     Fp sqrt2 = 1/std::sqrt(2);
     hadamard(0, 0) = sqrt2;
     hadamard(0, 1) = sqrt2;
     hadamard(1, 0) = sqrt2;
     hadamard(1, 1) = -sqrt2;
+    auto fn_hadamard = [](Sim & sim, unsigned targ) {
+			   sim.hadamard(targ);
+		       };
+    gates.push_back({fn_hadamard, hadamard});
 
-    // Create list of gates mapped to matrices
-    std::vector<std::pair<qsl::Gate<Sim, unsigned>, 
-			  arma::SpMat<std::complex<Fp>>>> gates;
-    gates.push_back({&Sim::pauliX, pauliX});
-    gates.push_back({&Sim::hadamard, hadamard});
+    // phase shift
+    double angle = 0.4;
+    arma::SpMat<std::complex<Fp>> phase(2, 2);
+    phase(0, 0) = 1;
+    phase(1, 1) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
+    auto fn_phase = [=](Sim & sim, unsigned targ) {
+			sim.phase(targ, angle);
+		       };
+    gates.push_back({fn_phase, phase});
 
+    // rotateZ    
+    arma::SpMat<std::complex<Fp>> rotateZ(2, 2);
+    rotateZ(0, 0) = std::complex<Fp>{std::cos(angle/2), std::sin(-angle/2)};
+    rotateZ(1, 1) = std::complex<Fp>{std::cos(angle/2), std::sin(angle/2)};
+    auto fn_rotateZ = [=](Sim & sim, unsigned targ) {
+			sim.rotateZ(targ, angle);
+		       };
+    gates.push_back({fn_rotateZ, rotateZ});
+    
+    // rotateX
+    arma::SpMat<std::complex<Fp>> rotateX(2, 2);
+    rotateX(0, 0) = std::cos(angle/2);
+    rotateX(0, 1) = std::complex<Fp>{0,-std::sin(angle/2)};
+    rotateX(1, 0) = std::complex<Fp>{0,-std::sin(angle/2)};
+    rotateX(1, 1) = std::cos(angle/2);
+    auto fn_rotateX = [=](Sim & sim, unsigned targ) {
+			sim.rotateX(targ, angle);
+		       };
+    gates.push_back({fn_rotateX, rotateX});
+    
+    
     for (const auto & [fn, mat] : gates) {    
 	// Make a random state
 	Sim q{num_qubits};
