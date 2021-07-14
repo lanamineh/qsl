@@ -45,6 +45,22 @@ void qsl::Qubits<qsl::Type::Default, Fp>::pauliX(unsigned targ)
 }
 
 template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::pauliZ(unsigned targ)
+{
+    std::size_t k = 1 << targ;
+    for (std::size_t s = 0; s < dim; s += 2*k) { 
+	for (std::size_t r = 0; r < k; r++) {
+	    // Get the index of |1>
+	    std::size_t index = s + k + r;
+	    // Apply -1 phase
+	    state[index].real *= -1;
+	    state[index].imag *= -1;
+	}
+    }
+}
+
+
+template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::Default, Fp>::hadamard(unsigned targ)
 {
     std::size_t k = 1 << targ;

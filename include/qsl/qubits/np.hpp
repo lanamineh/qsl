@@ -193,6 +193,23 @@ namespace qsl {
 	void phase(unsigned targ, Fp angle);
 
 	/**
+	 * \brief Apply the Pauli Z gate to qubit number targ.
+	 *
+	 * \ingroup qubits_gates_np
+	 *
+	 * \f[ 
+	 * Z = \begin{pmatrix}
+	 *     1 & 0 \\
+	 *     0 & -1 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 */
+	void pauliZ(unsigned targ);
+
+	
+	/**
 	 * \brief Rotate around the z-axis of the Bloch sphere \f$ e^{-i\theta Z/2} \f$
 	 *
 	 * \ingroup qubits_gates_np
@@ -202,7 +219,7 @@ namespace qsl {
 	 * angle \f$ \theta \f$:
 	 * 
 	 * \f[ 
-	 * R_x = \begin{pmatrix}
+	 * R_z = \begin{pmatrix}
 	 *       e^{-i\theta/2} & 0 \\
 	 *       0 & e^{i\theta/2} \\
 	 *       \end{pmatrix} 
@@ -243,7 +260,7 @@ namespace qsl {
 	 * \ingroup qubits_gates_np
 
 	 * \f[ 
-	 * CR_\theta = \begin{pmatrix}
+	 * SWAP = \begin{pmatrix}
 	 *             1 & 0 & 0 & 0 \\
 	 *             0 & 0 & 1 & 0 \\
 	 *             0 & 1 & 0 & 0 \\
@@ -263,7 +280,7 @@ namespace qsl {
 	 *
 	 *
 	 * \f[ 
-	 * CR_\theta = \begin{pmatrix}
+	 * CZ = \begin{pmatrix}
 	 *             1 & 0 & 0 & 0 \\
 	 *             0 & 1 & 0 & 0 \\
 	 *             0 & 0 & 1 & 0 \\

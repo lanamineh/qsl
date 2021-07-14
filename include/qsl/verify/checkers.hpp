@@ -985,6 +985,11 @@ namespace qsl {
 		"rotateZ",
 		this->check(os, &Sim1::rotateZ, &Sim2::rotateZ));
 	    
+	    os << "Checking pauliZ" << std::endl;
+	    results.emplace(
+		"pauliZ",
+		this->check(os, &Sim1::pauliZ, &Sim2::pauliZ));
+
 	    // Check two-qubit gates
 	    os << "Checking controlZ" << std::endl;
 	    results.emplace(
@@ -1051,6 +1056,12 @@ namespace qsl {
 		"rotateZ",
 		this->check(os, &Sim1::rotateZ, &Sim2::rotateZ));
 
+	    os << "Checking pauliZ" << std::endl;
+	    results.emplace(
+		"pauliZ",
+		this->check(os, &Sim1::pauliZ, &Sim2::pauliZ));
+
+	    
 	    os << "Checking controlZ" << std::endl;
 	    results.emplace(
 		"controlZ",

@@ -59,6 +59,31 @@ void qsl::Qubits<qsl::Type::NP, Fp>::phase(unsigned targ, Fp angle)
 }
 
 template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::NP, Fp>::pauliZ(unsigned targ)
+{
+    // Position of target qubit
+    std::size_t k = 1 << targ;
+
+    // Create masks for breaking up the number
+    std::size_t lower_mask = k - 1;
+    std::size_t upper_mask = ~lower_mask;
+    
+    // Loop through all the other numbers
+    //#pragma omp parallel for
+    for (std::size_t i = 0; i < lookup.at({nqubits-1, nones-1}).size(); i++) {
+	std::size_t x = lookup.at({nqubits-1, nones-1})[i];
+	std::size_t lower = x & lower_mask;
+	std::size_t upper = x & upper_mask;
+	// Get index for 1 in target position
+	std::size_t index = lower + k + (upper << 1);
+
+	state[index].real *= -1;
+	state[index].imag *= -1;
+    }
+}
+
+
+template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::NP, Fp>::rotateZ(unsigned targ, Fp angle)
 {
     Fp cos = std::cos(angle/2);
