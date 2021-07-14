@@ -15,7 +15,7 @@ struct SimWrapper
  * \brief Typed test suite for one-qubit gates
  */
 template <typename T>
-class OneQubitGates : public testing::Test {
+class Gates : public testing::Test {
 public:
     using List = std::list<T>;
     static T shared_;
@@ -23,7 +23,7 @@ public:
 };
 
 template <typename T>
-class NPOneQubitGates : public testing::Test {
+class NPGates : public testing::Test {
 public:
     using List = std::list<T>;
     static T shared_;
@@ -44,8 +44,8 @@ using Sim7 = SimWrapper<qsl::Qubits<qsl::Type::NP, float>>;
 using Sim8 = SimWrapper<qsl::Qubits<qsl::Type::NP, double>>;
 using NPSimTypes = ::testing::Types<Sim7,Sim8>;
 
-TYPED_TEST_SUITE(OneQubitGates, SimTypes);
-TYPED_TEST_SUITE(NPOneQubitGates, SimTypes);
+TYPED_TEST_SUITE(Gates, SimTypes);
+TYPED_TEST_SUITE(NPGates, NPSimTypes);
 
 /// Gets the bit in the nth position of val
 unsigned getBit(unsigned val, unsigned n)
@@ -360,7 +360,7 @@ TEST(GateTests,MakeMatrixTestsTensor)
 
 
 
-TYPED_TEST(OneQubitGates, OneQubitNoArg)
+TYPED_TEST(Gates, OneQubitNoArg)
 {   
     const unsigned num_qubits = 8;
     const unsigned targ = 4;
@@ -464,9 +464,179 @@ TYPED_TEST(OneQubitGates, OneQubitNoArg)
     }
 }
 
-TYPED_TEST(NPOneQubitGates, OneQubitNoArg)
+TYPED_TEST(Gates, TwoQubitGate)
 {   
     const unsigned num_qubits = 8;
+    const unsigned ctrl = 2;
+    const unsigned targ = 4;
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+
+    // Create list of gates mapped to matrices
+    std::vector<std::pair<std::function<void(Sim &, unsigned, unsigned)>, 
+			  arma::Mat<std::complex<Fp>>>> gates;
+
+    // controlNot
+    arma::Mat<std::complex<Fp>> cnot(4, 4, arma::fill::zeros);
+    cnot(0b00,0b00) = 1;
+    cnot(0b01,0b01) = 1;
+    cnot(0b10,0b11) = 1;
+    cnot(0b11,0b10) = 1;
+    auto fn_cnot = [](Sim & sim, unsigned ctrl, unsigned targ) {
+			 sim.controlNot(ctrl, targ);
+		     };
+    gates.push_back({fn_cnot, cnot});
+
+    // controlPhase
+    Fp angle{ 0.3 };
+    arma::Mat<std::complex<Fp>> cphase(4, 4, arma::fill::zeros);
+    cphase(0b00,0b00) = 1;
+    cphase(0b01,0b01) = 1;
+    cphase(0b10,0b10) = 1;
+    cphase(0b11,0b11) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
+    auto fn_cphase = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+		       sim.controlPhase(ctrl, targ, angle);
+		   };
+    gates.push_back({fn_cphase, cphase});
+
+    // controlZ
+    arma::Mat<std::complex<Fp>> cz(4, 4, arma::fill::zeros);
+    cz(0b00,0b00) = 1;
+    cz(0b01,0b01) = 1;
+    cz(0b10,0b10) = 1;
+    cz(0b11,0b11) = -1;
+    auto fn_cz = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+		     sim.controlZ(ctrl, targ);
+		   };
+    gates.push_back({fn_cz, cz});
+    
+    // swap
+    arma::Mat<std::complex<Fp>> swap(4, 4, arma::fill::zeros);
+    swap(0b00,0b00) = 1;
+    swap(0b01,0b10) = 1;
+    swap(0b10,0b01) = 1;
+    swap(0b11,0b11) = 1;
+    auto fn_swap = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+		       sim.swap(ctrl, targ);
+		   };
+    gates.push_back({fn_swap, swap});
+    
+    for (const auto & [fn, mat] : gates) {    
+
+	// Make a random state
+	Sim q{num_qubits};
+	const std::vector<qsl::complex<Fp>> state
+	    = qsl::makeRandomState<Fp>(num_qubits);
+	q.setState(state);
+
+	// Set an armadillo vector to the same state
+	std::size_t dim = 1 << num_qubits;
+	arma::Col<std::complex<Fp>> v(dim);
+	for (std::size_t i = 0; i < dim; i++) {
+	    v(i) = std::complex<Fp>{state[i].real, state[i].imag};
+	}
+
+	// Apply gate to qubits
+	std::invoke(fn, q, ctrl, targ);
+
+	// Apply gate in armadillo
+	v = makeMatrix(mat, num_qubits, {targ, ctrl}) * v;
+
+	// Read qubit state into armadillo
+	std::vector<qsl::complex<Fp>> res = q.getState();
+	arma::Col<std::complex<Fp>> qubit_v(dim);
+	for (std::size_t i = 0; i < dim; i++) {
+	    qubit_v(i) = std::complex<Fp>{res[i].real, res[i].imag};
+	}
+    
+    	EXPECT_TRUE(arma::approx_equal(v, qubit_v, "both", 1e-6, 1e-8));
+    }
+}
+
+TYPED_TEST(NPGates, TwoQubitGate)
+{   
+    const unsigned num_qubits = 8;
+    const unsigned num_ones = 4;
+    const unsigned ctrl = 2;
+    const unsigned targ = 4;
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+
+    // Create list of gates mapped to matrices
+    std::vector<std::pair<std::function<void(Sim &, unsigned, unsigned)>, 
+			  arma::Mat<std::complex<Fp>>>> gates;
+    
+    // controlPhase
+    Fp angle{ 0.3 };
+    arma::Mat<std::complex<Fp>> cphase(4, 4, arma::fill::zeros);
+    cphase(0b00,0b00) = 1;
+    cphase(0b01,0b01) = 1;
+    cphase(0b10,0b10) = 1;
+    cphase(0b11,0b11) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
+    auto fn_cphase = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+		       sim.controlPhase(ctrl, targ, angle);
+		   };
+    gates.push_back({fn_cphase, cphase});
+
+    // controlZ
+    arma::Mat<std::complex<Fp>> cz(4, 4, arma::fill::zeros);
+    cz(0b00,0b00) = 1;
+    cz(0b01,0b01) = 1;
+    cz(0b10,0b10) = 1;
+    cz(0b11,0b11) = -1;
+    auto fn_cz = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+		     sim.controlZ(ctrl, targ);
+		   };
+    gates.push_back({fn_cz, cz});
+    
+    // swap
+    arma::Mat<std::complex<Fp>> swap(4, 4, arma::fill::zeros);
+    swap(0b00,0b00) = 1;
+    swap(0b01,0b10) = 1;
+    swap(0b10,0b01) = 1;
+    swap(0b11,0b11) = 1;
+    auto fn_swap = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+		       sim.swap(ctrl, targ);
+		   };
+    gates.push_back({fn_swap, swap});
+    
+    for (const auto & [fn, mat] : gates) {    
+
+	// Make a random state
+	Sim q{num_qubits};
+	const std::vector<qsl::complex<Fp>> state
+	    = qsl::makeRandomNPState<Fp>(num_qubits, num_ones);
+	q.setState(state);
+
+	// Set an armadillo vector to the same state
+	std::size_t dim = 1 << num_qubits;
+	arma::Col<std::complex<Fp>> v(dim);
+	for (std::size_t i = 0; i < dim; i++) {
+	    v(i) = std::complex<Fp>{state[i].real, state[i].imag};
+	}
+
+	// Apply gate to qubits
+	std::invoke(fn, q, ctrl, targ);
+
+	// Apply gate in armadillo
+	v = makeMatrix(mat, num_qubits, {targ, ctrl}) * v;
+
+	// Read qubit state into armadillo
+	std::vector<qsl::complex<Fp>> res = q.getState();
+	arma::Col<std::complex<Fp>> qubit_v(dim);
+	for (std::size_t i = 0; i < dim; i++) {
+	    qubit_v(i) = std::complex<Fp>{res[i].real, res[i].imag};
+	}
+    
+    	EXPECT_TRUE(arma::approx_equal(v, qubit_v, "both", 1e-6, 1e-8));
+    }
+}
+
+
+TYPED_TEST(NPGates, OneQubitNoArg)
+{   
+    const unsigned num_qubits = 8;
+    const unsigned num_ones = 4;
     const unsigned targ = 4;
     using Sim = TypeParam::Sim;
     using Fp = TypeParam::Sim::Fp_type;
@@ -508,7 +678,7 @@ TYPED_TEST(NPOneQubitGates, OneQubitNoArg)
 	// Make a random state
 	Sim q{num_qubits};
 	const std::vector<qsl::complex<Fp>> state
-	    = qsl::makeRandomState<Fp>(num_qubits);
+	    = qsl::makeRandomNPState<Fp>(num_qubits, num_ones);
 	q.setState(state);
 
 	// Set an armadillo vector to the same state
