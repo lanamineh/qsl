@@ -69,6 +69,22 @@ namespace qsl {
 	void collapse(unsigned targ, unsigned outcome, Fp factor);
 
 	/**
+	 * \brief Collapse a qubit to the given outcome and remove
+	 * from the state vector.
+	 * 
+	 * This member function has the same behaviour as the collapse
+	 * function, but the measured qubit is also removed from the state
+	 * vector, and the number of qubits returned by getNumQubits() is reduced
+	 * by one. 
+	 *
+	 * The resulting state vector preserves the order of the other qubits,
+	 * meaning that a qubit at location index > targ will now be addressable
+	 * using index - 1. 
+	 *
+	 */
+	void collapseOut(unsigned targ, unsigned outcome, Fp factor);
+	
+	/**
 	 * \brief Generate the cumulative probability vector, ignoring
 	 * amplitudes that are zero.
 	 */
@@ -415,6 +431,27 @@ namespace qsl {
 	 */
 	Fp postselect(unsigned targ, unsigned outcome);
 
+	/**
+	 * \brief Perform a postselection measurement and
+	 * remove the qubit from the state vector.
+	 *
+	 * This is not a reversible operation unlike applying quantum gates.
+	 * 
+	 * This member function has the same behaviour as the postselect
+	 * function, but the measured qubit is also removed from the state
+	 * vector, and the number of qubits returned by getNumQubits() is reduced
+	 * by one. 
+	 *
+	 * The resulting state vector preserves the order of the other qubits,
+	 * meaning that a qubit at location index > targ will now be addressable
+	 * using index - 1.
+	 *
+	 * \param targ The qubit to measure.
+	 * \param outcome The outcome (0 or 1) to post select on.
+	 * \return The probability of measuring qubit targ in the given outcome.
+	 */
+	Fp postselectOut(unsigned targ, unsigned outcome);
+	
 	/**
 	 * \brief Sample measurement outcome for one qubit multiple times.
 	 * 
