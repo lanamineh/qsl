@@ -233,6 +233,7 @@ TEST(ResizeSim, MeasureOutTest)
     outcome = q1.measureOut(1); // Measure out qubit 1
     state = q1.getState();
     EXPECT_EQ(state.size(), 2);
+    EXPECT_FLOAT_EQ(qsl::norm(state), 1); // Check correct norm
 
     std::vector<qsl::complex<double>> state_correct;
     if (outcome == 0) {
