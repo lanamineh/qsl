@@ -49,7 +49,7 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(run-gtest src/gtest/utils.cpp src/gtest/sim-constructors.cpp src/gtest/gates.cpp)
+add_executable(run-gtest src/gtest/utils.cpp src/gtest/sim-constructors.cpp src/gtest/gates.cpp src/gtest/measurements.cpp src/gtest/test-utils.cpp)
 target_link_libraries(run-gtest gtest_main qsl armadillo)
 
 include(GoogleTest)
