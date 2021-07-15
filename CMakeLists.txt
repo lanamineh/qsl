@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12.4) # To get std=c++20
 
 # set the project name
-project(qsl VERSION 0.1 LANGUAGES CXX ASM)
+project(qsl VERSION 0.1 LANGUAGES CXX)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
@@ -15,6 +15,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # Test install to build directory
 #set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/qsl-install-test)
 set(CMAKE_INSTALL_PREFIX /usr)
+
+# This is a simple way to ensure that gcc-10 is used,
+# even if update-alternatives is not configured.
+# It will not work if later versions of the compiler
+# are released. Todo: fix with a better method
+set(CMAKE_C_COMPILER "gcc-10")
+set(CMAKE_CXX_COMPILER "g++-10")
 
 find_package(OpenMP REQUIRED)
 
