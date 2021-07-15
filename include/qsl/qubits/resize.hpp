@@ -23,6 +23,12 @@
  * 
  */
 
+/**
+ * \defgroup qubits_resize functionsResize
+ * \brief Functions that are different/specific to the Resize simulator.
+ */
+
+
 #ifndef QUBITS_RESIZE_HPP
 #define QUBITS_RESIZE_HPP
 
@@ -71,6 +77,7 @@ namespace qsl {
 	/**
 	 * \brief Collapse a qubit to the given outcome and remove
 	 * from the state vector.
+	 * \ingroup qubits_resize
 	 * 
 	 * This member function has the same behaviour as the collapse
 	 * function, but the measured qubit is also removed from the state
@@ -99,46 +106,21 @@ namespace qsl {
 
 	/**
 	 * \brief Initialise the class with a fixed number of qubits
-	 *
-	 * This function constructors an object with the specified 
-	 * number of qubits. The simulator is initialised in the
-	 * all zero state.
-	 *
-	 * \param nqubits The number of qubits to simulate
 	 */ 
 	Qubits(unsigned nqubits);
 
 	/**
 	 * \brief  Initialise the class from a pre-prepared state vector
-	 *
-	 *
-	 * This function constructs an object with the given initial
-	 * state vector. The  state vector must have a length which 
-	 * is a power of two, otherwise the function will throw 
-	 * std::logic_error.
-	 *
-	 * \param state A vector containing the initial state for the object
-	 *
 	 */
 	Qubits(const std::vector<complex<Fp>> & state);
 
 	/**
 	 * \brief Copy constructor
-	 *
-	 *
-	 * You can make copies of this object by constructing from an 
-	 * object of the same type.
 	 */
 	Qubits(const Qubits & ) = default;
 
 	/**
 	 * \brief Copy-assignment operator
-	 *
-	 *
-	 * You can assign one Qubits object to another, provided that they both
-	 * represent the same number of qubits. In this case, this operation
-	 * copies the state vector of one object to the other. If the number of
-	 * qubits are not equal, this function throws std::logic_error.
 	 */
 	void operator = (const Qubits & old);
 
@@ -162,6 +144,7 @@ namespace qsl {
 
 	/**
 	 * \brief Add a qubit to the state vector
+	 * \ingroup qubits_resize
 	 *
 	 * This function adds a qubit to the end of the list of qubits.
 	 * The resulting state is a tensor product between the previous
@@ -177,204 +160,63 @@ namespace qsl {
 	void addQubit();
 
 	/**
-	 * \brief Rotate around the x-axis of the Bloch sphere \f$ e^{-i\theta X/2} \f$
-	 *
-	 *
-	 * This single qubit gate applies the following 2x2 matrix to each
-	 * pair of \f$ |0\rangle \f$ and \f$ |1\rangle \f$ amplitudes for 
-	 * angle \f$ \theta \f$:
-	 * 
-	 * \f[ 
-	 * R_x = \begin{pmatrix}
-	 *       \cos(\theta/2) & -i\sin(\theta/2) \\
-	 *       -i\sin(\theta/2) & \cos(\theta/2) \\
-	 *       \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param targ The target qubit.
-	 * \param angle The angle to rotate the qubit by.
+	 * \brief Rotate around the x-axis of the Bloch sphere 
 	 */
 	void rotateX(unsigned targ, Fp angle);
 
 	/**
-	 * \brief Rotate around the z-axis of the Bloch sphere \f$ e^{-i\theta Z/2} \f$
-	 *
-	 * This single qubit gate applies the following 2x2 matrix to each
-	 * pair of \f$ |0\rangle \f$ and \f$ |1\rangle \f$ amplitudes for 
-	 * angle \f$ \theta \f$:
-	 * 
-	 * \f[ 
-	 * R_z = \begin{pmatrix}
-	 *       e^{-i\theta/2} & 0 \\
-	 *       0 & e^{i\theta/2} \\
-	 *       \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param targ The target qubit.
-	 * \param angle The angle to rotate the qubit by.
+	 * \brief Rotate around the z-axis of the Bloch sphere
 	 */
 	void rotateZ(unsigned targ, Fp angle);
 	
 	/**
 	 * \brief Apply the Hadamard gate to qubit number targ.
-	 *
-	 *
-	 * \f[ 
-	 * H = \frac{1}{\sqrt{2}}\begin{pmatrix}
-	 *     1 & 1 \\
-	 *     1 & -1 \\
-	 *     \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param targ The target qubit.
 	 */
 	void hadamard(unsigned targ);
 	
 	/**
 	 * \brief Apply the Pauli X gate to qubit number targ.
-	 *
-	 *
-	 * \f[ 
-	 * X = \begin{pmatrix}
-	 *     0 & 1 \\
-	 *     1 & 0 \\
-	 *     \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param targ The target qubit.
 	 */
 	void pauliX(unsigned targ);
 
 	/**
 	 * \brief Apply the Pauli Z gate to qubit number targ.
-	 *
-	 * \f[ 
-	 * Z = \begin{pmatrix}
-	 *     1 & 0 \\
-	 *     0 & -1 \\
-	 *     \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param targ The target qubit.
 	 */
 	void pauliZ(unsigned targ);
 	
 	/**
 	 * \brief Apply a phase shift to qubit number targ.
-	 *
-	 *
-	 * \f[ 
-	 * R_\theta = \begin{pmatrix}
-	 *            1 & 0 \\
-	 *            0 & e^{i\theta} \\
-	 *            \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param targ The target qubit.
-	 * \param angle The angle to phase shift the qubit by.
 	 */
 	void phase(unsigned targ, Fp angle);
 
 	/**
 	 * \brief Perform the controlled Not (CNOT) gate on two qubits.
-	 *
-	 *
-	 * Controlled on the first qubit, the matrix is:
-	 * \f[ 
-	 * CNOT = \begin{pmatrix}
-	 *        1 & 0 & 0 & 0 \\
-	 *        0 & 1 & 0 & 0 \\
-	 *        0 & 0 & 0 & 1 \\
-	 *        0 & 0 & 1 & 0
-	 *        \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param ctrl The control qubit, NOT is applied on the target qubit
-	 *             if this qubit is \f$ |1\rangle \f$.
-	 * \param targ The target qubit.
 	 */
 	void controlNot(unsigned ctrl, unsigned targ);
 
 	/**
 	 * \brief Perform a controlled phase shift on two qubits. 
-	 *
-	 *
-	 * A phase is added if both qubits are in the \f$ |1\rangle \f$ state. 
-	 *
-	 * \f[ 
-	 * CR_\theta = \begin{pmatrix}
-	 *             1 & 0 & 0 & 0 \\
-	 *             0 & 1 & 0 & 0 \\
-	 *             0 & 0 & 1 & 0 \\
-	 *             0 & 0 & 0 & e^{i\theta}
-	 *             \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param ctrl The control qubit, phase shift is applied on the target qubit
-	 *             if this qubit is \f$ |1\rangle \f$.
-	 * \param targ The target qubit.
-	 * \param angle The angle to phase shift the target qubit by.
 	 */
 	void controlPhase(unsigned ctrl, unsigned targ, Fp angle);
 
 	/**
 	 * \brief Perform a swap gate on two qubits. 
-	 *
-	 *
-	 * \f[ 
-	 * SWAP = \begin{pmatrix}
-	 *             1 & 0 & 0 & 0 \\
-	 *             0 & 0 & 1 & 0 \\
-	 *             0 & 1 & 0 & 0 \\
-	 *             0 & 0 & 0 & 1
-	 *             \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param q1 The first qubit to swap.
-	 * \param q2 The second qubit to swap.
 	 */
 	void swap(unsigned q1, unsigned q2);
 
 	/**
 	 * \brief Perform a controlled Z gate on two qubits. 
-	 *
-	 *
-	 * \f[ 
-	 * CZ = \begin{pmatrix}
-	 *             1 & 0 & 0 & 0 \\
-	 *             0 & 1 & 0 & 0 \\
-	 *             0 & 0 & 1 & 0 \\
-	 *             0 & 0 & 0 & -1
-	 *             \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param ctrl The control qubit, Z is applied on the target qubit
-	 *             if this qubit is \f$ |1\rangle \f$.
-	 * \param targ The target qubit.
 	 */
 	void controlZ(unsigned ctrl, unsigned targ);
 
-	
 	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.
-	 *
-	 *
-	 * This is not a reversible operation unlike applying quantum gates.
-	 *
-	 * A random number is generated to determine whether the given qubit
-	 * targ is measured to be 0 or 1. The state vector is then collapsed
-	 * to that outcome by zeroing out all the amplitudes that do not
-	 * correspond to the generated outcome. Note that the state vector
-	 * does not change size.
-	 *
-	 * \param targ The qubit to measure.
-	 * \return The value of the measured qubit (0 or 1).
 	 */
 	int measure(unsigned targ);
 
 	/**
 	 * \brief Measure a qubit and remove the qubit from the state vector.
-	 *
+	 * \ingroup qubits_resize
 	 *
 	 * This is not a reversible operation unlike applying quantum gates.
 	 * 
@@ -395,45 +237,25 @@ namespace qsl {
 	/**
 	 * \brief Measure all of the qubits at once and collapse to
 	 * the resulting computational basis state.
-	 *
-	 *
-	 * Measuring all of the qubits at once is the same as measuring them 
-	 * one by one. 
-	 *
-	 * \return The result of the measurement.
 	 */
 	std::size_t measureAll();
     
 	/**
 	 * \brief Calculate the probability of qubit targ being measured 
 	 * in the given outcome (0 or 1).
-	 *
-	 *
-	 * \param targ The qubit to calculate the probability for.
-	 * \param outcome The outcome (0 or 1) we are calculating the probability of.
-	 * \return The probability of the qubit being measured in the given outcome.
 	 */
 	Fp prob(unsigned targ, unsigned outcome) const;
 
 	/**
 	 * \brief Perform a post-selection measurement. The state is collapsed 
 	 * to the given outcome for the given qubit. 
-	 *
-	 *
-	 * This is not a reversible operation unlike applying quantum gates.
-	 * The state vector is collapsed by zeroing out all the amplitudes 
-	 * that do not correspond to the given outcome. Note that the state vector
-	 * does not change size.
-	 * 
-	 * \param targ The qubit to measure.
-	 * \param outcome The outcome (0 or 1) to post select on.
-	 * \return The probability of measuring qubit targ in the given outcome.
-	 */
+	  */
 	Fp postselect(unsigned targ, unsigned outcome);
 
 	/**
 	 * \brief Perform a postselection measurement and
 	 * remove the qubit from the state vector.
+	 * \ingroup qubits_resize	 
 	 *
 	 * This is not a reversible operation unlike applying quantum gates.
 	 * 
@@ -454,41 +276,18 @@ namespace qsl {
 	
 	/**
 	 * \brief Sample measurement outcome for one qubit multiple times.
-	 * 
-	 *
-	 * \param targ The qubit to measure.
-	 * \param nsamples The number of samples to draw.
-	 * \return A vector containing all the measurement results.
 	 */
 	std::vector<std::size_t> sample(unsigned targ, std::size_t nsamples);
     
 	/**
 	 * \brief Sample measurement outcome for all of the qubits 
 	 * at once multiple times.
-	 *
-	 *
-	 * Measuring all of the qubits at once is the same as measuring them 
-	 * one by one. This function implements a very efficient way of
-	 * measuring all the qubits multiple times and should be used 
-	 * instead of the measure function where possible. Note that this 
-	 * function does not modify the state vector.
-	 * 
-	 * \param nsamples The number of measurements to perform.
-	 * \return A map containing all of the measurement results, 
-	 *         mapping outcomes to the number of times they happen. 
 	 */
 	std::map<std::size_t, std::size_t> sampleAll(std::size_t nsamples);
 
 	/**
 	 * \brief Sample measurement outcome for all of the qubits 
 	 * at once multiple times.
-	 *
-	 *
-	 * Testing implementing sampling using the method in qsim. 
-	 *
-	 * \param nmeas The number of measurements to perform.
-	 * \return A map containing all of the measurement results, 
-	 *         mapping outcomes to the number of times they happen. 
 	 */
 	std::map<std::size_t, std::size_t> sampleAll2(std::size_t nsamples);
     };
