@@ -60,10 +60,6 @@ qsl::Qubits<qsl::Type::NP, Fp>::Qubits(const std::vector<qsl::complex<Fp>> & sta
     : nqubits{ qsl::checkStateSize(state) }, dim{ state.size() },
       nones{ checkStateNP(state) }, state{ state }, random(0,1)
 {
-    if (nones < 1 or nones >= nqubits) {
-	throw std::logic_error("The number of ones must be 1 <= nones < nqubits.");
-    }
-
     initLookup();
     //std::cout << "nqubits = " << nqubits << std::endl;
     //std::cout << "dim = " << dim << std::endl;
@@ -93,10 +89,6 @@ void qsl::Qubits<qsl::Type::NP, Fp>::setState(const std::vector<qsl::complex<Fp>
     }
 
     nones = checkStateNP(state_in);
-    if (nones < 1 or nones >= nqubits) {
-	throw std::logic_error("The number of ones must be 1 <= nones < nqubits.");
-    }
-
     initLookup();
     
     // Set the new state vector
@@ -208,11 +200,11 @@ void qsl::Qubits<qsl::Type::NP, Fp>::initLookup()
 
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::NP, Fp>::print() const
+void qsl::Qubits<qsl::Type::NP, Fp>::print(std::ostream & os) const
 {
-    std::cout << "Number of qubits = " << nqubits << std::endl;
-    std::cout << "Number of ones = " << nones << std::endl;
-    std::cout << state << std::endl;
+    os << "Number of qubits = " << nqubits << std::endl;
+    os << "Number of ones = " << nones << std::endl;
+    os << state << std::endl;
 }
 
 

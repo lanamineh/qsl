@@ -52,6 +52,7 @@
 #include <map>
 #include "qsl/utils/complex.hpp"
 #include "qsl/utils/random.hpp"
+#include <iostream>
 
 namespace qsl {
     
@@ -163,7 +164,7 @@ namespace qsl {
 	 * \brief Print the state vector
 	 * \ingroup qubits_utils
 	 */
-	void print() const;
+	void print(std::ostream & os = std::cout) const;
 
 	/**
 	 * \brief Get the state vector associated to the qubits

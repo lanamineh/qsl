@@ -38,6 +38,7 @@
 #include <map>
 #include "qsl/utils/complex.hpp"
 #include "qsl/utils/random.hpp"
+#include <iostream>
 
 namespace qsl {
     
@@ -131,7 +132,7 @@ namespace qsl {
 	void reset();
 
 	/// Print the state vector
-	void print() const;
+	void print(std::ostream & os = std::cout) const;
 
 	/// Get the state vector associated to the qubits
 	std::vector<complex<Fp>> getState() const;
@@ -291,7 +292,6 @@ namespace qsl {
 	 */
 	std::map<std::size_t, std::size_t> sampleAll2(std::size_t nsamples);
     };
-
     
     // Explicit instantiation declarations are required to avoid
     // compiler warnings in clang, when template instantiations
