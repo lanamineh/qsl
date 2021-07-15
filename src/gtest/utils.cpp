@@ -2,6 +2,7 @@
 
 #include <qsl/utils.hpp>
 #include <list>
+#include <sstream>
 
 /**
  * \brief Typed test suite for the floating point utilities
@@ -325,4 +326,20 @@ TYPED_TEST(FpUtilities, RandomPhasesTest)
     }
 
 
+}
+
+/// Test overloaded vector printing
+TEST(Utilities, VectorPrinting)
+{
+    std::stringstream ss1, ss2;
+    std::vector<int> vec { 1,2,5,4,4 };
+    ss1 << vec;
+    // Check the correct thing is printed
+    ss2 << 1 << std::endl
+	<< 2 << std::endl
+	<< 5 << std::endl
+	<< 4 << std::endl
+	<< 4 << std::endl;
+
+    EXPECT_EQ(ss1.str(), ss2.str());
 }

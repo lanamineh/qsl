@@ -111,7 +111,6 @@ public:
     T value_;
 };
 
-
 /// List of simulator types to check
 using Sim1 = SimWrapper<qsl::Qubits<qsl::Type::Default, float>>;
 using Sim2 = SimWrapper<qsl::Qubits<qsl::Type::Default, double>>;
@@ -370,7 +369,7 @@ TYPED_TEST(Measurements, MeasureTest)
 	    // Reset the state to the copy
 	    q = q_copy;
 	
-	    // Postselect on the 0 outcome 
+	    // Measure, get outcome, and collapse the state
 	    unsigned outcome = q.measure(n);
 
 	    // Update the statistics
@@ -383,8 +382,8 @@ TYPED_TEST(Measurements, MeasureTest)
 	}
 
 	// Compute the probability of getting 1
-	Fp p1 = probability(P[1],v);
-	Fp p1_arma = X.mean();
+	Fp p1_arma = probability(P[1],v);
+	Fp p1 = X.mean();
 	
 	// Compare with the true mean. This test will succeed if the
 	// estimated probability is within 5% of the true value.
@@ -434,7 +433,7 @@ TYPED_TEST(NPMeasurements, MeasureTest)
 	    // Reset the state to the copy
 	    q = q_copy;
 	
-	    // Postselect on the 0 outcome 
+	    // Measure, get outcome, and collapse the state
 	    unsigned outcome = q.measure(n);
 
 	    // Update the statistics
@@ -447,8 +446,8 @@ TYPED_TEST(NPMeasurements, MeasureTest)
 	}
 
 	// Compute the probability of getting 1
-	Fp p1 = probability(P[1],v);
-	Fp p1_arma = X.mean();
+	Fp p1_arma = probability(P[1],v);
+	Fp p1 = X.mean();
 	
 	// Compare with the true mean. This test will succeed if the
 	// estimated probability is within 5% of the true value.
@@ -459,3 +458,438 @@ TYPED_TEST(NPMeasurements, MeasureTest)
 	
     }
 }
+
+TYPED_TEST(Measurements, SampleTest)
+{
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+    const unsigned num_qubits{ 8 };
+
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomState<Fp>(num_qubits);
+    q.setState(state);
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+
+    for (unsigned n = 0; n < num_qubits; n++) {
+
+	// Make the projector onto the |0) state
+	arma::SpMat<std::complex<Fp>> P0 { projector<Fp>(num_qubits, n, 0) };
+
+	// Sample the measure function many times
+	std::size_t samples{ 1000 };
+
+	// Sample outcomes from the state vector
+	std::vector<std::size_t> outcomes = q.sample(n, samples);
+
+	// Compute the probability of getting 0
+	Fp p0 = probability(P0,v);
+	Fp p0_arma = static_cast<double>(outcomes[0])/(outcomes[0] + outcomes[1]);
+	
+	// Compare with the true mean. This test will succeed if the
+	// estimated probability is within 5% of the true value.
+	///\todo We need to figure out a legitimate way to test
+	/// whether the probability is correct.
+	EXPECT_NEAR(p0, p0_arma, 0.05);	
+    }
+}
+
+TYPED_TEST(NPMeasurements, SampleTest)
+{
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+    const unsigned num_qubits{ 8 };
+    const unsigned num_ones{ 5 };
+
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomNPState<Fp>(num_qubits, num_ones);
+    q.setState(state);
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+
+    for (unsigned n = 0; n < num_qubits; n++) {
+
+	// Make the projector onto the |0) state
+	arma::SpMat<std::complex<Fp>> P0 { projector<Fp>(num_qubits, n, 0) };
+
+	// Sample the measure function many times
+	std::size_t samples{ 1000 };
+
+	// Sample outcomes from the state vector
+	std::vector<std::size_t> outcomes = q.sample(n, samples);
+
+	// Compute the probability of getting 0
+	Fp p0 = probability(P0,v);
+	Fp p0_arma = static_cast<double>(outcomes[0])/(outcomes[0] + outcomes[1]);
+	
+	// Compare with the true mean. This test will succeed if the
+	// estimated probability is within 5% of the true value.
+	///\todo We need to figure out a legitimate way to test
+	/// whether the probability is correct.
+	EXPECT_NEAR(p0, p0_arma, 0.05);	
+    }
+}
+
+TYPED_TEST(Measurements, MeasureAllTest)
+{
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+    const unsigned num_qubits{ 4 };
+
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomState<Fp>(num_qubits);
+    q.setState(state);
+
+    // Make a copy to re-initialise the state
+    const Sim q_copy{q}; 
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+	
+    // Sample the measure function many times
+    std::size_t samples{ 1000 };
+
+    // Record how many times each outcome was measured
+    std::map<std::size_t, unsigned> results;
+    
+    for (std::size_t s = 0; s < samples; s++) {
+
+	// Reset the state to the copy
+	q = q_copy;
+	
+	// Measure, get outcome bitstring, and collapse to basis state
+	std::size_t outcome = q.measureAll();
+	results[outcome]++;
+
+	// Make the resulting basis state
+	const std::size_t dim{ 1ULL << num_qubits  };
+	arma::Col<std::complex<Fp>> state_2{ dim, arma::fill::zeros };
+	state_2(outcome) = 1;
+	
+	// Check that the state collapsed to the correct thing
+	arma::Col<std::complex<Fp>> state_1{ toArmaState(q) };
+	EXPECT_TRUE(arma::approx_equal(state_1, state_2, "both", 1e-6, 1e-8));
+    }
+
+    // Check that the probability of each outcome is correct
+    for (const auto & [outcome, s] : results) {
+
+	// Only check stats if there are enough samples
+	if (s > 50) {
+
+	    // Compute the probability estimate
+	    double p_est = static_cast<double>(s)/samples;
+
+	    // Compute the true probability
+	    double p_true = std::abs(v[outcome]) * std::abs(v[outcome]);
+
+	    // Check that the estimate is near the true value (with 5%)
+	    ///\todo Find a legitimate statistical test.
+	    EXPECT_NEAR(p_est, p_true, 0.05);
+
+	}
+
+    }
+}
+
+
+TYPED_TEST(NPMeasurements, MeasureAllTest)
+{
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+    const unsigned num_qubits{ 4 };
+    const unsigned num_ones{ 2 };
+
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomNPState<Fp>(num_qubits, num_ones);
+    q.setState(state);
+
+    // Make a copy to re-initialise the state
+    const Sim q_copy{q}; 
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+	
+    // Sample the measure function many times
+    std::size_t samples{ 1000 };
+
+    // Record how many times each outcome was measured
+    std::map<std::size_t, unsigned> results;
+    
+    for (std::size_t s = 0; s < samples; s++) {
+
+	// Reset the state to the copy
+	q = q_copy;
+	
+	// Measure, get outcome bitstring, and collapse to basis state
+	std::size_t outcome = q.measureAll();
+	results[outcome]++;
+
+	// Make the resulting basis state
+	const std::size_t dim{ 1ULL << num_qubits  };
+	arma::Col<std::complex<Fp>> state_2{ dim, arma::fill::zeros };
+	state_2(outcome) = 1;
+	
+	// Check that the state collapsed to the correct thing
+	arma::Col<std::complex<Fp>> state_1{ toArmaState(q) };
+	EXPECT_TRUE(arma::approx_equal(state_1, state_2, "both", 1e-6, 1e-8));
+    }
+
+    // Check that the probability of each outcome is correct
+    for (const auto & [outcome, s] : results) {
+
+	// Only check stats if there are enough samples
+	if (s > 50) {
+
+	    // Compute the probability estimate
+	    double p_est = static_cast<double>(s)/samples;
+
+	    // Compute the true probability
+	    double p_true = std::abs(v[outcome]) * std::abs(v[outcome]);
+
+	    // Check that the estimate is near the true value (with 5%)
+	    ///\todo Find a legitimate statistical test.
+	    EXPECT_NEAR(p_est, p_true, 0.05);
+
+	}
+
+    }
+}
+
+TYPED_TEST(Measurements, SampleAllTest)
+{
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+    const unsigned num_qubits{ 4 };
+
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomState<Fp>(num_qubits);
+    q.setState(state);
+
+    // Make a copy to re-initialise the state
+    const Sim q_copy{q}; 
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+	
+    // Sample the measure function many times
+    std::size_t samples{ 1000 };
+
+    // Record how many times each outcome was measured
+    std::map<std::size_t, std::size_t> results = q.sampleAll(samples);
+    
+    // Check that the probability of each outcome is correct
+    for (const auto & [outcome, s] : results) {
+
+	// Only check stats if there are enough samples
+	if (s > 50) {
+
+	    // Compute the probability estimate
+	    double p_est = static_cast<double>(s)/samples;
+
+	    // Compute the true probability
+	    double p_true = std::abs(v[outcome]) * std::abs(v[outcome]);
+
+	    // Check that the estimate is near the true value (with 5%)
+	    ///\todo Find a legitimate statistical test.
+	    EXPECT_NEAR(p_est, p_true, 0.05);
+
+	}
+
+    }
+}
+
+TYPED_TEST(NPMeasurements, SampleAllTest)
+{
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+    const unsigned num_qubits{ 4 };
+    const unsigned num_ones{ 2 };
+
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomNPState<Fp>(num_qubits, num_ones);
+    q.setState(state);
+
+    // Make a copy to re-initialise the state
+    const Sim q_copy{q}; 
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+	
+    // Sample the measure function many times
+    std::size_t samples{ 1000 };
+
+    // Record how many times each outcome was measured
+    std::map<std::size_t, std::size_t> results = q.sampleAll(samples);
+    
+    // Check that the probability of each outcome is correct
+    for (const auto & [outcome, s] : results) {
+
+	// Only check stats if there are enough samples
+	if (s > 50) {
+
+	    // Compute the probability estimate
+	    double p_est = static_cast<double>(s)/samples;
+
+	    // Compute the true probability
+	    double p_true = std::abs(v[outcome]) * std::abs(v[outcome]);
+
+	    // Check that the estimate is near the true value (with 5%)
+	    ///\todo Find a legitimate statistical test.
+	    EXPECT_NEAR(p_est, p_true, 0.05);
+
+	}
+
+    }
+}
+
+TEST(SampleAll2Test, DefaultDouble)
+{
+    using Sim = qsl::Qubits<qsl::Type::Default, double>;
+    using Fp = Sim::Fp_type;
+    const unsigned num_qubits{ 4 };
+
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomState<Fp>(num_qubits);
+    q.setState(state);
+
+    // Make a copy to re-initialise the state
+    const Sim q_copy{q}; 
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+	
+    // Sample the measure function many times
+    std::size_t samples{ 1000 };
+
+    // Record how many times each outcome was measured
+    std::map<std::size_t, std::size_t> results = q.sampleAll2(samples);
+    
+    // Check that the probability of each outcome is correct
+    for (const auto & [outcome, s] : results) {
+
+	// Only check stats if there are enough samples
+	if (s > 50) {
+
+	    // Compute the probability estimate
+	    double p_est = static_cast<double>(s)/samples;
+
+	    // Compute the true probability
+	    double p_true = std::abs(v[outcome]) * std::abs(v[outcome]);
+
+	    // Check that the estimate is near the true value (with 5%)
+	    ///\todo Find a legitimate statistical test.
+	    EXPECT_NEAR(p_est, p_true, 0.05);
+
+	}
+
+    }
+}
+
+TEST(SampleAll2Test, ResizeDouble)
+{
+    using Sim = qsl::Qubits<qsl::Type::Resize, double>;
+    using Fp = Sim::Fp_type;
+    const unsigned num_qubits{ 4 };
+
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomState<Fp>(num_qubits);
+    q.setState(state);
+
+    // Make a copy to re-initialise the state
+    const Sim q_copy{q}; 
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+	
+    // Sample the measure function many times
+    std::size_t samples{ 1000 };
+
+    // Record how many times each outcome was measured
+    std::map<std::size_t, std::size_t> results = q.sampleAll2(samples);
+    
+    // Check that the probability of each outcome is correct
+    for (const auto & [outcome, s] : results) {
+
+	// Only check stats if there are enough samples
+	if (s > 50) {
+
+	    // Compute the probability estimate
+	    double p_est = static_cast<double>(s)/samples;
+
+	    // Compute the true probability
+	    double p_true = std::abs(v[outcome]) * std::abs(v[outcome]);
+
+	    // Check that the estimate is near the true value (with 5%)
+	    ///\todo Find a legitimate statistical test.
+	    EXPECT_NEAR(p_est, p_true, 0.05);
+
+	}
+
+    }
+}
+
+
+TEST(SampleAll2Test, NPDouble)
+{
+    using Sim = qsl::Qubits<qsl::Type::NP, double>;
+    using Fp = Sim::Fp_type;
+    const unsigned num_qubits{ 4 };
+    const unsigned num_ones{ 2 };
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomNPState<Fp>(num_qubits, num_ones);
+    q.setState(state);
+
+    // Make a copy to re-initialise the state
+    const Sim q_copy{q}; 
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+	
+    // Sample the measure function many times
+    std::size_t samples{ 1000 };
+
+    // Record how many times each outcome was measured
+    std::map<std::size_t, std::size_t> results = q.sampleAll2(samples);
+    
+    // Check that the probability of each outcome is correct
+    for (const auto & [outcome, s] : results) {
+
+	// Only check stats if there are enough samples
+	if (s > 50) {
+
+	    // Compute the probability estimate
+	    double p_est = static_cast<double>(s)/samples;
+
+	    // Compute the true probability
+	    double p_true = std::abs(v[outcome]) * std::abs(v[outcome]);
+
+	    // Check that the estimate is near the true value (with 5%)
+	    ///\todo Find a legitimate statistical test.
+	    EXPECT_NEAR(p_est, p_true, 0.05);
+
+	}
+
+    }
+}
+
