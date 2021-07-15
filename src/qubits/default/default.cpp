@@ -120,10 +120,10 @@ unsigned qsl::Qubits<qsl::Type::Default, Fp>::getNumQubits() const
 
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::Default, Fp>::print() const
+void qsl::Qubits<qsl::Type::Default, Fp>::print(std::ostream & os) const
 {
-    std::cout << "Number of qubits = " << nqubits << std::endl;
-    std::cout << state << std::endl;
+    os << "Number of qubits = " << nqubits << std::endl;
+    os << state << std::endl;
 }
 
 

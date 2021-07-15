@@ -47,6 +47,7 @@
 #include <map>
 #include "qsl/utils/complex.hpp"
 #include "qsl/utils/random.hpp"
+#include <iostream>
 
 namespace qsl {
 
@@ -161,7 +162,7 @@ namespace qsl {
 	void reset();
 
 	/// Print the state vector
-	void print() const;
+	void print(std::ostream & os = std::cout) const;
 
 	/// Get the state vector associated to the qubits
 	std::vector<complex<Fp>> getState() const;

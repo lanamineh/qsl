@@ -210,6 +210,48 @@ TYPED_TEST(NPSimBasics, UtilityFunctions)
     EXPECT_FLOAT_EQ(std::abs(norm(basis_state)), 1);
 }
 
+TYPED_TEST(SimBasics, PrintTest)
+{
+    using Sim = TypeParam::Sim;
+    
+    const unsigned num_qubits{ 3 };
+    Sim q{ num_qubits };
+
+    std::stringstream ss1, ss2;
+    q.print(ss1);
+    ss2 << "Number of qubits = " << num_qubits << std::endl;
+    ss2 << "(1, 0)" << std::endl;
+    for (std::size_t n = 0; n < 7; n++) {
+	ss2 << "(0, 0)" << std::endl;
+    }
+    ss2 << std::endl;
+    EXPECT_EQ(ss1.str(), ss2.str());
+}
+
+TYPED_TEST(NPSimBasics, PrintTest)
+{
+    using Sim = TypeParam::Sim;
+    
+    const unsigned num_qubits{ 3 };
+    const unsigned num_ones{ 2 };
+    Sim q{ num_qubits, num_ones };
+
+    std::stringstream ss1, ss2;
+    q.print(ss1);
+    ss2 << "Number of qubits = " << num_qubits << std::endl;
+    ss2 << "Number of ones = " << num_ones << std::endl;
+    for (std::size_t n = 0; n < 3; n++) {
+	ss2 << "(0, 0)" << std::endl;
+    }
+    ss2 << "(1, 0)" << std::endl;
+    for (std::size_t n = 0; n < 4; n++) {
+	ss2 << "(0, 0)" << std::endl;
+    }
+    ss2 << std::endl;
+    EXPECT_EQ(ss1.str(), ss2.str());
+}
+
+
 /// Check the measure out function of the resize qubit
 TEST(ResizeSim, MeasureOutTest)
 {
