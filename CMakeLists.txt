@@ -18,27 +18,8 @@ set(CMAKE_INSTALL_PREFIX /usr)
 
 find_package(OpenMP REQUIRED)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-    # using Clang
-    if (MSVC)
-        #set(OpenMP_CXX_FLAGS, "-openmp:llvm") # Experimental version of openmp
-        #set(OpenMP_CXX_FLAGS "")
-        set(CMAKE_CXX_FLAGS "/EHsc /openmp:llvm")  
-    else()
-        set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -pg -O2 -fopenmp")  
-    endif (MSVC)
-
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  # using GCC
-  set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -pg -O2 -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5 -fprofile-arcs -ftest-coverage")
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-  # using Intel C++
-  set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -pg -O2 -fmax-errors=3 -fopenmp")
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  # using Visual Studio C++
-  #message( FATAL_ERROR "Microsoft Visual Studio is not supported yet." )  
-  #set(CMAKE_CXX_FLAGS "/EHsc /std:c++17")
-endif()
+# using GCC
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -pg -O2 -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5 -fprofile-arcs -ftest-coverage")
 
 include(FetchContent)
 FetchContent_Declare(
