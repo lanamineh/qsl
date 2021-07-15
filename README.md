@@ -4,9 +4,9 @@
 
 :warning: **The project is not stable yet. The documentation and library interface is likely to change in the future.** 
 
-The repository contains a library for simulating quantum computers with a low to medium number of qubits. It is designed to be simple to use and fast.
+The repository contains a library for simulating quantum computers with a low to medium number of qubits. It is designed to be simple to use and fast. The library contains a few different types of simulator, depending on what you want to do.
 
-The following code snippet shows a simple example of the kinds of things you can do:
+The following code snippet shows a simple example of the library usage:
 
 ```c++
 #include <qsl/qubits.hpp>
