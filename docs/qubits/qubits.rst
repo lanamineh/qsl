@@ -78,6 +78,14 @@ After performing a series of gates, you can measure or otherwise analyse the sta
 .. doxygengroup:: qubits_meas
    :content-only:
 
+Utilities
+=========
+
+These functions can be used to get information about the Qubits object.
+
+.. doxygengroup:: qubits_utils
+   :content-only:
+      
 
 OpenMP-based simulator
 ######################

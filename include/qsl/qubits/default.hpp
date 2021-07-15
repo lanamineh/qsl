@@ -32,6 +32,11 @@
  */
 
 /**
+ * \defgroup qubits_utils Utilities
+ * \brief Utilities for the default simulator object
+ */
+
+/**
  * \defgroup qubits_gates Quantum gates
  * \brief One- and two- qubit gates in the Qubits class
  */
@@ -143,22 +148,42 @@ namespace qsl {
 	 */
 	void operator = (const Qubits & old);
 
-	/// Return the number of qubits
+	/**
+	 * \brief Return the number of qubits
+	 * \ingroup qubits_utils
+	 */
 	unsigned getNumQubits() const;
     
-	/// Reset to the all-zero state
+	/**
+	 * \brief Reset to the all-zero state
+	 * \ingroup qubits_utils
+	 */
 	void reset();
 
-	/// Print the state vector
+	/**
+	 * \brief Print the state vector
+	 * \ingroup qubits_utils
+	 */
 	void print(std::ostream & os = std::cout) const;
 
-	/// Get the state vector associated to the qubits
+	/**
+	 * \brief Get the state vector associated to the qubits
+	 * \ingroup qubits_utils
+	 * \todo Return std::vector<std::complex<Fp>> instead
+	 */
 	std::vector<complex<Fp>> getState() const;
 
-	/// Set the state vector (i.e. re-initialise the state vector)
+	/**
+	 * \brief Set the state vector (i.e. re-initialise the state vector)
+	 * \ingroup qubits_utils
+	 * \todo Take std::vector<std::complex<Fp>> instead
+	 */
 	void setState(const std::vector<complex<Fp>> & state);
 
-	/// Set the state vector to a computational basis state
+	/**
+	 * \brief Set the state vector to a computational basis state
+	 * \ingroup qubits_utils
+	 */
 	void setBasisState(std::size_t index);
     
 	/**
