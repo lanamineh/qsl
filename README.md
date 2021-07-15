@@ -1,65 +1,57 @@
-# An optimised quantum computer simulator
+# An Optimised Quantum Computer Simulation Library
+
 
 [![CMake](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml/badge.svg?branch=master)](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml) [![Documentation Status](https://readthedocs.org/projects/qsl/badge/?version=latest)](https://qsl.readthedocs.io/en/latest/?badge=latest) [![codecov](https://codecov.io/gh/lanamineh/qsl/branch/master/graph/badge.svg?token=VYUJ0OZIEZ)](https://codecov.io/gh/lanamineh/qsl)
 
 :warning: **The project is not stable yet. The documentation and library interface is likely to change in the future.** 
 
+The repository contains a library for simulating quantum computers with a low to medium number of qubits. It is designed to be simple to use and fast. The following code snippet shows a simple example of the kinds of things you can do:
 
-This repository contains a quantum computer simulator which is optimised for a low to medium number of qubits (10-20, no more than about 28). The program will be able to simulate:
-
-- a range of single- and two-qubit gates
-- the outcome of measurements of the state vector
-
-## What to do first
-
-If you don't have access to the documentation from somewhere else, the first step is to build the documentation. For that, install doxygen and sphinx as follows:
-
-```bash
- sudo apt install doxygen python3 python3-pip
- python3 -m pip install breathe sphinx_rtd_theme sphinx_copybutton
+```c++
+#include <qsl/qubits.hpp>
+int main()
+{
+	qsl::Qubits<qsl::Type::Default, double> q{ 5 }; // Make a 5 qubit simulator
+	q.hadamard(2); // Apply a Hadamard gate to the second qubit
+	q.controlNot(0,1); // Apply a CNOT gate between qubits 0 and 1
+	q.print(); // Print the resulting state
+	unsigned outcome = q.measure(3); // Measure qubit 3 and return the result
+}
 ```
 
-Then build the documentation by changing to the top level directory (containing this README.md) and running:
+Full documentation for how to install and use the library is contained in the [documentation](https://qsl.readthedocs.io). If you want to quickly install the library to give it a go, you can follow the instructions below. 
+
+# Try it out: quick installation
+
+If you want to get the library up and running quickly to try it out, follow these instructions on a recent Linux distribution. To install the prerequisite `g++-10` compiler and `cmake` build system, run
 
 ```bash
-make docs
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt update
+sudo apt install g++-10 cmake
 ```
 
-The documentation will then be located in `docs/html/index.html` (open it in a web browser).
-
-## Build
-
-The project uses cmake. To build the simulator, run the following commands in the top level directory (where this file is):
+Now, to build and install the library, clone this repository and change into the top level directory (where this README is).
 
 ```bash
-mkdir build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=/path/to/install/ ..
-cmake --build .
+mkdir build # Make a build directory
+cd build # Change to the build directory
+CC=gcc-10 CXX=g++-10 cmake .. # Configure the build to use g++-10
+cmake --build . # Build the library
+sudo cmake . --target install # Install the library to /usr/include/ and /usr/lib/
 ```
 
-Make sure to include the dots at the ends of the cmake commands. Replace ``/path/to/install/`` with any chosen installation destination. For example, if ``~/opt/`` is chosen, the shared library will be installed to ``~/opt/lib/`` and the header files will be installed to ``~/opt/include/``.
+Now you should be able to compile the example above using `g++-10` as the compiler. If you encounter any errors, have a look at the documentation for more detailed installation instructions. 
 
-To build with clang instead of GCC, add the following options to the clang configuration: ``-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++`` (making sure the paths to the clang compiler are correct). To build with the intel compiler, use the following configuration: ``-DCMAKE_C_COMPILER=icc -DCMAKE_CXX_COMPILER=icpc``
+# How to remove the library
 
-After the build has finished, test executables will be in ``build/bin`` and the shared library ``libqsl.so`` will be in ``build/lib``
-
-## Install
-
-To install, after successfully building, change into the ``build/`` directory, and run
+If you want to remove the library that is installed using the steps above, run the following commands (double check you type them correctly!)
 
 ```bash
-cmake --build . --target install
+sudo rm -r /usr/include/qsl # Remove the include files
+sudo rm /usr/lib/libqsl.so # Remove the shared object file
 ```
 
-You might need to use sudo if the installation destination requires extra privileges. After the install has finished, check everything worked by making the example:
+You can also delete the repository you cloned.
 
-```bash
-cd ../example
-make
-./example.bin
-```
 
-## Source code documentation
-
-To read the (doxygen generated) documentation, clone the repository and run `make docs` inside the top level directory. The documentation will be created in a folder called html (navigate to `html/index.html`.

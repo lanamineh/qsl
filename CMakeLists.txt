@@ -16,18 +16,12 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 #set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/qsl-install-test)
 set(CMAKE_INSTALL_PREFIX /usr)
 
-# This is a simple way to ensure that gcc-10 is used,
-# even if update-alternatives is not configured.
-# It will not work if later versions of the compiler
-# are released. Todo: fix with a better method
-set(CMAKE_C_COMPILER "gcc-10")
-set(CMAKE_CXX_COMPILER "g++-10")
-
 find_package(OpenMP REQUIRED)
 
 # using GCC
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -pg -O2 -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5 -fprofile-arcs -ftest-coverage")
 
+set(INSTALL_GTEST OFF)
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -37,8 +31,8 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(run-gtest src/gtest/utils.cpp src/gtest/sim-constructors.cpp src/gtest/gates.cpp src/gtest/measurements.cpp src/gtest/test-utils.cpp)
-target_link_libraries(run-gtest gtest_main qsl armadillo)
+add_executable(run-gtest EXCLUDE_FROM_ALL src/gtest/utils.cpp src/gtest/sim-constructors.cpp src/gtest/gates.cpp src/gtest/measurements.cpp src/gtest/test-utils.cpp)
+target_link_libraries(run-gtest EXCLUDE_FROM_ALL gtest_main qsl armadillo)
 
 include(GoogleTest)
 gtest_discover_tests(run-gtest)
