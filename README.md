@@ -6,10 +6,12 @@
 
 The repository contains a library for simulating quantum computers with a low to medium number of qubits. It is designed to be simple to use and fast. The library contains a few different types of simulator, depending on what you want to do. At the moment, the available simulators are as follows:
 
-* **Default**: an unrestricted quantum simulator without parallelisation.
-* **OpenMP**: an unrestricted quantum simulator using OpenMP parallelisation.
-* **Number Preserving**: a simulator optimised for a restricted set of number-preserving gates.
-* **Resizeable**: a simulator that can be resized (qubits can be added or removed). 
+| Simulator | Description |
+|-----------|-------------|
+| Default   | an unrestricted quantum simulator without parallelisation.
+| OpenMP    | an unrestricted quantum simulator using OpenMP parallelisation.
+| Number Preserving | a simulator optimised for a restricted set of number-preserving gates.
+| Resizeable | a simulator that can be resized (qubits can be added or removed). 
 
 The following code snippet shows a simple example of the library usage:
 
