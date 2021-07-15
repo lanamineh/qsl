@@ -27,7 +27,7 @@ int main()
 }
 ```
 
-Full documentation for how to install and use the library is contained in the [documentation](https://qsl.readthedocs.io). If you want to quickly install the library to give it a go, you can follow the instructions below. 
+Full documentation for how to install and use the library is contained in the [documentation](https://qsl.readthedocs.io). If you want to install the library to give it a go, you can follow the instructions below. 
 
 # Try it out: quick installation
 
