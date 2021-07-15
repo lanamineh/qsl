@@ -6,6 +6,86 @@
 #include <list>
 #include "test-utils.hpp"
 
+/**
+ * \brief Convert a standard vector state to an armadillo vector
+ */
+template<std::floating_point Fp>
+arma::Col<std::complex<Fp>> toArmaState(const std::vector<qsl::complex<Fp>> & res)
+{
+    arma::Col<std::complex<Fp>> qubit_v(res.size());
+    for (std::size_t i = 0; i < res.size(); i++) {
+	qubit_v(i) = std::complex<Fp>{res[i].real, res[i].imag};
+    }
+    return qubit_v;
+}
+
+/**
+ * \brief Convert a Simulator state to an armadillo vector
+ */
+template<qsl::Simulator Sim>
+arma::Col<std::complex<typename Sim::Fp_type>> toArmaState(const Sim & sim)
+{
+    using Fp = Sim::Fp_type;
+    // Read qubit state into armadillo to check the state hasn't changed
+    std::vector<qsl::complex<Fp>> res = sim.getState();
+    return toArmaState<Fp>(res);
+}
+
+/**
+ * \brief Make the projector onto a particular outcome of the target qubit
+ *
+ */
+template<std::floating_point Fp>
+arma::SpMat<std::complex<Fp>>
+projector(unsigned num_qubits, unsigned targ, unsigned outcome)
+{
+    // Calculate the projector for the outcome, which is
+    // the observable that has eigenvalue 0 for |~outcome) and eigenvalue
+    // 1 for |outcome). The expectation value of this observable in a
+    // state is the probability of getting 1 on measurement.
+    arma::Mat<std::complex<Fp>> projector(2,2,arma::fill::zeros);
+    if (outcome == 0) {
+	projector(0,0) = 1;
+    } else if (outcome == 1) {
+	projector(1,1) = 1;
+    } else {
+	throw std::out_of_range("outcome must be 0 or 1 in projector() function");
+    }
+    arma::SpMat<std::complex<Fp>> M = makeMatrix(projector, num_qubits, {targ});
+    return M;
+}
+
+/**
+ * \brief Calculate the probability of measuring a projector outcome
+ *
+ * Uses the formula prob = (v|P|v), where v is the state and P is 
+ * the projector
+ */
+template<std::floating_point Fp>
+Fp probability(const arma::SpMat<std::complex<Fp>> & P,
+	       const arma::Col<std::complex<Fp>> & v)
+{
+    // Calculate the probability of the projector outcome
+    Fp prob = arma::cdot(v, P*v).real();
+    return prob;
+}
+
+
+/**
+ * \brief Collapse a state v using a projector P
+ *
+ * The output is the state Pv/|Pv| (i.e. the normalised projected state)
+ *
+ */
+template<std::floating_point Fp>
+arma::Col<std::complex<Fp>>
+applyProjector(const arma::SpMat<std::complex<Fp>> & P,
+	       const arma::Col<std::complex<Fp>> & v)
+{
+    arma::Col<std::complex<Fp>> state = (P * v)/arma::norm(P * v);
+    return state;
+}
+
 template<typename T>
 struct SimWrapper
 {
@@ -61,11 +141,7 @@ TYPED_TEST(Measurements, ProbTest)
     q.setState(state);
 
     // Set an armadillo vector to the same state
-    std::size_t dim = 1 << num_qubits;
-    arma::Col<std::complex<Fp>> v(dim);
-    for (std::size_t i = 0; i < dim; i++) {
-	v(i) = std::complex<Fp>{state[i].real, state[i].imag};
-    }
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
 
     // Find the probability of measurement 0 or 1 on every qubit
     for (unsigned n = 0; n < num_qubits; n++) {
@@ -79,29 +155,22 @@ TYPED_TEST(Measurements, ProbTest)
 	// the observable that has eigenvalue 0 for |0) and eigenvalue
 	// 1 for |1). The expectation value of this observable in a
 	// state is the probability of getting 1 on measurement.
-	arma::Mat<std::complex<Fp>> projector(2,2,arma::fill::zeros);
-	projector(1,1) = 1;
-	arma::SpMat<std::complex<Fp>> M = makeMatrix(projector, num_qubits, {n});
+	arma::SpMat<std::complex<Fp>> P = projector<Fp>(num_qubits, n, 1);
 	
-	// Calculate the probability of zero or one from the
-	// armadillo vector
-	Fp p1_arma = arma::cdot(v, M*v).real();
+	// calculate the probability of zero from the projector P
+	Fp p1_arma = probability(P,v);
 	Fp p0_arma = 1 - p1_arma;
 
 	EXPECT_NEAR(p0, p0_arma, 1e-6);
 	EXPECT_NEAR(p1, p1_arma, 1e-6);
 
 	// Read qubit state into armadillo to check the state hasn't changed
-	std::vector<qsl::complex<Fp>> res = q.getState();
-	arma::Col<std::complex<Fp>> qubit_v(dim);
-	for (std::size_t i = 0; i < dim; i++) {
-	    qubit_v(i) = std::complex<Fp>{res[i].real, res[i].imag};
-	}
-
+	arma::Col<std::complex<Fp>> qubit_v{ toArmaState(q) };
 	EXPECT_TRUE(arma::approx_equal(v, qubit_v, "both", 1e-6, 1e-8));
     }
 
 }
+
 
 TYPED_TEST(NPMeasurements, ProbTest)
 {
@@ -117,11 +186,7 @@ TYPED_TEST(NPMeasurements, ProbTest)
     q.setState(state);
 
     // Set an armadillo vector to the same state
-    std::size_t dim = 1 << num_qubits;
-    arma::Col<std::complex<Fp>> v(dim);
-    for (std::size_t i = 0; i < dim; i++) {
-	v(i) = std::complex<Fp>{state[i].real, state[i].imag};
-    }
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
 
     // Find the probability of measurement 0 or 1 on every qubit
     for (unsigned n = 0; n < num_qubits; n++) {
@@ -135,25 +200,17 @@ TYPED_TEST(NPMeasurements, ProbTest)
 	// the observable that has eigenvalue 0 for |0) and eigenvalue
 	// 1 for |1). The expectation value of this observable in a
 	// state is the probability of getting 1 on measurement.
-	arma::Mat<std::complex<Fp>> projector(2,2,arma::fill::zeros);
-	projector(1,1) = 1;
-	arma::SpMat<std::complex<Fp>> M = makeMatrix(projector, num_qubits, {n});
+	arma::SpMat<std::complex<Fp>> P = projector<Fp>(num_qubits, n, 1);
 	
-	// Calculate the probability of zero or one from the
-	// armadillo vector
-	Fp p1_arma = arma::cdot(v, M*v).real();
+	// calculate the probability of zero from the projector P
+	Fp p1_arma = probability(P,v);
 	Fp p0_arma = 1 - p1_arma;
 
 	EXPECT_NEAR(p0, p0_arma, 1e-6);
 	EXPECT_NEAR(p1, p1_arma, 1e-6);
-	
-	// Read qubit state into armadillo to check the state hasn't changed
-	std::vector<qsl::complex<Fp>> res = q.getState();
-	arma::Col<std::complex<Fp>> qubit_v(dim);
-	for (std::size_t i = 0; i < dim; i++) {
-	    qubit_v(i) = std::complex<Fp>{res[i].real, res[i].imag};
-	}
 
+	// Read qubit state into armadillo to check the state hasn't changed
+	arma::Col<std::complex<Fp>> qubit_v{ toArmaState(q) };
 	EXPECT_TRUE(arma::approx_equal(v, qubit_v, "both", 1e-6, 1e-8));
     }
 
@@ -175,13 +232,8 @@ TYPED_TEST(Measurements, PostselectTest)
     const Sim q_copy{q}; 
     
     // Set an armadillo vector to the same state
-    std::size_t dim = 1 << num_qubits;
-    arma::Col<std::complex<Fp>> v(dim);
-    for (std::size_t i = 0; i < dim; i++) {
-	v(i) = std::complex<Fp>{state[i].real, state[i].imag};
-    }
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
 
-    // Find the probability of the 
     for (unsigned n = 0; n < num_qubits; n++) {
 
 	// Reset the state to the copy
@@ -191,53 +243,35 @@ TYPED_TEST(Measurements, PostselectTest)
 	Fp p0 = q.postselect(n, 0);
 
 	// Calculate the projector for outcome 0
-	arma::Mat<std::complex<Fp>> proj0(2,2,arma::fill::zeros);
-	proj0(0,0) = 1;
-	arma::SpMat<std::complex<Fp>> M0 = makeMatrix(proj0, num_qubits, {n});
-
-	// Check that the state collapsed to the right value
-	std::vector<qsl::complex<Fp>> res = q.getState();
-	arma::Col<std::complex<Fp>> qubit_v(dim);
-	for (std::size_t i = 0; i < dim; i++) {
-	    qubit_v(i) = std::complex<Fp>{res[i].real, res[i].imag};
-	}
+	arma::SpMat<std::complex<Fp>> P0 = projector<Fp>(num_qubits, n, 0);
 
 	// Check that the state collapses to the correct thing
-	arma::Col<std::complex<Fp>> arma_v = (M0 * v)/arma::norm(M0 * v);
-	EXPECT_TRUE(arma::approx_equal(arma_v, qubit_v, "both", 1e-6, 1e-8));
+	arma::Col<std::complex<Fp>> state_1{ toArmaState(q) };
+	arma::Col<std::complex<Fp>> state_2{ applyProjector(P0, v) };
+	EXPECT_TRUE(arma::approx_equal(state_1, state_2, "both", 1e-6, 1e-8));
 
 	// Check that the probability returned by postselect is correct
-	Fp p0_arma = arma::cdot(v, M0*v).real();
+	Fp p0_arma = probability(P0,v);	
 	EXPECT_NEAR(p0, p0_arma, 1e-6);
 
 	// Reset the state to the copy
 	q = q_copy;
-	
-	// Now postselect on the 1 outcome 
+
+	// Postselect on the 1 outcome 
 	Fp p1 = q.postselect(n, 1);
 
 	// Calculate the projector for outcome 1
-	arma::Mat<std::complex<Fp>> proj1(2,2,arma::fill::zeros);
-	proj1(1,1) = 1;
-	arma::SpMat<std::complex<Fp>> M1 = makeMatrix(proj1, num_qubits, {n});
-
-	// Check that the state collapsed to the right value
-	res = q.getState();
-	for (std::size_t i = 0; i < dim; i++) {
-	    qubit_v(i) = std::complex<Fp>{res[i].real, res[i].imag};
-	}
+	arma::SpMat<std::complex<Fp>> P1 = projector<Fp>(num_qubits, n, 1);
 
 	// Check that the state collapses to the correct thing
-        arma_v = (M1 * v)/arma::norm(M1 * v);
-	EXPECT_TRUE(arma::approx_equal(arma_v, qubit_v, "both", 1e-6, 1e-8));
+	state_1 = toArmaState(q);
+	state_2 = applyProjector(P1, v);
+	EXPECT_TRUE(arma::approx_equal(state_1, state_2, "both", 1e-6, 1e-8));
 
 	// Check that the probability returned by postselect is correct
-	Fp p1_arma = arma::cdot(v, M1*v).real();
-	EXPECT_NEAR(p1, p1_arma, 1e-6);
-
-	
+	Fp p1_arma = probability(P1,v);	
+	EXPECT_NEAR(p1, p1_arma, 1e-6);	
     }
-
 }
 
 TYPED_TEST(NPMeasurements, PostselectTest)
@@ -257,13 +291,8 @@ TYPED_TEST(NPMeasurements, PostselectTest)
     const Sim q_copy{q}; 
     
     // Set an armadillo vector to the same state
-    std::size_t dim = 1 << num_qubits;
-    arma::Col<std::complex<Fp>> v(dim);
-    for (std::size_t i = 0; i < dim; i++) {
-	v(i) = std::complex<Fp>{state[i].real, state[i].imag};
-    }
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
 
-    // Find the probability of the 
     for (unsigned n = 0; n < num_qubits; n++) {
 
 	// Reset the state to the copy
@@ -273,51 +302,160 @@ TYPED_TEST(NPMeasurements, PostselectTest)
 	Fp p0 = q.postselect(n, 0);
 
 	// Calculate the projector for outcome 0
-	arma::Mat<std::complex<Fp>> proj0(2,2,arma::fill::zeros);
-	proj0(0,0) = 1;
-	arma::SpMat<std::complex<Fp>> M0 = makeMatrix(proj0, num_qubits, {n});
-
-	// Check that the state collapsed to the right value
-	std::vector<qsl::complex<Fp>> res = q.getState();
-	arma::Col<std::complex<Fp>> qubit_v(dim);
-	for (std::size_t i = 0; i < dim; i++) {
-	    qubit_v(i) = std::complex<Fp>{res[i].real, res[i].imag};
-	}
+	arma::SpMat<std::complex<Fp>> P0 = projector<Fp>(num_qubits, n, 0);
 
 	// Check that the state collapses to the correct thing
-	arma::Col<std::complex<Fp>> arma_v = (M0 * v)/arma::norm(M0 * v);
-	EXPECT_TRUE(arma::approx_equal(arma_v, qubit_v, "both", 1e-6, 1e-8));
+	arma::Col<std::complex<Fp>> state_1{ toArmaState(q) };
+	arma::Col<std::complex<Fp>> state_2{ applyProjector(P0, v) };
+	EXPECT_TRUE(arma::approx_equal(state_1, state_2, "both", 1e-6, 1e-8));
 
 	// Check that the probability returned by postselect is correct
-	Fp p0_arma = arma::cdot(v, M0*v).real();
+	Fp p0_arma = probability(P0,v);	
 	EXPECT_NEAR(p0, p0_arma, 1e-6);
 
 	// Reset the state to the copy
 	q = q_copy;
-	
-	// Now postselect on the 1 outcome 
+
+	// Postselect on the 1 outcome 
 	Fp p1 = q.postselect(n, 1);
 
 	// Calculate the projector for outcome 1
-	arma::Mat<std::complex<Fp>> proj1(2,2,arma::fill::zeros);
-	proj1(1,1) = 1;
-	arma::SpMat<std::complex<Fp>> M1 = makeMatrix(proj1, num_qubits, {n});
-
-	// Check that the state collapsed to the right value
-	res = q.getState();
-	for (std::size_t i = 0; i < dim; i++) {
-	    qubit_v(i) = std::complex<Fp>{res[i].real, res[i].imag};
-	}
+	arma::SpMat<std::complex<Fp>> P1 = projector<Fp>(num_qubits, n, 1);
 
 	// Check that the state collapses to the correct thing
-        arma_v = (M1 * v)/arma::norm(M1 * v);
-	EXPECT_TRUE(arma::approx_equal(arma_v, qubit_v, "both", 1e-6, 1e-8));
+	state_1 = toArmaState(q);
+	state_2 = applyProjector(P1, v);
+	EXPECT_TRUE(arma::approx_equal(state_1, state_2, "both", 1e-6, 1e-8));
 
 	// Check that the probability returned by postselect is correct
-	Fp p1_arma = arma::cdot(v, M1*v).real();
-	EXPECT_NEAR(p1, p1_arma, 1e-6);
+	Fp p1_arma = probability(P1,v);	
+	EXPECT_NEAR(p1, p1_arma, 1e-6);	
+    }
+}
 
+TYPED_TEST(Measurements, MeasureTest)
+{
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+    const unsigned num_qubits{ 8 };
+
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomState<Fp>(num_qubits);
+    q.setState(state);
+
+    // Make a copy to re-initialise the state
+    const Sim q_copy{q}; 
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+
+    for (unsigned n = 0; n < num_qubits; n++) {
+
+	// Make the projectors for both outcomes
+	// The vector is indexed by outcome
+	std::vector<arma::SpMat<std::complex<Fp>>> P {
+	    projector<Fp>(num_qubits, n, 0),
+	    projector<Fp>(num_qubits, n, 1)
+	};
+
+	// Store the running average measured outcome
+	arma::running_stat<double> X;
+	
+	// Sample the measure function many times
+	std::size_t samples{ 1000 };
+	for (std::size_t s = 0; s < samples; s++) {
+
+	    // Reset the state to the copy
+	    q = q_copy;
+	
+	    // Postselect on the 0 outcome 
+	    unsigned outcome = q.measure(n);
+
+	    // Update the statistics
+	    X(outcome);
+	    
+	    // Check that the state collapsed to the correct thing
+	    arma::Col<std::complex<Fp>> state_1{ toArmaState(q) };
+	    arma::Col<std::complex<Fp>> state_2{ applyProjector(P[outcome], v) };
+	    EXPECT_TRUE(arma::approx_equal(state_1, state_2, "both", 1e-6, 1e-8));
+	}
+
+	// Compute the probability of getting 1
+	Fp p1 = probability(P[1],v);
+	Fp p1_arma = X.mean();
+	
+	// Compare with the true mean. This test will succeed if the
+	// estimated probability is within 5% of the true value.
+	///\todo We need to figure out a legitimate way to test
+	/// whether the probability is correct.
+	EXPECT_NEAR(p1, p1_arma, 0.05);	
+	
 	
     }
+}
 
+TYPED_TEST(NPMeasurements, MeasureTest)
+{
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+    const unsigned num_qubits{ 8 };
+    const unsigned num_ones{ 5 };
+
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomNPState<Fp>(num_qubits, num_ones);
+    q.setState(state);
+
+    // Make a copy to re-initialise the state
+    const Sim q_copy{q}; 
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+
+    for (unsigned n = 0; n < num_qubits; n++) {
+
+	// Make the projectors for both outcomes
+	// The vector is indexed by outcome
+	std::vector<arma::SpMat<std::complex<Fp>>> P {
+	    projector<Fp>(num_qubits, n, 0),
+	    projector<Fp>(num_qubits, n, 1)
+	};
+
+	// Store the running average measured outcome
+	arma::running_stat<double> X;
+	
+	// Sample the measure function many times
+	std::size_t samples{ 1000 };
+	for (std::size_t s = 0; s < samples; s++) {
+
+	    // Reset the state to the copy
+	    q = q_copy;
+	
+	    // Postselect on the 0 outcome 
+	    unsigned outcome = q.measure(n);
+
+	    // Update the statistics
+	    X(outcome);
+	    
+	    // Check that the state collapsed to the correct thing
+	    arma::Col<std::complex<Fp>> state_1{ toArmaState(q) };
+	    arma::Col<std::complex<Fp>> state_2{ applyProjector(P[outcome], v) };
+	    EXPECT_TRUE(arma::approx_equal(state_1, state_2, "both", 1e-6, 1e-8));
+	}
+
+	// Compute the probability of getting 1
+	Fp p1 = probability(P[1],v);
+	Fp p1_arma = X.mean();
+	
+	// Compare with the true mean. This test will succeed if the
+	// estimated probability is within 5% of the true value.
+	///\todo We need to figure out a legitimate way to test
+	/// whether the probability is correct.
+	EXPECT_NEAR(p1, p1_arma, 0.05);	
+	
+	
+    }
 }

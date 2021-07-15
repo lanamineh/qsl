@@ -139,6 +139,7 @@ namespace qsl {
 	      bottom{center-width/2}, top{center+width/2},
 	      level{level_in}
 	    {}
+
     };
 
     /// Return true if the confidence intervals overlap
