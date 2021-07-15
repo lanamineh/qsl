@@ -1,11 +1,12 @@
 # An Optimised Quantum Computer Simulation Library
 
-
 [![CMake](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml/badge.svg?branch=master)](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml) [![Documentation Status](https://readthedocs.org/projects/qsl/badge/?version=latest)](https://qsl.readthedocs.io/en/latest/?badge=latest) [![codecov](https://codecov.io/gh/lanamineh/qsl/branch/master/graph/badge.svg?token=VYUJ0OZIEZ)](https://codecov.io/gh/lanamineh/qsl)
 
 :warning: **The project is not stable yet. The documentation and library interface is likely to change in the future.** 
 
-The repository contains a library for simulating quantum computers with a low to medium number of qubits. It is designed to be simple to use and fast. The following code snippet shows a simple example of the kinds of things you can do:
+The repository contains a library for simulating quantum computers with a low to medium number of qubits. It is designed to be simple to use and fast.
+
+The following code snippet shows a simple example of the kinds of things you can do:
 
 ```c++
 #include <qsl/qubits.hpp>
@@ -28,7 +29,7 @@ If you want to get the library up and running quickly to try it out, follow thes
 ```bash
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
 sudo apt update
-sudo apt install g++-10 cmake
+sudo apt install gcc-10 g++-10 cmake
 ```
 
 Now, to build and install the library, clone this repository and change into the top level directory (where this README is).
@@ -53,5 +54,4 @@ sudo rm /usr/lib/libqsl.so # Remove the shared object file
 ```
 
 You can also delete the repository you cloned.
-
 
