@@ -309,9 +309,7 @@ TYPED_TEST(Measurements, MeasureTest)
 	// estimated probability is within 5% of the true value.
 	///\todo We need to figure out a legitimate way to test
 	/// whether the probability is correct.
-	EXPECT_NEAR(p1, p1_arma, 0.05);	
-	
-	
+	EXPECT_NEAR(p1, p1_arma, 0.05);		
     }
 }
 
