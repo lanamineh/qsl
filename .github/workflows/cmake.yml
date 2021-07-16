@@ -13,10 +13,25 @@ env:
   CXX: g++-10
 
 jobs:
-  build:
+
+  setup:
     runs-on: ubuntu-latest
     if: "contains(github.event.head_commit.message, '[ci]')"
 
+    steps:
+    - name: Install Prerequisites
+      run:   |
+         sudo apt update
+         sudo apt install gcc-10 g++-10
+         sudo apt install lcov
+         sudo apt install libarmadillo-dev
+      shell: bash
+    
+  build:
+    runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, '[ci]')"
+    needs: setup
+    
     steps:
     - uses: actions/checkout@v2
       
