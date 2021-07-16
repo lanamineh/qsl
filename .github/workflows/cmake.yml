@@ -8,7 +8,6 @@ on:
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
   CC: gcc-10
   CXX: g++-10
 
@@ -33,35 +32,27 @@ jobs:
     needs: setup
     
     steps:
-    - uses: actions/checkout@v2
-      
-    - name: Prerequisites
-      run:   |
-         sudo apt update
-         sudo apt install gcc-10 g++-10
-         sudo apt install lcov
-         sudo apt install libarmadillo-dev
-      shell: bash
-  
+    - uses: actions/checkout@v2  
     - name: Configure CMake
-      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
-      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
-      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
 
     - name: Build
-      # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/build --config Release
 
-    - name: Coverage
-      # Build your program with the given configuration
-      run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target coverage
+  tests:
+    runs-on: ubuntu-latest
+    if: "contains(github.event.head_commit.message, '[ci]')"
+    needs: build
+  
+    steps:
+    - uses: actions/checkout@v2  
+    - name: Configure CMake
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Debug
+
+    - name: Build
+      run: cmake --build ${{github.workspace}}/build --config Debug
       
+    - name: Coverage
+      run: cmake --build ${{github.workspace}}/build --config Debug --target coverage      
     - name: Codecov
       run: bash <(curl -s https://codecov.io/bash) -f ${{github.workspace}}/build/coverage.info -t eb5f45af-49b8-453e-a252-bf8dfe9a8016 || echo "Codecov did not collect coverage reports"
-      
-    - name: Test
-      working-directory: ${{github.workspace}}/build
-      # Execute tests defined by the CMake configuration.  
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C ${{env.BUILD_TYPE}}
-      
