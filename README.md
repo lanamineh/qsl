@@ -1,4 +1,4 @@
-# An Optimised Quantum Computer Simulation Library
+# A C++ Quantum Computer Simulation Library
 
 [![build](https://github.com/lanamineh/qsl/actions/workflows/build.yml/badge.svg)](https://github.com/lanamineh/qsl/actions/workflows/build.yml) [![tests](https://github.com/lanamineh/qsl/actions/workflows/tests.yml/badge.svg)](https://github.com/lanamineh/qsl/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/lanamineh/qsl/branch/master/graph/badge.svg?token=VYUJ0OZIEZ)](https://codecov.io/gh/lanamineh/qsl) [![Documentation Status](https://readthedocs.org/projects/qsl/badge/?version=latest)](https://qsl.readthedocs.io/en/latest/?badge=latest) 
 
