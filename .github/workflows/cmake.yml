@@ -37,7 +37,6 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     if: "contains(github.event.head_commit.message, '[ci]')"
-    needs: setup
   
     steps:
     - uses: actions/checkout@v2  
