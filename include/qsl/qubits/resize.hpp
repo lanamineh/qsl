@@ -166,6 +166,11 @@ namespace qsl {
 	void rotateX(unsigned targ, Fp angle);
 
 	/**
+	 * \brief Rotate around the y-axis of the Bloch sphere 
+	 */
+	void rotateY(unsigned targ, Fp angle);
+	
+	/**
 	 * \brief Rotate around the z-axis of the Bloch sphere
 	 */
 	void rotateZ(unsigned targ, Fp angle);
@@ -179,6 +184,11 @@ namespace qsl {
 	 * \brief Apply the Pauli X gate to qubit number targ.
 	 */
 	void pauliX(unsigned targ);
+
+	/**
+	 * \brief Apply the Pauli Y gate to qubit number targ.
+	 */
+	void pauliY(unsigned targ);
 
 	/**
 	 * \brief Apply the Pauli Z gate to qubit number targ.

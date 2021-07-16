@@ -187,7 +187,8 @@ namespace qsl {
 	void setBasisState(std::size_t index);
     
 	/**
-	 * \brief Rotate around the x-axis of the Bloch sphere \f$ e^{-i\theta X/2} \f$
+	 * \brief Rotate around the x-axis of the Bloch sphere 
+	 * \f$ e^{-i\theta X/2} \f$
 	 *
 	 * \ingroup qubits_gates
 	 *
@@ -208,7 +209,30 @@ namespace qsl {
 	void rotateX(unsigned targ, Fp angle);
 
 	/**
-	 * \brief Rotate around the z-axis of the Bloch sphere \f$ e^{-i\theta Z/2} \f$
+	 * \brief Rotate around the y-axis of the Bloch sphere 
+	 * \f$ e^{-i\theta Y/2} \f$
+	 *
+	 * \ingroup qubits_gates
+	 *
+	 * This single qubit gate applies the following 2x2 matrix to each
+	 * pair of \f$ |0\rangle \f$ and \f$ |1\rangle \f$ amplitudes for 
+	 * angle \f$ \theta \f$:
+	 * 
+	 * \f[ 
+	 * R_y = \begin{pmatrix}
+	 *       \cos(\theta/2) & -\sin(\theta/2) \\
+	 *       \sin(\theta/2) & \cos(\theta/2) \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by.
+	 */
+	void rotateY(unsigned targ, Fp angle);
+	
+	/**
+	 * \brief Rotate around the z-axis of the Bloch sphere 
+	 * \f$ e^{-i\theta Z/2} \f$
 	 *
 	 * \ingroup qubits_gates
 	 *
@@ -244,6 +268,22 @@ namespace qsl {
 	 */
 	void pauliX(unsigned targ);
 
+	/**
+	 * \brief Apply the Pauli Y gate to qubit number targ.
+	 *
+	 * \ingroup qubits_gates
+	 *
+	 * \f[ 
+	 * Y = \begin{pmatrix}
+	 *     0 & -i \\
+	 *     i & 0 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 */
+	void pauliY(unsigned targ);
+	
 	/**
 	 * \brief Apply the Pauli Z gate to qubit number targ.
 	 *

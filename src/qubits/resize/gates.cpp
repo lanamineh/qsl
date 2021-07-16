@@ -45,6 +45,27 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::pauliX(unsigned targ)
 }
 
 template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Resize, Fp>::pauliY(unsigned targ)
+{
+    std::size_t k = 1 << targ;
+    for (std::size_t s = 0; s < dim; s += 2*k) { 
+	for (std::size_t r = 0; r < k; r++) {
+	    // Get the indices that need to be modified
+	    std::size_t index1 = s + r;
+	    std::size_t index2 = s + k + r;
+
+	    qsl::complex<Fp> temp1 = state[index1];
+	    qsl::complex<Fp> temp2 = state[index2];
+
+	    state[index1].real = temp2.imag;
+	    state[index1].imag = -temp2.real;
+	    state[index2].real = -temp1.imag;
+	    state[index2].imag = temp1.real;
+	}
+    }
+}
+
+template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::Resize, Fp>::pauliZ(unsigned targ)
 {
     std::size_t k = 1 << targ;
@@ -122,6 +143,36 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::rotateX(unsigned targ, Fp angle)
 	    // Write the new |1> amplitude
 	    state[index_1].real = a1.real * cos + a0.imag * sin;
 	    state[index_1].imag = a1.imag * cos - a0.real * sin;
+	    
+	}
+    }
+}
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Resize, Fp>::rotateY(unsigned targ, Fp angle)
+{
+    // Store variables
+    Fp cos = std::cos(angle/2);
+    Fp sin = std::sin(angle/2);
+    std::size_t k = 1 << targ;
+    for (std::size_t s = 0; s < dim; s += 2*k) { 
+	for (std::size_t r = 0; r < k; r++) {
+
+	    // Get the index of |0> and |1>
+	    std::size_t index_0 = s + r;
+	    std::size_t index_1 = s + k + r;
+
+	    // Store the values of |0> and |1> amplitudes
+	    qsl::complex<Fp> a0 = state[index_0];
+	    qsl::complex<Fp> a1 = state[index_1];
+
+	    // Write the new |0> amplitude
+	    state[index_0].real = a0.real * cos - a1.real * sin;
+	    state[index_0].imag = a0.imag * cos - a1.imag * sin;
+
+	    // Write the new |1> amplitude
+	    state[index_1].real = a0.real * sin + a1.real * cos;
+	    state[index_1].imag = a0.imag * sin + a1.imag * cos;
 	    
 	}
     }

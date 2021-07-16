@@ -284,7 +284,7 @@ TEST(GateTests,MakeMatrixTestsTensor)
 
 
 
-TYPED_TEST(Gates, OneQubitNoArg)
+TYPED_TEST(Gates, OneQubitGate)
 {   
     const unsigned num_qubits = 8;
     const unsigned targ = 4;
@@ -303,6 +303,15 @@ TYPED_TEST(Gates, OneQubitNoArg)
 			 sim.pauliX(targ);
 		     };
     gates.push_back({fn_pauliX, pauliX});
+
+    // PauliY 
+    arma::Mat<std::complex<Fp>> pauliY(2, 2, arma::fill::zeros);
+    pauliY(0, 1) = std::complex<Fp>{0, -1};
+    pauliY(1, 0) = std::complex<Fp>{0, 1};
+    auto fn_pauliY = [](Sim & sim, unsigned targ) {
+    			 sim.pauliY(targ);
+    		     };
+    gates.push_back({fn_pauliY, pauliY});
 
     // PauliZ
     arma::Mat<std::complex<Fp>> pauliZ(2, 2, arma::fill::zeros);
@@ -334,15 +343,6 @@ TYPED_TEST(Gates, OneQubitNoArg)
 			sim.phase(targ, angle);
 		       };
     gates.push_back({fn_phase, phase});
-
-    // rotateZ    
-    arma::Mat<std::complex<Fp>> rotateZ(2, 2, arma::fill::zeros);
-    rotateZ(0, 0) = std::complex<Fp>{std::cos(angle/2), std::sin(-angle/2)};
-    rotateZ(1, 1) = std::complex<Fp>{std::cos(angle/2), std::sin(angle/2)};
-    auto fn_rotateZ = [=](Sim & sim, unsigned targ) {
-			sim.rotateZ(targ, angle);
-		       };
-    gates.push_back({fn_rotateZ, rotateZ});
     
     // rotateX
     arma::Mat<std::complex<Fp>> rotateX(2, 2, arma::fill::zeros);
@@ -354,7 +354,27 @@ TYPED_TEST(Gates, OneQubitNoArg)
 			sim.rotateX(targ, angle);
 		       };
     gates.push_back({fn_rotateX, rotateX});
+
+    // rotateY
+    arma::Mat<std::complex<Fp>> rotateY(2, 2, arma::fill::zeros);
+    rotateY(0, 0) = std::cos(angle/2);
+    rotateY(0, 1) = -std::sin(angle/2);
+    rotateY(1, 0) = std::sin(angle/2);
+    rotateY(1, 1) = std::cos(angle/2);
+    auto fn_rotateY = [=](Sim & sim, unsigned targ) {
+			sim.rotateY(targ, angle);
+		       };
+    gates.push_back({fn_rotateY, rotateY});
     
+    // rotateZ    
+    arma::Mat<std::complex<Fp>> rotateZ(2, 2, arma::fill::zeros);
+    rotateZ(0, 0) = std::complex<Fp>{std::cos(angle/2), std::sin(-angle/2)};
+    rotateZ(1, 1) = std::complex<Fp>{std::cos(angle/2), std::sin(angle/2)};
+    auto fn_rotateZ = [=](Sim & sim, unsigned targ) {
+			sim.rotateZ(targ, angle);
+		       };
+    gates.push_back({fn_rotateZ, rotateZ});
+
     
     for (const auto & [fn, mat] : gates) {    
 
@@ -557,7 +577,7 @@ TYPED_TEST(NPGates, TwoQubitGate)
 }
 
 
-TYPED_TEST(NPGates, OneQubitNoArg)
+TYPED_TEST(NPGates, OneQubitGate)
 {   
     const unsigned num_qubits = 8;
     const unsigned num_ones = 4;

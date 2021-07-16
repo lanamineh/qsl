@@ -83,6 +83,8 @@ namespace qsl {
 	sim.pauliX(targ);
 	sim.rotateX(targ,param);
 	sim.controlNot(ctrl,targ);
+	sim.pauliY(targ);
+	sim.rotateY(targ,param);
     };
 
     template<typename Sim>
