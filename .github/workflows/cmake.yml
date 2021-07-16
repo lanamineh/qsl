@@ -13,27 +13,21 @@ env:
 
 jobs:
 
-  setup:
-    runs-on: ubuntu-latest
-    if: "contains(github.event.head_commit.message, '[ci]')"
-
-    steps:
-    - uses: actions/checkout@v2  
-    - name: Install Prerequisites
-      run:   |
-         sudo apt update
-         sudo apt install gcc-10 g++-10
-         sudo apt install lcov
-         sudo apt install libarmadillo-dev
-      shell: bash
-    
   build:
+
     runs-on: ubuntu-latest
     if: "contains(github.event.head_commit.message, '[ci]')"
     needs: setup
-    
-    steps:
+  
     - uses: actions/checkout@v2  
+    - name: Setup
+      run:   |
+        sudo apt update
+        sudo apt install gcc-10 g++-10
+        sudo apt install lcov
+        sudo apt install libarmadillo-dev
+      shell: bash
+
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
 
@@ -47,6 +41,15 @@ jobs:
   
     steps:
     - uses: actions/checkout@v2  
+
+    - name: Setup
+      run:   |
+        sudo apt update
+        sudo apt install gcc-10 g++-10
+        sudo apt install lcov
+        sudo apt install libarmadillo-dev
+      shell: bash
+
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Debug
 

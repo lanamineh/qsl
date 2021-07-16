@@ -1,6 +1,6 @@
 # An Optimised Quantum Computer Simulation Library
 
-[![build](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml/badge.svg)](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml)[![Documentation Status](https://readthedocs.org/projects/qsl/badge/?version=latest)](https://qsl.readthedocs.io/en/latest/?badge=latest) [![codecov](https://codecov.io/gh/lanamineh/qsl/branch/master/graph/badge.svg?token=VYUJ0OZIEZ)](https://codecov.io/gh/lanamineh/qsl)
+[![build](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml/badge.svg)](https://github.com/lanamineh/qsl/actions/workflows/cmake.yml) [![Documentation Status](https://readthedocs.org/projects/qsl/badge/?version=latest)](https://qsl.readthedocs.io/en/latest/?badge=latest) [![codecov](https://codecov.io/gh/lanamineh/qsl/branch/master/graph/badge.svg?token=VYUJ0OZIEZ)](https://codecov.io/gh/lanamineh/qsl)
 
 :warning: **The project is not stable yet. The documentation and library interface is likely to change in the future.** 
 
