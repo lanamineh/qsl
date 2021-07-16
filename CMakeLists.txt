@@ -31,8 +31,8 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(run-gtest EXCLUDE_FROM_ALL src/gtest/utils.cpp src/gtest/sim-constructors.cpp src/gtest/gates.cpp src/gtest/measurements.cpp src/gtest/test-utils.cpp)
-target_link_libraries(run-gtest EXCLUDE_FROM_ALL gtest_main qsl armadillo)
+add_executable(run-gtest src/gtest/utils.cpp src/gtest/sim-constructors.cpp src/gtest/gates.cpp src/gtest/measurements.cpp src/gtest/test-utils.cpp src/gtest/resize-test.cpp)
+target_link_libraries(run-gtest gtest_main qsl armadillo)
 
 include(GoogleTest)
 gtest_discover_tests(run-gtest)
@@ -64,6 +64,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   setup_target_for_coverage_lcov(
     NAME coverage
     EXECUTABLE ./bin/run-gtest
+    DEPENDENCIES run-gtest
     BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2/*"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/gtest/*"
@@ -75,7 +76,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/verify*"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/timer.cpp"
     EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/print.cpp"
-    EXCLUDE "/usr/*")
+    EXCLUDE "/usr/*"
+    )
 endif()
 
 install(TARGETS qsl LIBRARY DESTINATION lib)

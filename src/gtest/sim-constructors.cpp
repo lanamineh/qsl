@@ -25,6 +25,15 @@ public:
 };
 
 template <typename T>
+class FixedSizeSimBasics : public testing::Test {
+public:
+    using List = std::list<T>;
+    static T shared_;
+    T value_;
+};
+
+
+template <typename T>
 class NPSimBasics : public testing::Test {
 public:
     using List = std::list<T>;
@@ -42,11 +51,17 @@ using Sim5 = SimWrapper<qsl::Qubits<qsl::Type::Resize, float>>;
 using Sim6 = SimWrapper<qsl::Qubits<qsl::Type::Resize, double>>;
 using SimTypes = ::testing::Types<Sim1, Sim2, Sim3, Sim4, Sim5, Sim6>;
 
+/// List of simulator types to check
+using Sim1 = SimWrapper<qsl::Qubits<qsl::Type::Default, float>>;
+using Sim2 = SimWrapper<qsl::Qubits<qsl::Type::Default, double>>;
+using Sim3 = SimWrapper<qsl::Qubits<qsl::Type::Omp, float>>;
+using Sim4 = SimWrapper<qsl::Qubits<qsl::Type::Omp, double>>;
+using FixedSizeSimTypes = ::testing::Types<Sim1, Sim2, Sim3, Sim4>;
+
+
 using Sim7 = SimWrapper<qsl::Qubits<qsl::Type::NP, float>>;
 using Sim8 = SimWrapper<qsl::Qubits<qsl::Type::NP, double>>;
 using NPSimTypes = ::testing::Types<Sim7,Sim8>;
-
-
 
 /**
  * \brief Declare the test suite that depends on these types
@@ -58,12 +73,11 @@ using NPSimTypes = ::testing::Types<Sim7,Sim8>;
  *
  */
 TYPED_TEST_SUITE(SimBasics, SimTypes);
-
 TYPED_TEST_SUITE(NPSimBasics, NPSimTypes);
-
+TYPED_TEST_SUITE(FixedSizeSimBasics, FixedSizeSimTypes);
 
 /// Qubits object constructors
-TYPED_TEST(SimBasics, ConstructorTest)
+TYPED_TEST(FixedSizeSimBasics, ConstructorTest)
 {
     using Sim = TypeParam::Sim;
     using Fp_type = TypeParam::Sim::Fp_type;
@@ -148,7 +162,7 @@ TYPED_TEST(NPSimBasics, ConstructorTest)
 }
 
 /// Test the basic utility functions of the simulators
-TYPED_TEST(SimBasics, UtilityFunctions)
+TYPED_TEST(FixedSizeSimBasics, UtilityFunctions)
 {
     using Sim = TypeParam::Sim;
     using Fp_type = TypeParam::Sim::Fp_type;
@@ -249,54 +263,4 @@ TYPED_TEST(NPSimBasics, PrintTest)
     }
     ss2 << std::endl;
     EXPECT_EQ(ss1.str(), ss2.str());
-}
-
-
-/// Check the measure out function of the resize qubit
-TEST(ResizeSim, MeasureOutTest)
-{
-    using Sim = qsl::Qubits<qsl::Type::Resize, double>;    
-
-    // Make a simulator in computational basis state
-    Sim q{ 4 };
-    
-    unsigned outcome = q.measureOut(0); 
-    EXPECT_EQ(outcome, 0);
-    EXPECT_EQ(q.getNumQubits(), 3);
-
-    std::vector<qsl::complex<double>> state = q.getState();
-    EXPECT_EQ(state.size(), (1 << 3));
-    EXPECT_FLOAT_EQ(qsl::norm(state), 1); // Check correct norm
-    
-    // Check that measuring out a Bell pair works
-    Sim q1{ 2 };
-    const double sqrt2 = std::sqrt(2);
-    q1.setState({{1/sqrt2,0}, {0,0}, {0,0}, {1/sqrt2,0}}); // Set Bell pair
-    outcome = q1.measureOut(1); // Measure out qubit 1
-    state = q1.getState();
-    EXPECT_EQ(state.size(), 2);
-    EXPECT_FLOAT_EQ(qsl::norm(state), 1); // Check correct norm
-
-    std::vector<qsl::complex<double>> state_correct;
-    if (outcome == 0) {
-	state_correct.push_back({1,0});
-	state_correct.push_back({0,0});
-    } else {
-	state_correct.push_back({0,0});
-	state_correct.push_back({1,0});
-    } 
-    EXPECT_NEAR(distance(state_correct, state), 0, 1e-10);
-
-    // Check that you can add a qubit
-    q1.addQubit();
-    EXPECT_EQ(q1.getNumQubits(), 2);
-    state = q1.getState();
-    // The correct state has new zeroes at the end
-    state_correct.push_back({0,0});
-    state_correct.push_back({0,0});
-
-    EXPECT_NEAR(distance(state_correct, state), 0, 1e-10);
-    EXPECT_FLOAT_EQ(qsl::norm(state), 1); // Check correct norm
-
-    
 }

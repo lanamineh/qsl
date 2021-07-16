@@ -68,12 +68,12 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::reset()
 template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::Resize, Fp>::setState(const std::vector<qsl::complex<Fp>> & state_in)
 {
-    if (state_in.size() != dim) {
-	std::string msg = "Cannot assign state vector from different ";
-	msg += "number of qubits";
-	throw std::logic_error(msg);
-    }
-
+    // For the resizeable simulator, you can set a different sized
+    // state vector without causing an exception (unless the state is
+    // an invalid size)
+    dim = state_in.size();
+    nqubits = checkStateSize(state_in);
+   
     // Set the new state vector
     state = state_in;
 }
@@ -106,12 +106,12 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::addQubit()
 template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::Resize, Fp>::operator = (const Qubits & old)
 {
-    // Check if nqubits (and therefore dim) are the same
-    if (nqubits != old.nqubits) {
-	std::string msg = "Cannot assign Qubits object vector from different ";
-	msg += "number of qubits";
-	throw std::logic_error(msg);
-    }
+    // For the resizeable simulator, you can assign a different sized
+    // simulator object without causing an exception (unless the state is
+    // an invalid size)
+    dim = old.dim;
+    nqubits = old.nqubits;
+
     // Set the new state vector
     state = old.state;
 }
