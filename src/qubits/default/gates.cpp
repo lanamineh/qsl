@@ -241,6 +241,200 @@ void qsl::Qubits<qsl::Type::Default, Fp>::controlNot(unsigned ctrl, unsigned tar
 }
 
 template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::controlY(unsigned ctrl,
+						   unsigned targ)
+{
+    std::size_t small_bit = 1 << std::min(ctrl, targ);
+    std::size_t large_bit = 1 << std::max(ctrl, targ);
+
+    std::size_t mid_incr = (small_bit << 1);
+    std::size_t high_incr = (large_bit << 1);
+    std::size_t targ_bit = (1 << targ);
+    std::size_t ctrl_bit = (1 << ctrl);
+    
+    // Increment through the indices above largest bit (ctrl or targ)
+    for (std::size_t i = 0; i < dim; i += high_incr) {
+	// Increment through the middle set of bits
+	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+	    // Increment through the low set of bits
+	    for (std::size_t k = 0; k < small_bit; k++) {
+		// Get the |01> and |11> indices
+		std::size_t index1 = i + j + k + ctrl_bit;
+		std::size_t index2 = index1 + targ_bit;
+
+		qsl::complex<Fp> temp1 = state[index1];
+		qsl::complex<Fp> temp2 = state[index2];
+	    
+		state[index1].real = temp2.imag;
+		state[index1].imag = -temp2.real;
+		state[index2].real = -temp1.imag;
+		state[index2].imag = temp1.real;
+	    }
+	}
+    }    
+}
+
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::controlZ(unsigned ctrl,
+						   unsigned targ)
+{
+    std::size_t small_bit = 1 << std::min(ctrl, targ);
+    std::size_t large_bit = 1 << std::max(ctrl, targ);
+
+    std::size_t mid_incr = (small_bit << 1);
+    std::size_t high_incr = (large_bit << 1);
+
+    std::size_t outcome = (1 << targ) + (1 << ctrl);
+    
+    // Increment through the indices above largest bit (ctrl or targ)
+    for (std::size_t i = 0; i < dim; i += high_incr) {
+	// Increment through the middle set of bits
+	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+	    // Increment through the low set of bits
+	    for (std::size_t k = 0; k < small_bit; k++) {
+		std::size_t index = i + j + k + outcome;
+		state[index].real *= -1;
+		state[index].imag *= -1;
+	    }
+	}
+    }    
+}
+
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::controlRotateX(unsigned ctrl,
+							 unsigned targ,
+							 Fp angle)
+{
+    // Store variables
+    Fp cos = std::cos(angle/2);
+    Fp sin = std::sin(angle/2);
+    
+    std::size_t small_bit = 1 << std::min(ctrl, targ);
+    std::size_t large_bit = 1 << std::max(ctrl, targ);
+
+    std::size_t mid_incr = (small_bit << 1);
+    std::size_t high_incr = (large_bit << 1);
+    std::size_t targ_bit = (1 << targ);
+    std::size_t ctrl_bit = (1 << ctrl);
+
+    // Increment through the indices above largest bit (ctrl or targ)
+    for (std::size_t i = 0; i < dim; i += high_incr) {
+	// Increment through the middle set of bits
+	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+	    // Increment through the low set of bits
+	    for (std::size_t k = 0; k < small_bit; k++) {
+		// Get the |01> and |11> indices
+		std::size_t index1 = i + j + k + ctrl_bit;
+		std::size_t index2 = index1 + targ_bit;
+
+		// Store the values of the amplitudes
+		qsl::complex<Fp> a0 = state[index1];
+		qsl::complex<Fp> a1 = state[index2];
+
+		// Write the new |01> amplitude
+		state[index1].real = a0.real * cos + a1.imag * sin;
+		state[index1].imag = a0.imag * cos - a1.real * sin;
+
+		// Write the new |11> amplitude
+		state[index2].real = a1.real * cos + a0.imag * sin;
+		state[index2].imag = a1.imag * cos - a0.real * sin;
+	    }
+	}
+    }    
+}
+
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::controlRotateY(unsigned ctrl,
+							 unsigned targ,
+							 Fp angle)
+{
+    // Store variables
+    Fp cos = std::cos(angle/2);
+    Fp sin = std::sin(angle/2);
+    
+    std::size_t small_bit = 1 << std::min(ctrl, targ);
+    std::size_t large_bit = 1 << std::max(ctrl, targ);
+
+    std::size_t mid_incr = (small_bit << 1);
+    std::size_t high_incr = (large_bit << 1);
+    std::size_t targ_bit = (1 << targ);
+    std::size_t ctrl_bit = (1 << ctrl);
+
+    // Increment through the indices above largest bit (ctrl or targ)
+    for (std::size_t i = 0; i < dim; i += high_incr) {
+	// Increment through the middle set of bits
+	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+	    // Increment through the low set of bits
+	    for (std::size_t k = 0; k < small_bit; k++) {
+		// Get the |01> and |11> indices
+		std::size_t index1 = i + j + k + ctrl_bit;
+		std::size_t index2 = index1 + targ_bit;
+
+		// Store the values of the amplitudes
+		qsl::complex<Fp> a0 = state[index1];
+		qsl::complex<Fp> a1 = state[index2];
+
+		// Write the new |01> amplitude
+		state[index1].real = a0.real * cos - a1.real * sin;
+		state[index1].imag = a0.imag * cos - a1.imag * sin;
+
+		// Write the new |11> amplitude
+		state[index2].real = a0.real * sin + a1.real * cos;
+		state[index2].imag = a0.imag * sin + a1.imag * cos;
+	    }
+	}
+    }    
+}
+
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::controlRotateZ(unsigned ctrl,
+							 unsigned targ,
+							 Fp angle)
+{
+    // Store variables
+    Fp cos = std::cos(angle/2);
+    Fp sin = std::sin(angle/2);
+    
+    std::size_t small_bit = 1 << std::min(ctrl, targ);
+    std::size_t large_bit = 1 << std::max(ctrl, targ);
+
+    std::size_t mid_incr = (small_bit << 1);
+    std::size_t high_incr = (large_bit << 1);
+    std::size_t targ_bit = (1 << targ);
+    std::size_t ctrl_bit = (1 << ctrl);
+
+    // Increment through the indices above largest bit (ctrl or targ)
+    for (std::size_t i = 0; i < dim; i += high_incr) {
+	// Increment through the middle set of bits
+	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+	    // Increment through the low set of bits
+	    for (std::size_t k = 0; k < small_bit; k++) {
+		// Get the |01> and |11> indices
+		std::size_t index1 = i + j + k + ctrl_bit;
+		std::size_t index2 = index1 + targ_bit;
+
+		// Store the values of the amplitudes
+		qsl::complex<Fp> a0 = state[index1];
+		qsl::complex<Fp> a1 = state[index2];
+
+		// Write the new |01> amplitude
+		state[index1].real = a0.real * cos + a0.imag * sin;
+		state[index1].imag = a0.imag * cos - a0.real * sin;
+
+		// Write the new |11> amplitude
+		state[index2].real = a1.real * cos - a1.imag * sin;
+		state[index2].imag = a1.imag * cos + a1.real * sin;
+	    }
+	}
+    }    
+}
+
+
+template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::Default, Fp>::controlPhase(unsigned ctrl,
 						       unsigned targ,
 						       Fp angle)
@@ -271,6 +465,42 @@ void qsl::Qubits<qsl::Type::Default, Fp>::controlPhase(unsigned ctrl,
     }    
 }
 
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::controlHadamard(unsigned ctrl,
+							  unsigned targ)
+{
+    std::size_t small_bit = 1 << std::min(ctrl, targ);
+    std::size_t large_bit = 1 << std::max(ctrl, targ);
+
+    std::size_t mid_incr = (small_bit << 1);
+    std::size_t high_incr = (large_bit << 1);
+    std::size_t targ_bit = (1 << targ);
+    std::size_t ctrl_bit = (1 << ctrl);
+
+    // Increment through the indices above largest bit (ctrl or targ)
+    for (std::size_t i = 0; i < dim; i += high_incr) {
+	// Increment through the middle set of bits
+	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+	    // Increment through the low set of bits
+	    for (std::size_t k = 0; k < small_bit; k++) {
+		// Get the |01> and |11> indices
+		std::size_t index1 = i + j + k + ctrl_bit;
+		std::size_t index2 = index1 + targ_bit;
+
+		const qsl::complex<Fp> temp1 = state[index1];
+		const qsl::complex<Fp> temp2 = state[index2];
+		constexpr Fp sqrt2 = std::sqrt(2); 
+		state[index1].real = (temp1.real + temp2.real)/sqrt2;
+		state[index1].imag = (temp1.imag + temp2.imag)/sqrt2;
+		state[index2].real = (temp1.real - temp2.real)/sqrt2;
+		state[index2].imag = (temp1.imag - temp2.imag)/sqrt2;
+	    }
+	}
+    }    
+}
+
+
 template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::Default, Fp>::swap(unsigned q1, unsigned q2)
 {
@@ -297,34 +527,6 @@ void qsl::Qubits<qsl::Type::Default, Fp>::swap(unsigned q1, unsigned q2)
 	}
     }    
 }
-
-template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::Default, Fp>::controlZ(unsigned ctrl,
-						   unsigned targ)
-{
-    std::size_t small_bit = 1 << std::min(ctrl, targ);
-    std::size_t large_bit = 1 << std::max(ctrl, targ);
-
-    std::size_t mid_incr = (small_bit << 1);
-    std::size_t high_incr = (large_bit << 1);
-
-    std::size_t outcome = (1 << targ) + (1 << ctrl);
-    
-    // Increment through the indices above largest bit (ctrl or targ)
-    for (std::size_t i = 0; i < dim; i += high_incr) {
-	// Increment through the middle set of bits
-	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
-	    // Increment through the low set of bits
-	    for (std::size_t k = 0; k < small_bit; k++) {
-		std::size_t index = i + j + k + outcome;
-		state[index].real *= -1;
-		state[index].imag *= -1;
-	    }
-	}
-    }    
-}
-
-
 
 // Explicit instantiations
 template class qsl::Qubits<qsl::Type::Default, float>;

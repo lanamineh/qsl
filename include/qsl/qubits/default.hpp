@@ -348,12 +348,120 @@ namespace qsl {
 	 *        \end{pmatrix} 
 	 * \f]
 	 *
-	 * \param ctrl The control qubit, NOT is applied on the target qubit
+	 * \param ctrl The control qubit, X is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
 	 */
 	void controlNot(unsigned ctrl, unsigned targ);
 
+	/**
+	 * \brief Perform a controlled Y gate on two qubits. 
+	 *
+	 * \ingroup qubits_gates
+	 *
+	 *
+	 * \f[ 
+	 * CY = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & 0 & -i \\
+	 *             0 & 0 & i & 0
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param ctrl The control qubit, Y is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
+	void controlY(unsigned ctrl, unsigned targ);
+	
+	/**
+	 * \brief Perform a controlled Z gate on two qubits. 
+	 *
+	 * \ingroup qubits_gates
+	 *
+	 *
+	 * \f[ 
+	 * CZ = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & 1 & 0 \\
+	 *             0 & 0 & 0 & -1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param ctrl The control qubit, Z is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
+	void controlZ(unsigned ctrl, unsigned targ);
+
+	/**
+	 * \brief Perform a controlled Rx gate on two qubits. 
+	 *
+	 * \ingroup qubits_gates
+	 *
+	 *
+	 * \f[ 
+	 * CRx = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & \cos(\theta/2) & -i\sin(\theta/2) \\
+	 *             0 & 0 & -i\sin(\theta/2) & \cos(\theta/2)
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param ctrl The control qubit, Rx is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by.
+	 */
+	void controlRotateX(unsigned ctrl, unsigned targ, Fp angle);
+
+	/**
+	 * \brief Perform a controlled Ry gate on two qubits. 
+	 *
+	 * \ingroup qubits_gates
+	 *
+	 *
+	 * \f[ 
+	 * CRy = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & \cos(\theta/2) & -\sin(\theta/2) \\
+	 *             0 & 0 & \sin(\theta/2) & \cos(\theta/2)
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param ctrl The control qubit, Ry is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by.
+	 */
+	void controlRotateY(unsigned ctrl, unsigned targ, Fp angle);
+	
+	/**
+	 * \brief Perform a controlled Rz gate on two qubits. 
+	 *
+	 * \ingroup qubits_gates
+	 *
+	 *
+	 * \f[ 
+	 * CRz = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & e^{-i\theta/2} & 0 \\
+	 *             0 & 0 & 0 & e^{i\theta/2}
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param ctrl The control qubit, Rz is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by.
+	 */
+	void controlRotateZ(unsigned ctrl, unsigned targ, Fp angle);
+        
 	/**
 	 * \brief Perform a controlled phase shift on two qubits. 
 	 *
@@ -378,6 +486,27 @@ namespace qsl {
 	void controlPhase(unsigned ctrl, unsigned targ, Fp angle);
 
 	/**
+	 * \brief Perform a controlled H gate on two qubits. 
+	 *
+	 * \ingroup qubits_gates
+	 *
+	 *
+	 * \f[ 
+	 * CH = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & 1/\sqrt{2} & 1/\sqrt{2} \\
+	 *             0 & 0 & 1/\sqrt{2} & -1/\sqrt{2}
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param ctrl The control qubit, H is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
+	void controlHadamard(unsigned ctrl, unsigned targ);
+	
+	/**
 	 * \brief Perform a swap gate on two qubits. 
 	 *
 	 * \ingroup qubits_gates
@@ -395,28 +524,6 @@ namespace qsl {
 	 * \param q2 The second qubit to swap.
 	 */
 	void swap(unsigned q1, unsigned q2);
-
-	/**
-	 * \brief Perform a controlled Z gate on two qubits. 
-	 *
-	 * \ingroup qubits_gates
-	 *
-	 *
-	 * \f[ 
-	 * CZ = \begin{pmatrix}
-	 *             1 & 0 & 0 & 0 \\
-	 *             0 & 1 & 0 & 0 \\
-	 *             0 & 0 & 1 & 0 \\
-	 *             0 & 0 & 0 & -1
-	 *             \end{pmatrix} 
-	 * \f]
-	 *
-	 * \param ctrl The control qubit, Z is applied on the target qubit
-	 *             if this qubit is \f$ |1\rangle \f$.
-	 * \param targ The target qubit.
-	 */
-	void controlZ(unsigned ctrl, unsigned targ);
-
 	
 	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.

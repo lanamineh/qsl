@@ -206,19 +206,44 @@ namespace qsl {
 	void controlNot(unsigned ctrl, unsigned targ);
 
 	/**
-	 * \brief Perform a controlled phase shift on two qubits. 
+	 * \brief Perform the CY gate on two qubits.
+	 */
+	void controlY(unsigned ctrl, unsigned targ);
+	
+	/**
+	 * \brief Perform the CZ gate on two qubits.
+	 */
+	void controlZ(unsigned ctrl, unsigned targ);
+
+	/**
+	 * \brief Perform the CRx gate on two qubits.
+	 */
+	void controlRotateX(unsigned ctrl, unsigned targ, Fp angle);
+
+	/**
+	 * \brief Perform the CRy gate on two qubits.
+	 */
+	void controlRotateY(unsigned ctrl, unsigned targ, Fp angle);
+
+	/**
+	 * \brief Perform the CRz gate on two qubits.
+	 */
+	void controlRotateZ(unsigned ctrl, unsigned targ, Fp angle);
+	
+	/**
+	 * \brief Perform a controlled phase shift on two qubits.
 	 */
 	void controlPhase(unsigned ctrl, unsigned targ, Fp angle);
 
 	/**
+	 * \brief Perform the CH gate on two qubits.
+	 */
+	void controlHadamard(unsigned ctrl, unsigned targ);
+	
+	/**
 	 * \brief Perform a swap gate on two qubits. 
 	 */
 	void swap(unsigned q1, unsigned q2);
-
-	/**
-	 * \brief Perform a controlled Z gate on two qubits. 
-	 */
-	void controlZ(unsigned ctrl, unsigned targ);
 
 	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.

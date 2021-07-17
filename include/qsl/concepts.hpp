@@ -68,23 +68,37 @@ namespace qsl {
     template<typename Sim>
     concept HasNPGates = requires (Sim sim, unsigned ctrl, unsigned targ,
 				   Sim::Fp_type param) {
-	sim.phase(targ,param);
-	sim.controlPhase(ctrl,targ,param);
-	sim.swap(ctrl,targ); // Actually q1 and q2, but still unsigned
-	sim.controlZ(ctrl,targ);
+	// One qubit gates
+	sim.pauliZ(targ); 
 	sim.rotateZ(targ,param);
-	sim.pauliZ(targ);
+	sim.phase(targ,param);	
+
+	// Controlled two qubit gates
+	sim.controlZ(ctrl,targ);
+	sim.controlRotateZ(ctrl,targ,param);
+	sim.controlPhase(ctrl,targ,param);
+
+	// Number preserved two qubit gates
+	sim.swap(ctrl,targ); // Actually q1 and q2, but still unsigned
     };
     
     template<typename Sim>
     concept HasNonNPGates = requires (Sim sim, unsigned ctrl, unsigned targ,
 				      Sim::Fp_type param) {
-	sim.hadamard(targ);
+
+	// One qubit gates
 	sim.pauliX(targ);
-	sim.rotateX(targ,param);
-	sim.controlNot(ctrl,targ);
 	sim.pauliY(targ);
+	sim.rotateX(targ,param);
 	sim.rotateY(targ,param);
+	sim.hadamard(targ);
+
+	// Controlled two qubit gates
+	sim.controlNot(ctrl,targ);
+	sim.controlY(ctrl,targ);
+	sim.controlRotateX(ctrl,targ,param);	
+	sim.controlRotateY(ctrl,targ,param);
+	sim.controlHadamard(ctrl,targ);
     };
 
     template<typename Sim>

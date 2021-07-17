@@ -965,11 +965,31 @@ namespace qsl {
 	    results.emplace(
 		"pauliX",
 		this->check(os, &Sim1::pauliX, &Sim2::pauliX));
- 
+
+	    os << "Checking pauliY" << std::endl;
+	    results.emplace(
+		"pauliY",
+		this->check(os, &Sim1::pauliY, &Sim2::pauliY));
+
+	    os << "Checking pauliZ" << std::endl;
+	    results.emplace(
+		"pauliZ",
+		this->check(os, &Sim1::pauliZ, &Sim2::pauliZ));
+
 	    os << "Checking rotateX" << std::endl;
 	    results.emplace(
 		"rotateX",
 		this->check(os, &Sim1::rotateX, &Sim2::rotateX));
+
+	    os << "Checking rotateY" << std::endl;
+	    results.emplace(
+		"rotateY",
+		this->check(os, &Sim1::rotateY, &Sim2::rotateY));
+	    
+	    os << "Checking rotateZ" << std::endl;
+	    results.emplace(
+		"rotateZ",
+		this->check(os, &Sim1::rotateZ, &Sim2::rotateZ));
 	    
 	    os << "Checking phase" << std::endl;
 	    results.emplace(
@@ -980,42 +1000,47 @@ namespace qsl {
 	    results.emplace(
 		"hadamard",
 		this->check(os, &Sim1::hadamard, &Sim2::hadamard));
-
-	    os << "Checking rotateZ" << std::endl;
-	    results.emplace(
-		"rotateZ",
-		this->check(os, &Sim1::rotateZ, &Sim2::rotateZ));
-	    
-	    os << "Checking pauliZ" << std::endl;
-	    results.emplace(
-		"pauliZ",
-		this->check(os, &Sim1::pauliZ, &Sim2::pauliZ));
-
-	    os << "Checking rotateY" << std::endl;
-	    results.emplace(
-		"rotateY",
-		this->check(os, &Sim1::rotateY, &Sim2::rotateY));
-	    
-	    os << "Checking pauliY" << std::endl;
-	    results.emplace(
-		"pauliY",
-		this->check(os, &Sim1::pauliY, &Sim2::pauliY));
 	    
 	    // Check two-qubit gates
-	    os << "Checking controlZ" << std::endl;
-	    results.emplace(
-		"controlZ",
-		this->check(os, &Sim1::controlZ, &Sim2::controlZ));
-	    
 	    os << "Checking controlNot" << std::endl;
 	    results.emplace(
 		"controlNot",
 		this->check(os, &Sim1::controlNot, &Sim2::controlNot));
 	    
+	    os << "Checking controlY" << std::endl;
+	    results.emplace(
+		"controlY",
+		this->check(os, &Sim1::controlY, &Sim2::controlY));
+
+	    os << "Checking controlZ" << std::endl;
+	    results.emplace(
+		"controlZ",
+		this->check(os, &Sim1::controlZ, &Sim2::controlZ));
+
+	    os << "Checking controlRotateX" << std::endl;
+	    results.emplace(
+		"controlRotateX",
+		this->check(os, &Sim1::controlRotateX, &Sim2::controlRotateX));
+	    
+	    os << "Checking controlRotateY" << std::endl;
+	    results.emplace(
+		"controlRotateY",
+		this->check(os, &Sim1::controlRotateY, &Sim2::controlRotateY));
+	    
+	    os << "Checking controlRotateZ" << std::endl;
+	    results.emplace(
+		"controlRotateZ",
+		this->check(os, &Sim1::controlRotateZ, &Sim2::controlRotateZ));
+	    
 	    os << "Checking controlPhase" << std::endl;
 	    results.emplace(
 		"controlPhase",
 		this->check(os, &Sim1::controlPhase, &Sim2::controlPhase));
+
+	    os << "Checking controlHadamard" << std::endl;
+	    results.emplace(
+		"controlHadamard",
+		this->check(os, &Sim1::controlHadamard, &Sim2::controlHadamard));
 	    
 	    os << "Checking swap" << std::endl;
 	    results.emplace(
@@ -1056,27 +1081,33 @@ namespace qsl {
 	ResultData checkAll(std::ostream & os) {
 
 	    ResultData results;
+
+	    // One qubit gates
+	    os << "Checking pauliZ" << std::endl;
+	    results.emplace(
+		"pauliZ",
+		this->check(os, &Sim1::pauliZ, &Sim2::pauliZ));
+
+	    os << "Checking rotateZ" << std::endl;
+	    results.emplace(
+		"rotateZ",
+		this->check(os, &Sim1::rotateZ, &Sim2::rotateZ));
 	    
 	    os << "Checking phase" << std::endl;
 	    results.emplace(
 		"phase",
 		this->check(os, &Sim1::phase, &Sim2::phase));
 
-	    os << "Checking rotateZ" << std::endl;
-	    results.emplace(
-		"rotateZ",
-		this->check(os, &Sim1::rotateZ, &Sim2::rotateZ));
-
-	    os << "Checking pauliZ" << std::endl;
-	    results.emplace(
-		"pauliZ",
-		this->check(os, &Sim1::pauliZ, &Sim2::pauliZ));
-
-	    
+	    // Two qubit gates
 	    os << "Checking controlZ" << std::endl;
 	    results.emplace(
 		"controlZ",
 		this->check(os, &Sim1::controlZ, &Sim2::controlZ));
+
+	    os << "Checking controlRotateZ" << std::endl;
+	    results.emplace(
+		"controlRotateZ",
+		this->check(os, &Sim1::controlRotateZ, &Sim2::controlRotateZ));
 	    
 	    os << "Checking controlPhase" << std::endl;
 	    results.emplace(
