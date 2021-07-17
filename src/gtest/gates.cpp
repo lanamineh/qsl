@@ -93,7 +93,7 @@ TEST(GateTests,MakeMatrixTestsCnot)
     unsigned ctrl = 1;
     unsigned targ = 0;
     const auto m0 = makeMatrix(gate, 3, {targ, ctrl});
-    std::cout << m0 << std::endl;
+    //std::cout << m0 << std::endl;
     // Check all the basis states
     const std::complex<double> one{1,0};
     EXPECT_EQ(m0(0b000,0b000), one); // |000) -> |000) 
@@ -109,7 +109,7 @@ TEST(GateTests,MakeMatrixTestsCnot)
     ctrl = 0;
     targ = 2;
     const auto m1 = makeMatrix(gate, 3, {targ, ctrl});
-    std::cout << m1 << std::endl;
+    //std::cout << m1 << std::endl;
     // Check all the basis states
     EXPECT_EQ(m1(0b000,0b000), one); 
     EXPECT_EQ(m1(0b001,0b101), one);
@@ -124,7 +124,7 @@ TEST(GateTests,MakeMatrixTestsCnot)
     ctrl = 0;
     targ = 1;
     const auto m2 = makeMatrix(gate, 2, {targ, ctrl});
-    std::cout << m2 << std::endl;
+    //std::cout << m2 << std::endl;
     // Check all the basis states
     EXPECT_EQ(m2(0b00,0b00), one); 
     EXPECT_EQ(m2(0b01,0b11), one);
@@ -135,7 +135,7 @@ TEST(GateTests,MakeMatrixTestsCnot)
     ctrl = 1;
     targ = 0;
     const auto m3 = makeMatrix(gate, 2, {targ, ctrl});
-    std::cout << m3 << std::endl;
+    //std::cout << m3 << std::endl;
     // Check all the basis states
     EXPECT_EQ(m3(0b00,0b00), one); 
     EXPECT_EQ(m3(0b01,0b01), one);
@@ -157,7 +157,7 @@ TEST(GateTests,MakeMatrixTestsSwap)
     unsigned ctrl = 1;
     unsigned targ = 0;
     const auto m0 = makeMatrix(gate, 3, {targ, ctrl});
-    std::cout << m0 << std::endl;
+    //std::cout << m0 << std::endl;
     // Check all the basis states
     const std::complex<double> one{1,0};
     EXPECT_EQ(m0(0b000,0b000), one); // |000) -> |000) 
@@ -173,7 +173,7 @@ TEST(GateTests,MakeMatrixTestsSwap)
     ctrl = 0;
     targ = 2;
     const auto m1 = makeMatrix(gate, 3, {targ, ctrl});
-    std::cout << m1 << std::endl;
+    //std::cout << m1 << std::endl;
     // Check all the basis states
     EXPECT_EQ(m1(0b000,0b000), one);
     EXPECT_EQ(m1(0b001,0b100), one);
@@ -202,7 +202,7 @@ TEST(GateTests,MakeMatrixTestsCHadamard)
     unsigned ctrl = 1;
     unsigned targ = 0;
     const auto m0 = makeMatrix(gate, 3, {targ, ctrl});
-    std::cout << m0 << std::endl;
+    //std::cout << m0 << std::endl;
     // Check all the basis states
     const std::complex<double> one{1,0};
     const std::complex<double> val{one_sqrt2,0};
@@ -223,7 +223,7 @@ TEST(GateTests,MakeMatrixTestsCHadamard)
     ctrl = 0;
     targ = 2;
     const auto m1 = makeMatrix(gate, 3, {targ, ctrl});
-    std::cout << m1 << std::endl;
+    //std::cout << m1 << std::endl;
 
     // Check all the basis states
     // Identity
@@ -290,7 +290,9 @@ TYPED_TEST(Gates, OneQubitGate)
     const unsigned targ = 4;
     using Sim = TypeParam::Sim;
     using Fp = TypeParam::Sim::Fp_type;
-
+    // Generate random angle to test parameterised gates
+    Fp angle = arma::datum::pi * arma::randn<Fp>();
+    
     // Create list of gates mapped to matrices
     std::vector<std::pair<std::function<void(Sim &, unsigned)>, 
 			  arma::Mat<std::complex<Fp>>>> gates;
@@ -335,7 +337,6 @@ TYPED_TEST(Gates, OneQubitGate)
     gates.push_back({fn_hadamard, hadamard});
 
     // phase shift
-    Fp angle = 0.4;
     arma::Mat<std::complex<Fp>> phase(2, 2, arma::fill::zeros);
     phase(0, 0) = 1;
     phase(1, 1) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
@@ -415,7 +416,9 @@ TYPED_TEST(Gates, TwoQubitGate)
     const unsigned targ = 4;
     using Sim = TypeParam::Sim;
     using Fp = TypeParam::Sim::Fp_type;
-
+    // Generate random angle to test parameterised gates
+    Fp angle = arma::datum::pi * arma::randn<Fp>();
+    
     // Create list of gates mapped to matrices
     std::vector<std::pair<std::function<void(Sim &, unsigned, unsigned)>, 
 			  arma::Mat<std::complex<Fp>>>> gates;
@@ -431,17 +434,16 @@ TYPED_TEST(Gates, TwoQubitGate)
 		     };
     gates.push_back({fn_cnot, cnot});
 
-    // controlPhase
-    Fp angle{ 0.3 };
-    arma::Mat<std::complex<Fp>> cphase(4, 4, arma::fill::zeros);
-    cphase(0b00,0b00) = 1;
-    cphase(0b01,0b01) = 1;
-    cphase(0b10,0b10) = 1;
-    cphase(0b11,0b11) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
-    auto fn_cphase = [=](Sim & sim, unsigned ctrl, unsigned targ) {
-		       sim.controlPhase(ctrl, targ, angle);
+    // controlY
+    arma::Mat<std::complex<Fp>> cy(4, 4, arma::fill::zeros);
+    cy(0b00,0b00) = 1;
+    cy(0b01,0b01) = 1;
+    cy(0b10,0b11) = std::complex<Fp>{0, -1};
+    cy(0b11,0b10) = std::complex<Fp>{0, 1};;
+    auto fn_cy = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+		     sim.controlY(ctrl, targ);
 		   };
-    gates.push_back({fn_cphase, cphase});
+    gates.push_back({fn_cy, cy});
 
     // controlZ
     arma::Mat<std::complex<Fp>> cz(4, 4, arma::fill::zeros);
@@ -453,6 +455,71 @@ TYPED_TEST(Gates, TwoQubitGate)
 		     sim.controlZ(ctrl, targ);
 		   };
     gates.push_back({fn_cz, cz});
+
+    // controlRotateX
+    arma::Mat<std::complex<Fp>> crx(4, 4, arma::fill::zeros);
+    crx(0b00,0b00) = 1;
+    crx(0b01,0b01) = 1;
+    crx(0b10,0b10) = std::complex<Fp>{std::cos(angle/2), 0};
+    crx(0b10,0b11) = std::complex<Fp>{0, -std::sin(angle/2)};
+    crx(0b11,0b10) = std::complex<Fp>{0, -std::sin(angle/2)};
+    crx(0b11,0b11) = std::complex<Fp>{std::cos(angle/2), 0};
+
+    auto fn_crx = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.controlRotateX(ctrl, targ, angle);
+		   };
+    gates.push_back({fn_crx, crx});
+
+    // controlRotateY
+    arma::Mat<std::complex<Fp>> cry(4, 4, arma::fill::zeros);
+    cry(0b00,0b00) = 1;
+    cry(0b01,0b01) = 1;
+    cry(0b10,0b10) = std::cos(angle/2);
+    cry(0b10,0b11) = -std::sin(angle/2);
+    cry(0b11,0b10) = std::sin(angle/2);
+    cry(0b11,0b11) = std::cos(angle/2);
+
+    auto fn_cry = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.controlRotateY(ctrl, targ, angle);
+		   };
+    gates.push_back({fn_cry, cry});
+
+    // controlRotateZ
+    arma::Mat<std::complex<Fp>> crz(4, 4, arma::fill::zeros);
+    crz(0b00,0b00) = 1;
+    crz(0b01,0b01) = 1;
+    crz(0b10,0b10) = std::complex<Fp>{std::cos(angle/2), -std::sin(angle/2)};
+    crz(0b11,0b11) = std::complex<Fp>{std::cos(angle/2), std::sin(angle/2)};
+    auto fn_crz = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.controlRotateZ(ctrl, targ, angle);
+		   };
+    gates.push_back({fn_crz, crz});
+    
+    // controlPhase
+    arma::Mat<std::complex<Fp>> cphase(4, 4, arma::fill::zeros);
+    cphase(0b00,0b00) = 1;
+    cphase(0b01,0b01) = 1;
+    cphase(0b10,0b10) = 1;
+    cphase(0b11,0b11) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
+    auto fn_cphase = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+		       sim.controlPhase(ctrl, targ, angle);
+		   };
+    gates.push_back({fn_cphase, cphase});
+
+    // controlHadamard
+    Fp sqrt2 = 1/std::sqrt(2);
+    arma::Mat<std::complex<Fp>> ch(4, 4, arma::fill::zeros);
+    ch(0b00,0b00) = 1;
+    ch(0b01,0b01) = 1;
+    ch(0b10,0b10) = sqrt2;
+    ch(0b10,0b11) = sqrt2;
+    ch(0b11,0b10) = sqrt2;
+    ch(0b11,0b11) = -sqrt2;
+
+    auto fn_ch = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.controlHadamard(ctrl, targ);
+		   };
+    gates.push_back({fn_ch, ch});
     
     // swap
     arma::Mat<std::complex<Fp>> swap(4, 4, arma::fill::zeros);
@@ -505,22 +572,12 @@ TYPED_TEST(NPGates, TwoQubitGate)
     const unsigned targ = 4;
     using Sim = TypeParam::Sim;
     using Fp = TypeParam::Sim::Fp_type;
-
+    // Generate random angle to test parameterised gates
+    Fp angle = arma::datum::pi * arma::randn<Fp>();
+    
     // Create list of gates mapped to matrices
     std::vector<std::pair<std::function<void(Sim &, unsigned, unsigned)>, 
 			  arma::Mat<std::complex<Fp>>>> gates;
-    
-    // controlPhase
-    Fp angle{ 0.3 };
-    arma::Mat<std::complex<Fp>> cphase(4, 4, arma::fill::zeros);
-    cphase(0b00,0b00) = 1;
-    cphase(0b01,0b01) = 1;
-    cphase(0b10,0b10) = 1;
-    cphase(0b11,0b11) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
-    auto fn_cphase = [=](Sim & sim, unsigned ctrl, unsigned targ) {
-		       sim.controlPhase(ctrl, targ, angle);
-		   };
-    gates.push_back({fn_cphase, cphase});
 
     // controlZ
     arma::Mat<std::complex<Fp>> cz(4, 4, arma::fill::zeros);
@@ -532,7 +589,29 @@ TYPED_TEST(NPGates, TwoQubitGate)
 		     sim.controlZ(ctrl, targ);
 		   };
     gates.push_back({fn_cz, cz});
+
+    // controlRotateZ
+    arma::Mat<std::complex<Fp>> crz(4, 4, arma::fill::zeros);
+    crz(0b00,0b00) = 1;
+    crz(0b01,0b01) = 1;
+    crz(0b10,0b10) = std::complex<Fp>{std::cos(angle/2), -std::sin(angle/2)};
+    crz(0b11,0b11) = std::complex<Fp>{std::cos(angle/2), std::sin(angle/2)};
+    auto fn_crz = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.controlRotateZ(ctrl, targ, angle);
+		   };
+    gates.push_back({fn_crz, crz});
     
+    // controlPhase
+    arma::Mat<std::complex<Fp>> cphase(4, 4, arma::fill::zeros);
+    cphase(0b00,0b00) = 1;
+    cphase(0b01,0b01) = 1;
+    cphase(0b10,0b10) = 1;
+    cphase(0b11,0b11) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
+    auto fn_cphase = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+		       sim.controlPhase(ctrl, targ, angle);
+		   };
+    gates.push_back({fn_cphase, cphase});
+
     // swap
     arma::Mat<std::complex<Fp>> swap(4, 4, arma::fill::zeros);
     swap(0b00,0b00) = 1;
@@ -584,7 +663,9 @@ TYPED_TEST(NPGates, OneQubitGate)
     const unsigned targ = 4;
     using Sim = TypeParam::Sim;
     using Fp = TypeParam::Sim::Fp_type;
-
+    // Generate random angle to test parameterised gates
+    Fp angle = arma::datum::pi * arma::randn<Fp>();
+    
     // Create list of gates mapped to matrices
     std::vector<std::pair<std::function<void(Sim &, unsigned)>, 
 			  arma::SpMat<std::complex<Fp>>>> gates;
@@ -599,7 +680,6 @@ TYPED_TEST(NPGates, OneQubitGate)
     gates.push_back({fn_pauliZ, pauliZ});
     
     // phase shift
-    Fp angle = 0.4;
     arma::SpMat<std::complex<Fp>> phase(2, 2);
     phase(0, 0) = 1;
     phase(1, 1) = std::complex<Fp>{std::cos(angle), std::sin(angle)};
