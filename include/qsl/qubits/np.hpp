@@ -169,6 +169,16 @@ namespace qsl {
 	void rotateZ(unsigned targ, Fp angle);
 	
 	/**
+	 * \brief Perform a controlled Z gate on two qubits. 
+	 */
+	void controlZ(unsigned ctrl, unsigned targ);
+
+	/**
+	 * \brief Perform the CRz gate on two qubits.
+	 */
+	void controlRotateZ(unsigned ctrl, unsigned targ, Fp angle);
+	
+	/**
 	 * \brief Perform a controlled phase shift on two qubits. 
 	 */
 	void controlPhase(unsigned ctrl, unsigned targ, Fp angle);
@@ -177,11 +187,6 @@ namespace qsl {
 	 * \brief Perform a swap gate on two qubits. 
 	 */
 	void swap(unsigned q1, unsigned q2);
-
-	/**
-	 * \brief Perform a controlled Z gate on two qubits. 
-	 */
-	void controlZ(unsigned ctrl, unsigned targ);
 
     	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.

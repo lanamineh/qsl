@@ -71,25 +71,25 @@ Most two-qubit operations of interest for near-term devices are controlled opera
 * **Controlled X-rotation, Y-rotation and Z-rotation**
 
   These use :math:`U=R_x(\theta),R_y(\theta),R_z(\theta)` as defined above. The corresponding function names are ``controlRotateX``, ``controlRotateY``, ``controlRotateZ``.
-  
-* **Controlled-NOT**
 
-  This is given by :math:`U=\sigma_x`. The corresponding function name is ``controlNot``.
+* **Controlled-Pauli gates**
+
+  When :math:`U=\sigma_x`, the gate is commonly called the Controlled-NOT (or
+  CNOT) gate. The corresponding function name is ``controlNot``.
+
+  When :math:`U=\sigma_z`, the gate is commonly called Controlled-Z (or
+  CZ). Here we give it the function name ``controlZ``.
+
+  Taking :math:`U=\sigma_y` the gate is called ``controlY``. 
+
+* **Controlled-Phase**
+
+  This is given by :math:`U=\text{phase}(\theta)`. The corresponding function name is ``controlPhase``.
 
 * **Controlled-H**
 
   This is given by :math:`U=H`. The corresponding function name is ``controlHadamard``.
-
-  
-* **Controlled-Phase**
-
-  This is given by :math:`U=\text{phase}(\theta)`. The corresponding function name is ``controlPhase``.
-  
-* **Controlled-Z**
-
-  This is given by :math:`U=\sigma_z`. The corresponding function name is
-  ``controlZ``.
-
+    
 * **Controlled-unitary**
 
   The user can specify an arbitrary controlled gate with a one-qubit unitary
