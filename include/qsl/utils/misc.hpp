@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef MISC_HPP
-#define MISC_HPP
+#ifndef QSL_MISC_HPP
+#define QSL_MISC_HPP
 
 #include <ostream>
 #include <vector>

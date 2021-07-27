@@ -22,8 +22,8 @@
  * \brief Header file for timing functions.
  */
 
-#ifndef TIMER_HPP
-#define TIMER_HPP
+#ifndef QSL_TIMER_HPP
+#define QSL_TIMER_HPP
 
 #include <chrono>
 #include <string>

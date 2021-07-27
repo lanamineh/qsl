@@ -23,8 +23,8 @@
  *
  */
 
-#ifndef QUANTUM_HPP
-#define QUANTUM_HPP
+#ifndef QSL_QUANTUM_HPP
+#define QSL_QUANTUM_HPP
 
 #include <vector>
 #include "complex.hpp"

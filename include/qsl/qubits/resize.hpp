@@ -29,8 +29,8 @@
  */
 
 
-#ifndef QUBITS_RESIZE_HPP
-#define QUBITS_RESIZE_HPP
+#ifndef QSL_QUBITS_RESIZE_HPP
+#define QSL_QUBITS_RESIZE_HPP
 
 #include <cstddef>
 #include <cstdint>

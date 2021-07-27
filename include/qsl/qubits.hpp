@@ -23,8 +23,8 @@
  * 
  */
 
-#ifndef QUBITS_HPP
-#define QUBITS_HPP
+#ifndef QSL_QUBITS_HPP
+#define QSL_QUBITS_HPP
 
 #include <concepts>
 

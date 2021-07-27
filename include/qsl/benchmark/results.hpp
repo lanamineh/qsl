@@ -22,8 +22,8 @@
  * \brief Contains a simple class for storing a table of results with metadata
  */
 
-#ifndef RESULTS_HPP
-#define RESULTS_HPP
+#ifndef QSL_RESULTS_HPP
+#define QSL_RESULTS_HPP
 
 #include <string>
 #include <map>

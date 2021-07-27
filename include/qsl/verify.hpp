@@ -36,8 +36,8 @@
  * reference all the simulators and check that they agree.
  */
 
-#ifndef VERIFY_HPP
-#define VERIFY_HPP
+#ifndef QSL_VERIFY_HPP
+#define QSL_VERIFY_HPP
 
 #include "qsl/concepts.hpp"
 #include "qsl/utils/quantum.hpp"

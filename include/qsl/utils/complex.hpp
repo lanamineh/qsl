@@ -24,8 +24,8 @@
  * 
  */
 
-#ifndef COMPLEX_HPP
-#define COMPLEX_HPP
+#ifndef QSL_COMPLEX_HPP
+#define QSL_COMPLEX_HPP
 
 #include <ostream>
 

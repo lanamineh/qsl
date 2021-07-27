@@ -23,8 +23,8 @@
  * 
  */
 
-#ifndef QUBITS_DEFAULT_HPP
-#define QUBITS_DEFAULT_HPP
+#ifndef QSL_QUBITS_DEFAULT_HPP
+#define QSL_QUBITS_DEFAULT_HPP
 
 /**
  * \defgroup qubits_constructors Constructors

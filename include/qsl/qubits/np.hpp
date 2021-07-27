@@ -23,8 +23,8 @@
  * 
  */
 
-#ifndef QUBITS_NP_HPP
-#define QUBITS_NP_HPP
+#ifndef QSL_QUBITS_NP_HPP
+#define QSL_QUBITS_NP_HPP
 
 /**
  * \defgroup qubits_np functionsNP

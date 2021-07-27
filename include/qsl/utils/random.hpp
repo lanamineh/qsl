@@ -22,8 +22,8 @@
  * \brief A class for generating random numbers, states, etc.
  */
 
-#ifndef RANDOM_HPP
-#define RANDOM_HPP
+#ifndef QSL_RANDOM_HPP
+#define QSL_RANDOM_HPP
 
 
 #include <random>

@@ -24,8 +24,8 @@
  * Put a detailed description here... 
  */
 
-#ifndef TIME_HPP
-#define TIME_HPP
+#ifndef QSL_TIME_HPP
+#define QSL_TIME_HPP
 
 #include "qsl/benchmark.hpp"
 

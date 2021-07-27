@@ -23,8 +23,8 @@
  * 
  */
 
-#ifndef CONCEPTS_HPP
-#define CONCEPTS_HPP
+#ifndef QSL_CONCEPTS_HPP
+#define QSL_CONCEPTS_HPP
 
 #include <concepts>
 #include <iostream>

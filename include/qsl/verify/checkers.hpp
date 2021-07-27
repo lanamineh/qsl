@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef CHECKERS_HPP
-#define CHECKERS_HPP
+#ifndef QSL_CHECKERS_HPP
+#define QSL_CHECKERS_HPP
 
 #include <memory>
 #include <vector>

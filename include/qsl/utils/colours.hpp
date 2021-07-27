@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef COLOURS_HPP
-#define COLOURS_HPP
+#ifndef QSL_COLOURS_HPP
+#define QSL_COLOURS_HPP
 
 /// Requires <string>, use of std::string
 namespace qsl {

@@ -23,8 +23,8 @@
  * 
  */
 
-#ifndef BENCHMARK_HPP
-#define BENCHMARK_HPP
+#ifndef QSL_BENCHMARK_HPP
+#define QSL_BENCHMARK_HPP
 
 #include "utils/quantum.hpp"
 #include "utils/timer.hpp"

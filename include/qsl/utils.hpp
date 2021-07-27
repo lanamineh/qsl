@@ -24,8 +24,8 @@
  * To be included by the user. 
  */
 
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#ifndef QSL_UTILS_HPP
+#define QSL_UTILS_HPP
 
 #include "utils/colours.hpp"
 #include "utils/complex.hpp"

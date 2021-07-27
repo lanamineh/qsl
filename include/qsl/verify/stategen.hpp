@@ -22,8 +22,8 @@
  *
  */
 
-#ifndef STATEGEN_HPP
-#define STATEGEN_HPP
+#ifndef QSL_STATEGEN_HPP
+#define QSL_STATEGEN_HPP
 
 namespace qsl {
 

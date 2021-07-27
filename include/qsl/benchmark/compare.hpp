@@ -24,8 +24,8 @@
  * Put a detailed description here... 
  */
 
-#ifndef COMPARE_HPP
-#define COMPARE_HPP
+#ifndef QSL_COMPARE_HPP
+#define QSL_COMPARE_HPP
 
 #include "qsl/benchmark.hpp"
 

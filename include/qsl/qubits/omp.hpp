@@ -23,8 +23,8 @@
  * 
  */
 
-#ifndef QUBITS_OMP_HPP
-#define QUBITS_OMP_HPP
+#ifndef QSL_QUBITS_OMP_HPP
+#define QSL_QUBITS_OMP_HPP
 
 /**
  * \defgroup qubits_omp functionsOmp
