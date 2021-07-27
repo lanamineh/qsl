@@ -246,7 +246,7 @@ mergeMaps(std::map<std::size_t,std::size_t> maps[], std::size_t nthreads)
 	    results[outcome] += frequency;
 	}
     }
-    std::cout << "there" << std::endl;
+
     return results;
 }
 
@@ -276,7 +276,6 @@ std::map<std::size_t, std::size_t> qsl::Qubits<qsl::Type::Omp, Fp>::sampleAll(st
 	maps[t][drawSample(dist)]++;
     }
 
-    std::cout << "here" << std::endl;
     return mergeMaps(maps, nthreads);
 }
 
