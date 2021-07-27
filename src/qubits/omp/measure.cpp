@@ -225,7 +225,29 @@ std::vector<std::size_t> qsl::Qubits<qsl::Type::Omp, Fp>::sample(unsigned targ,
     return {num0,num1};
 }
 
-
+/**
+ * \brief Merge a set of maps containing outcomes
+ *
+ * This function is necessary because a std::map cannot be written inside
+ * an omp for loop in a thread safe way. So it is necessary to write to
+ * separate maps and then merge them. The argument is a map whose key is
+ * the thread number and whose value is the map from that thread.
+ */
+std::map<std::size_t,std::size_t>
+mergeMaps(const std::map<unsigned,std::map<std::size_t,std::size_t>> maps)
+{
+    std::map<std::size_t, std::size_t> results;
+    // Loop over all the maps from each thread
+    for (const auto & m : maps) {
+	// Loop over the contents of each map
+	for (const auto & [outcome,frequency] : m.second) {
+	    // Operator [] zero-initialises the key if it
+	    // does not exist
+	    results[outcome] += frequency;
+	}
+    }
+    return results;
+}
 
 template<std::floating_point Fp>
 std::map<std::size_t, std::size_t> qsl::Qubits<qsl::Type::Omp, Fp>::sampleAll(std::size_t nsamples)
@@ -234,14 +256,20 @@ std::map<std::size_t, std::size_t> qsl::Qubits<qsl::Type::Omp, Fp>::sampleAll(st
     std::vector<Dist> dist = generateDist();
     
     // Sample from the vector nmeas times
-    std::map<std::size_t, std::size_t> results;
+    std::map<unsigned, std::map<std::size_t, std::size_t>> maps;
 #pragma omp parallel for num_threads(nthreads)
     for (std::size_t i = 0; i < nsamples; i++) {
-	// The [] operator zero-initialises keys that don't exist.
-	results[drawSample(dist)]++;
+
+	// Get the thread number
+	int t = omp_get_thread_num();
+
+	// Sample an outcome and add it to the map corresponding
+	// to this thread.
+ 	// The second operator[] zero-initialises keys that don't exist.
+	maps[i][drawSample(dist)]++;
     }
 
-    return results;
+    return mergeMaps(maps);
 }
 
 
