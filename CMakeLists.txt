@@ -13,13 +13,14 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Test install to build directory
-#set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/qsl-install-test)
-set(CMAKE_INSTALL_PREFIX /usr)
+set(CMAKE_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/qsl-install-test)
+#set(CMAKE_INSTALL_PREFIX /usr)
 
 find_package(OpenMP REQUIRED)
 
 # using GCC
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -g -pg -O2 -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5 -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall -Wextra -g -pg -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5 -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall -Wextra -O2 -fopenmp")
 
 set(INSTALL_GTEST OFF)
 include(FetchContent)
