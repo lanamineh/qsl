@@ -12,6 +12,8 @@ struct SimWrapper
     using Sim = T;
 };
 
+#define UNCERTAINTY 0.1
+
 /**
  * \brief Typed test suite for one-qubit gates
  */
@@ -309,7 +311,7 @@ TYPED_TEST(Measurements, MeasureTest)
 	// estimated probability is within 5% of the true value.
 	///\todo We need to figure out a legitimate way to test
 	/// whether the probability is correct.
-	EXPECT_NEAR(p1, p1_arma, 0.05);		
+	EXPECT_NEAR(p1, p1_arma, UNCERTAINTY);		
     }
 }
 
@@ -371,7 +373,7 @@ TYPED_TEST(NPMeasurements, MeasureTest)
 	// estimated probability is within 5% of the true value.
 	///\todo We need to figure out a legitimate way to test
 	/// whether the probability is correct.
-	EXPECT_NEAR(p1, p1_arma, 0.05);	
+	EXPECT_NEAR(p1, p1_arma, UNCERTAINTY);	
 	
 	
     }
@@ -411,7 +413,7 @@ TYPED_TEST(Measurements, SampleTest)
 	// estimated probability is within 5% of the true value.
 	///\todo We need to figure out a legitimate way to test
 	/// whether the probability is correct.
-	EXPECT_NEAR(p0, p0_arma, 0.05);	
+	EXPECT_NEAR(p0, p0_arma, UNCERTAINTY);	
     }
 }
 
@@ -450,7 +452,7 @@ TYPED_TEST(NPMeasurements, SampleTest)
 	// estimated probability is within 5% of the true value.
 	///\todo We need to figure out a legitimate way to test
 	/// whether the probability is correct.
-	EXPECT_NEAR(p0, p0_arma, 0.05);	
+	EXPECT_NEAR(p0, p0_arma, UNCERTAINTY);	
     }
 }
 
@@ -511,7 +513,7 @@ TYPED_TEST(Measurements, MeasureAllTest)
 
 	    // Check that the estimate is near the true value (with 5%)
 	    ///\todo Find a legitimate statistical test.
-	    EXPECT_NEAR(p_est, p_true, 0.05);
+	    EXPECT_NEAR(p_est, p_true, UNCERTAINTY);
 
 	}
 
@@ -577,7 +579,7 @@ TYPED_TEST(NPMeasurements, MeasureAllTest)
 
 	    // Check that the estimate is near the true value (with 5%)
 	    ///\todo Find a legitimate statistical test.
-	    EXPECT_NEAR(p_est, p_true, 0.05);
+	    EXPECT_NEAR(p_est, p_true, UNCERTAINTY);
 
 	}
 
@@ -622,7 +624,7 @@ TYPED_TEST(Measurements, SampleAllTest)
 
 	    // Check that the estimate is near the true value (with 5%)
 	    ///\todo Find a legitimate statistical test.
-	    EXPECT_NEAR(p_est, p_true, 0.05);
+	    EXPECT_NEAR(p_est, p_true, UNCERTAINTY);
 
 	}
 
@@ -668,7 +670,7 @@ TYPED_TEST(NPMeasurements, SampleAllTest)
 
 	    // Check that the estimate is near the true value (with 5%)
 	    ///\todo Find a legitimate statistical test.
-	    EXPECT_NEAR(p_est, p_true, 0.05);
+	    EXPECT_NEAR(p_est, p_true, UNCERTAINTY);
 
 	}
 
@@ -713,11 +715,11 @@ TEST(SampleAll2Test, DefaultDouble)
 
 	    // Check that the estimate is near the true value (with 5%)
 	    ///\todo Find a legitimate statistical test.
-	    EXPECT_NEAR(p_est, p_true, 0.05);
+	    EXPECT_NEAR(p_est, p_true, UNCERTAINTY);
 
 	}
 
-    }
+   } 
 }
 
 TEST(SampleAll2Test, ResizeDouble)
@@ -758,7 +760,7 @@ TEST(SampleAll2Test, ResizeDouble)
 
 	    // Check that the estimate is near the true value (with 5%)
 	    ///\todo Find a legitimate statistical test.
-	    EXPECT_NEAR(p_est, p_true, 0.05);
+	    EXPECT_NEAR(p_est, p_true, UNCERTAINTY);
 
 	}
 
@@ -804,7 +806,7 @@ TEST(SampleAll2Test, NPDouble)
 
 	    // Check that the estimate is near the true value (with 5%)
 	    ///\todo Find a legitimate statistical test.
-	    EXPECT_NEAR(p_est, p_true, 0.05);
+	    EXPECT_NEAR(p_est, p_true, UNCERTAINTY);
 
 	}
 
