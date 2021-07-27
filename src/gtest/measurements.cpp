@@ -609,6 +609,13 @@ TYPED_TEST(Measurements, SampleAllTest)
 
     // Record how many times each outcome was measured
     std::map<std::size_t, std::size_t> results = q.sampleAll(samples);
+
+    // Check that there are the right number of samples
+    std::size_t num_samples = 0;
+    for (const auto & item : results) {
+	num_samples += item.second;
+    }
+    EXPECT_EQ(num_samples, samples);
     
     // Check that the probability of each outcome is correct
     for (const auto & [outcome, s] : results) {
@@ -655,6 +662,13 @@ TYPED_TEST(NPMeasurements, SampleAllTest)
 
     // Record how many times each outcome was measured
     std::map<std::size_t, std::size_t> results = q.sampleAll(samples);
+
+    // Check that there are the right number of samples
+    std::size_t num_samples = 0;
+    for (const auto & item : results) {
+	num_samples += item.second;
+    }
+    EXPECT_EQ(num_samples, samples);
     
     // Check that the probability of each outcome is correct
     for (const auto & [outcome, s] : results) {

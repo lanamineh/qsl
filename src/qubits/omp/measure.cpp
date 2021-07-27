@@ -234,18 +234,19 @@ std::vector<std::size_t> qsl::Qubits<qsl::Type::Omp, Fp>::sample(unsigned targ,
  * the thread number and whose value is the map from that thread.
  */
 std::map<std::size_t,std::size_t>
-mergeMaps(const std::map<unsigned,std::map<std::size_t,std::size_t>> maps)
+mergeMaps(std::map<std::size_t,std::size_t> maps[], std::size_t nthreads)
 {
     std::map<std::size_t, std::size_t> results;
     // Loop over all the maps from each thread
-    for (const auto & m : maps) {
+    for (std::size_t n = 0; n < nthreads; n++) {
 	// Loop over the contents of each map
-	for (const auto & [outcome,frequency] : m.second) {
+	for (const auto & [outcome,frequency] : maps[n]) {
 	    // Operator [] zero-initialises the key if it
 	    // does not exist
 	    results[outcome] += frequency;
 	}
     }
+    std::cout << "there" << std::endl;
     return results;
 }
 
@@ -256,7 +257,9 @@ std::map<std::size_t, std::size_t> qsl::Qubits<qsl::Type::Omp, Fp>::sampleAll(st
     std::vector<Dist> dist = generateDist();
     
     // Sample from the vector nmeas times
-    std::map<unsigned, std::map<std::size_t, std::size_t>> maps;
+    int nthreads = omp_get_num_threads();
+    std::map<std::size_t, std::size_t>  maps[nthreads];
+
 #pragma omp parallel for num_threads(nthreads)
     for (std::size_t i = 0; i < nsamples; i++) {
 
@@ -266,10 +269,11 @@ std::map<std::size_t, std::size_t> qsl::Qubits<qsl::Type::Omp, Fp>::sampleAll(st
 	// Sample an outcome and add it to the map corresponding
 	// to this thread.
  	// The second operator[] zero-initialises keys that don't exist.
-	maps[i][drawSample(dist)]++;
+	maps[t][drawSample(dist)]++;
     }
 
-    return mergeMaps(maps);
+    std::cout << "here" << std::endl;
+    return mergeMaps(maps, nthreads);
 }
 
 
