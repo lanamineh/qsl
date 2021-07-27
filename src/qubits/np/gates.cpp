@@ -44,7 +44,6 @@ void qsl::Qubits<qsl::Type::NP, Fp>::phase(unsigned targ, Fp angle)
     std::size_t upper_mask = ~lower_mask;
     
     // Loop through all the other numbers
-    //#pragma omp parallel for
     for (std::size_t i = 0; i < lookup.at({nqubits-1, nones-1}).size(); i++) {
 	std::size_t x = lookup.at({nqubits-1, nones-1})[i];
 	std::size_t lower = x & lower_mask;
@@ -69,7 +68,6 @@ void qsl::Qubits<qsl::Type::NP, Fp>::pauliZ(unsigned targ)
     std::size_t upper_mask = ~lower_mask;
     
     // Loop through all the other numbers
-    //#pragma omp parallel for
     for (std::size_t i = 0; i < lookup.at({nqubits-1, nones-1}).size(); i++) {
 	std::size_t x = lookup.at({nqubits-1, nones-1})[i];
 	std::size_t lower = x & lower_mask;

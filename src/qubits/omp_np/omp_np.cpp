@@ -18,9 +18,9 @@
  */
 
 /**
- * \file np.cpp
+ * \file omp_np.cpp
  * \brief Contains the implementation of the number preserved Qubits class.
- *
+ * with OpenMP.
  */
 
 
@@ -33,17 +33,18 @@
 #include <algorithm>
 
 template<>
-const std::string qsl::Qubits<qsl::Type::NP, double>::name =
-    std::string("Qub<np,double>");
+const std::string qsl::Qubits<qsl::Type::OmpNP, double>::name =
+    std::string("Qub<omp_np,double>");
 
 template<>
-const std::string qsl::Qubits<qsl::Type::NP, float>::name =
-    std::string("Qub<np,float>");
+const std::string qsl::Qubits<qsl::Type::OmpNP, float>::name =
+    std::string("Qub<omp_np,float>");
 
 template<std::floating_point Fp>
-qsl::Qubits<qsl::Type::NP, Fp>::Qubits(unsigned nqubits_in, unsigned nones_in) 
-    : nqubits{ nqubits_in }, dim{ std::size_t(1) << nqubits },
-      nones{ nones_in }, state(dim), random(0,1)
+qsl::Qubits<qsl::Type::OmpNP, Fp>::Qubits(unsigned nqubits_in, unsigned nones_in,
+					  unsigned nthreads_in) 
+    : nqubits{ nqubits_in }, dim{ std::size_t(1) << nqubits }, 
+      nthreads{ nthreads_in }, nones{ nones_in }, state(dim), random(0,1)
 {
     /// \todo Figure out better place to put this?
     if (nones < 1 or nones >= nqubits) {
@@ -56,9 +57,10 @@ qsl::Qubits<qsl::Type::NP, Fp>::Qubits(unsigned nqubits_in, unsigned nones_in)
 }
 
 template<std::floating_point Fp>
-qsl::Qubits<qsl::Type::NP, Fp>::Qubits(const std::vector<qsl::complex<Fp>> & state)
+qsl::Qubits<qsl::Type::OmpNP, Fp>::Qubits(const std::vector<qsl::complex<Fp>> & state, unsigned nthreads_in)
     : nqubits{ qsl::checkStateSize(state) }, dim{ state.size() },
-      nones{ checkStateNP(state) }, state{ state }, random(0,1)
+      nones{ checkStateNP(state) }, nthreads{ nthreads_in },
+      state{ state }, random(0,1)
 {
     initLookup();
     //std::cout << "nqubits = " << nqubits << std::endl;
@@ -67,7 +69,7 @@ qsl::Qubits<qsl::Type::NP, Fp>::Qubits(const std::vector<qsl::complex<Fp>> & sta
 
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::NP, Fp>::reset()
+void qsl::Qubits<qsl::Type::OmpNP, Fp>::reset()
 {
     for (std::size_t n = 0; n < dim; n++) {
 	state[n].real = 0;
@@ -80,7 +82,7 @@ void qsl::Qubits<qsl::Type::NP, Fp>::reset()
 }
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::NP, Fp>::setState(const std::vector<qsl::complex<Fp>> & state_in)
+void qsl::Qubits<qsl::Type::OmpNP, Fp>::setState(const std::vector<qsl::complex<Fp>> & state_in)
 {   
     if (state_in.size() != dim) {
 	std::string msg = "Cannot assign state vector from different ";
@@ -96,7 +98,7 @@ void qsl::Qubits<qsl::Type::NP, Fp>::setState(const std::vector<qsl::complex<Fp>
 }
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::NP, Fp>::setBasisState(std::size_t index)
+void qsl::Qubits<qsl::Type::OmpNP, Fp>::setBasisState(std::size_t index)
 {
     unsigned nones_old = nones;
     nones = qsl::hammingWeight(index);
@@ -116,7 +118,7 @@ void qsl::Qubits<qsl::Type::NP, Fp>::setBasisState(std::size_t index)
 
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::NP, Fp>::operator = (const Qubits & old)
+void qsl::Qubits<qsl::Type::OmpNP, Fp>::operator = (const Qubits & old)
 {
     // Check if nqubits (and therefore dim) are the same
     if (nqubits != old.nqubits) {
@@ -131,27 +133,27 @@ void qsl::Qubits<qsl::Type::NP, Fp>::operator = (const Qubits & old)
 
 /// Get the state vector associated to the qubits
 template<std::floating_point Fp>
-std::vector<qsl::complex<Fp>> qsl::Qubits<qsl::Type::NP, Fp>::getState() const
+std::vector<qsl::complex<Fp>> qsl::Qubits<qsl::Type::OmpNP, Fp>::getState() const
 {
     return state;
 }
 
 template<std::floating_point Fp>
-unsigned qsl::Qubits<qsl::Type::NP, Fp>::getNumQubits() const
+unsigned qsl::Qubits<qsl::Type::OmpNP, Fp>::getNumQubits() const
 {
     return nqubits;
 }
 
 
 template<std::floating_point Fp>
-unsigned qsl::Qubits<qsl::Type::NP, Fp>::getNumOnes() const
+unsigned qsl::Qubits<qsl::Type::OmpNP, Fp>::getNumOnes() const
 {
     return nones;
 }
 
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::NP, Fp>::setNumOnes(unsigned nones_in) 
+void qsl::Qubits<qsl::Type::OmpNP, Fp>::setNumOnes(unsigned nones_in) 
 {
     if (nones_in < 1 or nones_in >= nqubits) {
 	throw std::logic_error("The number of ones must be 1 <= nones < nqubits.");
@@ -162,9 +164,8 @@ void qsl::Qubits<qsl::Type::NP, Fp>::setNumOnes(unsigned nones_in)
     reset();
 }
 
-
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::NP, Fp>::initLookup() 
+void qsl::Qubits<qsl::Type::OmpNP, Fp>::initLookup() 
 {
     lookup.clear();
     // Generate lookup tables
@@ -181,7 +182,7 @@ void qsl::Qubits<qsl::Type::NP, Fp>::initLookup()
 
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::NP, Fp>::print(std::ostream & os) const
+void qsl::Qubits<qsl::Type::OmpNP, Fp>::print(std::ostream & os) const
 {
     os << "Number of qubits = " << nqubits << std::endl;
     os << "Number of ones = " << nones << std::endl;
@@ -190,6 +191,6 @@ void qsl::Qubits<qsl::Type::NP, Fp>::print(std::ostream & os) const
 
 
 // Explicit instantiations
-template class qsl::Qubits<qsl::Type::NP, float>;
-template class qsl::Qubits<qsl::Type::NP, double>;
+template class qsl::Qubits<qsl::Type::OmpNP, float>;
+template class qsl::Qubits<qsl::Type::OmpNP, double>;
 

@@ -4,7 +4,7 @@ set(UTILS_SRC utils/complex.cpp utils/quantum.cpp
   utils/print.cpp)
 
 # Qubits object source file list
-set(QUBITS_SRC qubits/default/default.cpp qubits/default/gates.cpp qubits/default/measure.cpp qubits/omp/omp.cpp qubits/omp/gates.cpp qubits/omp/measure.cpp qubits/np/np.cpp qubits/np/gates.cpp qubits/np/measure.cpp qubits/resize/resize.cpp qubits/resize/gates.cpp qubits/resize/measure.cpp)
+set(QUBITS_SRC qubits/default/default.cpp qubits/default/gates.cpp qubits/default/measure.cpp qubits/omp/omp.cpp qubits/omp/gates.cpp qubits/omp/measure.cpp qubits/np/np.cpp qubits/np/gates.cpp qubits/np/measure.cpp qubits/resize/resize.cpp qubits/resize/gates.cpp qubits/resize/measure.cpp qubits/omp_np/omp_np.cpp qubits/omp_np/gates.cpp qubits/omp_np/measure.cpp)
 
 # Make the utilities library
 add_library(utils ${UTILS_SRC})

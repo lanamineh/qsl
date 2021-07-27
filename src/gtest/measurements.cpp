@@ -44,7 +44,11 @@ using SimTypes = ::testing::Types<Sim1, Sim2, Sim3, Sim4, Sim5, Sim6>;
 
 using Sim7 = SimWrapper<qsl::Qubits<qsl::Type::NP, float>>;
 using Sim8 = SimWrapper<qsl::Qubits<qsl::Type::NP, double>>;
-using NPSimTypes = ::testing::Types<Sim7,Sim8>;
+using Sim9 = SimWrapper<qsl::Qubits<qsl::Type::OmpNP, float>>;
+using Sim10 = SimWrapper<qsl::Qubits<qsl::Type::OmpNP, double>>;
+
+using NPSimTypes = ::testing::Types<Sim7,Sim8,Sim9,Sim10>;
+
 
 TYPED_TEST_SUITE(Measurements, SimTypes);
 TYPED_TEST_SUITE(NPMeasurements, NPSimTypes);

@@ -158,6 +158,14 @@ namespace qsl {
      */
     unsigned choose(unsigned n, unsigned k);
 
+    /**
+     * \brief Generate the lookup vector for a given bit-string
+     * length and number of ones.
+     *
+     * Used in the number preserving simulators
+     */
+    std::vector<std::size_t> generateLookup(unsigned len, unsigned ones);
+    
 }
 
 

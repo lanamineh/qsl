@@ -43,7 +43,10 @@ using SimTypes = ::testing::Types<Sim1, Sim2, Sim3, Sim4, Sim5, Sim6>;
 
 using Sim7 = SimWrapper<qsl::Qubits<qsl::Type::NP, float>>;
 using Sim8 = SimWrapper<qsl::Qubits<qsl::Type::NP, double>>;
-using NPSimTypes = ::testing::Types<Sim7,Sim8>;
+using Sim9 = SimWrapper<qsl::Qubits<qsl::Type::OmpNP, float>>;
+using Sim10 = SimWrapper<qsl::Qubits<qsl::Type::OmpNP, double>>;
+
+using NPSimTypes = ::testing::Types<Sim7,Sim8,Sim9,Sim10>;
 
 TYPED_TEST_SUITE(Gates, SimTypes);
 TYPED_TEST_SUITE(NPGates, NPSimTypes);
@@ -797,7 +800,7 @@ TYPED_TEST(NPGates, OneQubitGate)
 			sim.phase(targ, angle);
 		       };
     gates.push_back({fn_phase, phase});
-
+    
     // rotateZ    
     arma::SpMat<std::complex<Fp>> rotateZ(2, 2);
     rotateZ(0, 0) = std::complex<Fp>{std::cos(angle/2), std::sin(-angle/2)};

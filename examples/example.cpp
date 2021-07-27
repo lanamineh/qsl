@@ -6,14 +6,27 @@ int main ()
 {
     unsigned nqubits = 4;
 
-    std::vector<qsl::complex<double>> rand = qsl::makeRandomState<double>(nqubits);
-    qsl::Qubits<qsl::Type::Default, double> q{rand};
-    qsl::Qubits<qsl::Type::Omp, double> qomp{rand};
+    std::vector<qsl::complex<double>> rand = qsl::makeRandomNPState<double>(nqubits);
+    qsl::Qubits<qsl::Type::NP, double> q{rand};
+    qsl::Qubits<qsl::Type::OmpNP, double> qomp{rand};
+    qsl::Qubits<qsl::Type::Default, double> qref{rand};
     
-    q.rotateX(0,12);
+    q.pauliZ(0);
     q.print();
 
-    qomp.rotateX(0,12);
+    qomp.pauliZ(0);
     qomp.print();
+
+    qref.pauliZ(0);
+    qref.print();
+
+    std::cout << "q and qomp = "
+	      << qsl::fubiniStudy(q.getState(), qomp.getState())
+	      << std::endl;
+
+    
+    std::cout << "q and qref = "
+	      << qsl::fubiniStudy(q.getState(), qref.getState())
+	      << std::endl;
 
 }

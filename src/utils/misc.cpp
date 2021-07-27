@@ -73,4 +73,23 @@ namespace qsl {
 	return ans;
     }
 
+    std::vector<std::size_t> generateLookup(unsigned len, unsigned ones)
+    {
+	std::vector<std::size_t> list;
+	// Starting number (ones in the least significant positions)
+	std::size_t x = (1ULL << ones) - 1ULL;
+	// Last number (ones in the most significant positions)
+	std::size_t end = x << (len - ones);
+	
+	// Loop through all the other numbers
+	while(x <= end) {
+	    list.push_back(x);
+	    qsl::next(x);
+	}
+	
+	return list;
+    }
+
+
+    
 }
