@@ -1052,6 +1052,21 @@ namespace qsl {
 		"fswap",
 		this->check(os, &Sim1::fswap, &Sim2::fswap));
 
+	    os << "Checking npRotateX" << std::endl;
+	    results.emplace(
+		"npRotateX",
+		this->check(os, &Sim1::npRotateX, &Sim2::npRotateX));
+
+	    os << "Checking npRotateY" << std::endl;
+	    results.emplace(
+		"npRotateY",
+		this->check(os, &Sim1::npRotateY, &Sim2::npRotateY));
+
+	    os << "Checking npHadamard" << std::endl;
+	    results.emplace(
+		"npHadamard",
+		this->check(os, &Sim1::npHadamard, &Sim2::npHadamard));
+
 	    
 	    return results;
 	}
@@ -1129,6 +1144,22 @@ namespace qsl {
 	    results.emplace(
 		"fswap",
 		this->check(os, &Sim1::fswap, &Sim2::fswap));
+
+	    os << "Checking npRotateX" << std::endl;
+	    results.emplace(
+		"npRotateX",
+		this->check(os, &Sim1::npRotateX, &Sim2::npRotateX));
+
+	    os << "Checking npRotateY" << std::endl;
+	    results.emplace(
+		"npRotateY",
+		this->check(os, &Sim1::npRotateY, &Sim2::npRotateY));
+
+	    os << "Checking npHadamard" << std::endl;
+	    results.emplace(
+		"npHadamard",
+		this->check(os, &Sim1::npHadamard, &Sim2::npHadamard));
+
 	    
 	    return results;
 	}

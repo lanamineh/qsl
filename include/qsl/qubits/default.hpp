@@ -543,6 +543,71 @@ namespace qsl {
 	 * \param q2 The second qubit to fswap.
 	 */
 	void fswap(unsigned q1, unsigned q2);
+
+	/**
+	 * \brief Perform an X rotation on the \f$ \{|01\rangle,|10\rangle\}\f$
+	 * subspace. This is equivalent to applying 
+	 * \f$ e^{-i\theta (XX+YY)/2} \f$. 
+	 *
+	 * \ingroup qubits_gates
+
+	 * \f[ 
+	 *  npR_x(\theta) = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & \cos(\theta/2) & -i\sin(\theta/2) & 0 \\
+	 *             0 & -i\sin(\theta/2) & \cos(\theta/2) & 0 \\
+	 *             0 & 0 & 0 & 1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param q1 The first qubit.
+	 * \param q2 The second qubit.
+	 * \param angle Angle to rotate by.
+	 */
+	void npRotateX(unsigned q1, unsigned q2, Fp angle);
+
+	/**
+	 * \brief Perform an Y rotation on the \f$ \{|01\rangle,|10\rangle\}\f$
+	 * subspace. This is equivalent to applying 
+	 * \f$ e^{-i\theta (YX-XY)/2} \f$. 
+	 *
+	 * \ingroup qubits_gates
+
+	 * \f[ 
+	 *  npR_y(\theta) = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & \cos(\theta/2) & -\sin(\theta/2) & 0 \\
+	 *             0 & \sin(\theta/2) & \cos(\theta/2) & 0 \\
+	 *             0 & 0 & 0 & 1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param q1 The first qubit.
+	 * \param q2 The second qubit.
+	 * \param angle Angle to rotate by.
+	 */
+	void npRotateY(unsigned q1, unsigned q2, Fp angle);
+
+	/**
+	 * \brief Perform a Hadamard gate on the \f$ \{|01\rangle,|10\rangle\}\f$
+	 * subspace.  
+	 *
+	 * \ingroup qubits_gates
+
+	 * \f[ 
+	 *  npH = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 1/\sqrt{2} & 1/\sqrt{2} & 0 \\
+	 *             0 & 1/\sqrt{2} & -1/\sqrt{2} & 0 \\
+	 *             0 & 0 & 0 & 1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param q1 The first qubit.
+	 * \param q2 The second qubit.
+	 */
+	void npHadamard(unsigned q1, unsigned q2);
+
 	
 	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.

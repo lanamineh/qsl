@@ -561,6 +561,127 @@ void qsl::Qubits<qsl::Type::Default, Fp>::fswap(unsigned q1, unsigned q2)
     }    
 }
 
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::npRotateX(unsigned q1,
+						    unsigned q2,
+						    Fp angle)
+{
+    // Store variables
+    Fp cos = std::cos(angle/2);
+    Fp sin = std::sin(angle/2);
+    
+    std::size_t small_bit = 1 << std::min(q1, q2);
+    std::size_t large_bit = 1 << std::max(q1, q2);
+
+    std::size_t mid_incr = (small_bit << 1);
+    std::size_t high_incr = (large_bit << 1);
+    std::size_t q1_bit = (1 << q1);
+    std::size_t q2_bit = (1 << q2);
+
+    // Increment through the indices above largest bit 
+    for (std::size_t i = 0; i < dim; i += high_incr) {
+	// Increment through the middle set of bits
+	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+	    // Increment through the low set of bits
+	    for (std::size_t k = 0; k < small_bit; k++) {
+		// Get the |01> and |10> indices
+		std::size_t index1 = i + j + k + q1_bit;
+		std::size_t index2 = i + j + k + q2_bit;
+
+		// Store the values of the amplitudes
+		qsl::complex<Fp> a0 = state[index1];
+		qsl::complex<Fp> a1 = state[index2];
+
+		// Write the new |01> amplitude
+		state[index1].real = a0.real * cos + a1.imag * sin;
+		state[index1].imag = a0.imag * cos - a1.real * sin;
+
+		// Write the new |10> amplitude
+		state[index2].real = a1.real * cos + a0.imag * sin;
+		state[index2].imag = a1.imag * cos - a0.real * sin;
+	    }
+	}
+    }    
+}
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::npRotateY(unsigned q1,
+						    unsigned q2,
+						    Fp angle)
+{
+    // Store variables
+    Fp cos = std::cos(angle/2);
+    Fp sin = std::sin(angle/2);
+    
+    std::size_t small_bit = 1 << std::min(q1, q2);
+    std::size_t large_bit = 1 << std::max(q1, q2);
+
+    std::size_t mid_incr = (small_bit << 1);
+    std::size_t high_incr = (large_bit << 1);
+    std::size_t q1_bit = (1 << q1);
+    std::size_t q2_bit = (1 << q2);
+
+    // Increment through the indices above largest bit 
+    for (std::size_t i = 0; i < dim; i += high_incr) {
+	// Increment through the middle set of bits
+	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+	    // Increment through the low set of bits
+	    for (std::size_t k = 0; k < small_bit; k++) {
+		// Get the |01> and |10> indices
+		std::size_t index1 = i + j + k + q1_bit;
+		std::size_t index2 = i + j + k + q2_bit;
+
+		// Store the values of the amplitudes
+		qsl::complex<Fp> a0 = state[index1];
+		qsl::complex<Fp> a1 = state[index2];
+
+		// Write the new |01> amplitude
+		state[index1].real = a0.real * cos - a1.real * sin;
+		state[index1].imag = a0.imag * cos - a1.imag * sin;
+
+		// Write the new |10> amplitude
+		state[index2].real = a0.real * sin + a1.real * cos;
+		state[index2].imag = a0.imag * sin + a1.imag * cos;
+	    }
+	}
+    }    
+}
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Default, Fp>::npHadamard(unsigned q1,
+						     unsigned q2)
+{
+    std::size_t small_bit = 1 << std::min(q1, q2);
+    std::size_t large_bit = 1 << std::max(q1, q2);
+
+    std::size_t mid_incr = (small_bit << 1);
+    std::size_t high_incr = (large_bit << 1);
+    std::size_t q1_bit = (1 << q1);
+    std::size_t q2_bit = (1 << q2);
+
+    // Increment through the indices above largest bit 
+    for (std::size_t i = 0; i < dim; i += high_incr) {
+	// Increment through the middle set of bits
+	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+	    // Increment through the low set of bits
+	    for (std::size_t k = 0; k < small_bit; k++) {
+		// Get the |01> and |10> indices
+		std::size_t index1 = i + j + k + q1_bit;
+		std::size_t index2 = i + j + k + q2_bit;
+
+		// Store the values of the amplitudes
+		const qsl::complex<Fp> temp1 = state[index1];
+		const qsl::complex<Fp> temp2 = state[index2];
+		constexpr Fp sqrt2 = std::sqrt(2); 
+		state[index1].real = (temp1.real + temp2.real)/sqrt2;
+		state[index1].imag = (temp1.imag + temp2.imag)/sqrt2;
+		state[index2].real = (temp1.real - temp2.real)/sqrt2;
+		state[index2].imag = (temp1.imag - temp2.imag)/sqrt2;
+	    }
+	}
+    }    
+}
+
 
 // Explicit instantiations
 template class qsl::Qubits<qsl::Type::Default, float>;

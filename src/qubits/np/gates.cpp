@@ -239,7 +239,7 @@ void qsl::Qubits<qsl::Type::NP, Fp>::controlPhase(unsigned ctrl, unsigned targ,
 template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::NP, Fp>::swap(unsigned q1, unsigned q2)
 {
-    // Find the bit positions of ctrl and targ
+    // Find the bit positions
     std::size_t small_bit = 1 << std::min(q1, q2);
     std::size_t large_bit = 1 << std::max(q1, q2);
 
@@ -258,8 +258,7 @@ void qsl::Qubits<qsl::Type::NP, Fp>::swap(unsigned q1, unsigned q2)
 	std::size_t upper = x & upper_mask;
 
 	// Calculate the index by adding together the 3 shifted sections
-	// of x and small_bit and large_bit (which represent having 1
-	// on ctrl and targ).
+	// of x and small_bit and large_bit
 	std::size_t index01 = lower + small_bit + (mid << 1) + (upper << 2);
 	std::size_t index10 = lower + (mid << 1) + large_bit + (upper << 2);
 
@@ -276,6 +275,146 @@ void qsl::Qubits<qsl::Type::NP, Fp>::fswap(unsigned q1, unsigned q2)
     // it is best just to use separate functions for them
     swap(q1, q2);
     controlZ(q1, q2);
+}
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::NP, Fp>::npRotateX(unsigned q1,
+					       unsigned q2,
+					       Fp angle)
+{
+    // Store variables
+    Fp cos = std::cos(angle/2);
+    Fp sin = std::sin(angle/2);
+    
+    // Find the bit positions
+    std::size_t small_bit = 1 << std::min(q1, q2);
+    std::size_t large_bit = 1 << std::max(q1, q2);
+    std::size_t q1_bit = 1 << q1;
+    std::size_t q2_bit = 1 << q2;
+    
+    // Create masks for the 3 sections that the bit string will be broken into 
+    std::size_t lower_mask = small_bit - 1;
+    std::size_t mid_mask = ((large_bit >> 1) - 1) ^ lower_mask;
+    std::size_t upper_mask = ~(lower_mask | mid_mask);
+        
+    // Loop through all the other numbers with num_ones 1s 
+    // then break down that number into 3 parts to go on either side
+    // of q1 and q2
+    for (std::size_t i = 0; i < lookup.at({nqubits-2, nones-1}).size(); i++) {
+	std::size_t x = lookup.at({nqubits-2, nones-1})[i];
+	std::size_t lower = x & lower_mask;
+	std::size_t mid = x & mid_mask;
+	std::size_t upper = x & upper_mask;
+
+	// Calculate the index by adding together the 3 shifted sections
+	// of x and small_bit and large_bit
+	std::size_t index1 = lower + (mid << 1) + (upper << 2) + q1_bit;
+	std::size_t index2 = lower + (mid << 1) + (upper << 2) + q2_bit;
+
+	// Store the values of the amplitudes
+	qsl::complex<Fp> a0 = state[index1];
+	qsl::complex<Fp> a1 = state[index2];
+
+	// Write the new |01> amplitude
+	state[index1].real = a0.real * cos + a1.imag * sin;
+	state[index1].imag = a0.imag * cos - a1.real * sin;
+
+	// Write the new |10> amplitude
+	state[index2].real = a1.real * cos + a0.imag * sin;
+	state[index2].imag = a1.imag * cos - a0.real * sin;
+
+    }
+
+}
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::NP, Fp>::npRotateY(unsigned q1,
+					       unsigned q2,
+					       Fp angle)
+{
+    // Store variables
+    Fp cos = std::cos(angle/2);
+    Fp sin = std::sin(angle/2);
+    
+    // Find the bit positions
+    std::size_t small_bit = 1 << std::min(q1, q2);
+    std::size_t large_bit = 1 << std::max(q1, q2);
+    std::size_t q1_bit = 1 << q1;
+    std::size_t q2_bit = 1 << q2;
+    
+    // Create masks for the 3 sections that the bit string will be broken into 
+    std::size_t lower_mask = small_bit - 1;
+    std::size_t mid_mask = ((large_bit >> 1) - 1) ^ lower_mask;
+    std::size_t upper_mask = ~(lower_mask | mid_mask);
+        
+    // Loop through all the other numbers with num_ones 1s 
+    // then break down that number into 3 parts to go on either side
+    // of q1 and q2
+    for (std::size_t i = 0; i < lookup.at({nqubits-2, nones-1}).size(); i++) {
+	std::size_t x = lookup.at({nqubits-2, nones-1})[i];
+	std::size_t lower = x & lower_mask;
+	std::size_t mid = x & mid_mask;
+	std::size_t upper = x & upper_mask;
+
+	// Calculate the index by adding together the 3 shifted sections
+	// of x and small_bit and large_bit
+	std::size_t index1 = lower + (mid << 1) + (upper << 2) + q1_bit;
+	std::size_t index2 = lower + (mid << 1) + (upper << 2) + q2_bit;
+
+	// Store the values of the amplitudes
+	qsl::complex<Fp> a0 = state[index1];
+	qsl::complex<Fp> a1 = state[index2];
+
+	// Write the new |01> amplitude
+	state[index1].real = a0.real * cos - a1.real * sin;
+	state[index1].imag = a0.imag * cos - a1.imag * sin;
+	
+	// Write the new |10> amplitude
+	state[index2].real = a0.real * sin + a1.real * cos;
+	state[index2].imag = a0.imag * sin + a1.imag * cos;
+    }
+
+}
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::NP, Fp>::npHadamard(unsigned q1,
+						unsigned q2)
+{
+    // Find the bit positions
+    std::size_t small_bit = 1 << std::min(q1, q2);
+    std::size_t large_bit = 1 << std::max(q1, q2);
+    std::size_t q1_bit = 1 << q1;
+    std::size_t q2_bit = 1 << q2;
+    
+    // Create masks for the 3 sections that the bit string will be broken into 
+    std::size_t lower_mask = small_bit - 1;
+    std::size_t mid_mask = ((large_bit >> 1) - 1) ^ lower_mask;
+    std::size_t upper_mask = ~(lower_mask | mid_mask);
+        
+    // Loop through all the other numbers with num_ones 1s 
+    // then break down that number into 3 parts to go on either side
+    // of q1 and q2
+    for (std::size_t i = 0; i < lookup.at({nqubits-2, nones-1}).size(); i++) {
+	std::size_t x = lookup.at({nqubits-2, nones-1})[i];
+	std::size_t lower = x & lower_mask;
+	std::size_t mid = x & mid_mask;
+	std::size_t upper = x & upper_mask;
+
+	// Calculate the index by adding together the 3 shifted sections
+	// of x and small_bit and large_bit
+	std::size_t index1 = lower + (mid << 1) + (upper << 2) + q1_bit;
+	std::size_t index2 = lower + (mid << 1) + (upper << 2) + q2_bit;
+
+	// Store the values of the amplitudes
+	const qsl::complex<Fp> temp1 = state[index1];
+	const qsl::complex<Fp> temp2 = state[index2];
+	constexpr Fp sqrt2 = std::sqrt(2); 
+	state[index1].real = (temp1.real + temp2.real)/sqrt2;
+	state[index1].imag = (temp1.imag + temp2.imag)/sqrt2;
+	state[index2].real = (temp1.real - temp2.real)/sqrt2;
+	state[index2].imag = (temp1.imag - temp2.imag)/sqrt2;
+    }
+
 }
 
 

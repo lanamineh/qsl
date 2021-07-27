@@ -429,6 +429,7 @@ TYPED_TEST(Gates, TwoQubitGate)
     cnot(0b01,0b01) = 1;
     cnot(0b10,0b11) = 1;
     cnot(0b11,0b10) = 1;
+    
     auto fn_cnot = [](Sim & sim, unsigned ctrl, unsigned targ) {
 			 sim.controlNot(ctrl, targ);
 		     };
@@ -543,6 +544,48 @@ TYPED_TEST(Gates, TwoQubitGate)
 		   };
     gates.push_back({fn_fswap, fswap});
 
+    // npRotateX
+    arma::Mat<std::complex<Fp>> nprx(4, 4, arma::fill::zeros);
+    nprx(0b00,0b00) = 1;
+    nprx(0b01,0b01) = std::complex<Fp>{std::cos(angle/2), 0};
+    nprx(0b01,0b10) = std::complex<Fp>{0, -std::sin(angle/2)};
+    nprx(0b10,0b01) = std::complex<Fp>{0, -std::sin(angle/2)};
+    nprx(0b10,0b10) = std::complex<Fp>{std::cos(angle/2), 0};
+    nprx(0b11,0b11) = 1;
+    
+    auto fn_nprx = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.npRotateX(targ, ctrl, angle);
+		   };
+    gates.push_back({fn_nprx, nprx});
+
+    // npRotateY
+    arma::Mat<std::complex<Fp>> npry(4, 4, arma::fill::zeros);
+    npry(0b00,0b00) = 1;
+    npry(0b01,0b01) = std::cos(angle/2);
+    npry(0b01,0b10) = -std::sin(angle/2);
+    npry(0b10,0b01) = std::sin(angle/2);
+    npry(0b10,0b10) = std::cos(angle/2);
+    npry(0b11,0b11) = 1;
+    
+    auto fn_npry = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.npRotateY(targ, ctrl, angle);
+		   };
+    gates.push_back({fn_npry, npry});
+    
+    // npHadamard
+    arma::Mat<std::complex<Fp>> nph(4, 4, arma::fill::zeros);
+    nph(0b00,0b00) = 1;
+    nph(0b01,0b01) = sqrt2;
+    nph(0b01,0b10) = sqrt2;
+    nph(0b10,0b01) = sqrt2;
+    nph(0b10,0b10) = -sqrt2;
+    nph(0b11,0b11) = 1;
+    
+    auto fn_nph = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.npHadamard(targ, ctrl);
+		   };
+    gates.push_back({fn_nph, nph});
+   
     
     for (const auto & [fn, mat] : gates) {    
 
@@ -646,6 +689,49 @@ TYPED_TEST(NPGates, TwoQubitGate)
 		   };
     gates.push_back({fn_fswap, fswap});
 
+    // npRotateX
+    arma::Mat<std::complex<Fp>> nprx(4, 4, arma::fill::zeros);
+    nprx(0b00,0b00) = 1;
+    nprx(0b01,0b01) = std::complex<Fp>{std::cos(angle/2), 0};
+    nprx(0b01,0b10) = std::complex<Fp>{0, -std::sin(angle/2)};
+    nprx(0b10,0b01) = std::complex<Fp>{0, -std::sin(angle/2)};
+    nprx(0b10,0b10) = std::complex<Fp>{std::cos(angle/2), 0};
+    nprx(0b11,0b11) = 1;
+    
+    auto fn_nprx = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.npRotateX(targ, ctrl, angle);
+		   };
+    gates.push_back({fn_nprx, nprx});
+    
+    // npRotateY
+    arma::Mat<std::complex<Fp>> npry(4, 4, arma::fill::zeros);
+    npry(0b00,0b00) = 1;
+    npry(0b01,0b01) = std::cos(angle/2);
+    npry(0b01,0b10) = -std::sin(angle/2);
+    npry(0b10,0b01) = std::sin(angle/2);
+    npry(0b10,0b10) = std::cos(angle/2);
+    npry(0b11,0b11) = 1;
+    
+    auto fn_npry = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.npRotateY(targ, ctrl, angle);
+		   };
+    gates.push_back({fn_npry, npry});
+    
+    // npHadamard
+    arma::Mat<std::complex<Fp>> nph(4, 4, arma::fill::zeros);
+    Fp sqrt2 = 1/std::sqrt(2);
+    nph(0b00,0b00) = 1;
+    nph(0b01,0b01) = sqrt2;
+    nph(0b01,0b10) = sqrt2;
+    nph(0b10,0b01) = sqrt2;
+    nph(0b10,0b10) = -sqrt2;
+    nph(0b11,0b11) = 1;
+    
+    auto fn_nph = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.npHadamard(targ, ctrl);
+		   };
+    gates.push_back({fn_nph, nph});
+    
     
     for (const auto & [fn, mat] : gates) {    
 

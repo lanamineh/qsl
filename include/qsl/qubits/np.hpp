@@ -192,6 +192,21 @@ namespace qsl {
 	 * \brief Perform a fermionic swap gate on two qubits. 
 	 */
 	void fswap(unsigned q1, unsigned q2);
+
+	/**
+	 * \brief Perform a number preserved rotate X on two qubits. 
+	 */
+	void npRotateX(unsigned q1, unsigned q2, Fp angle);
+
+	/**
+	 * \brief Perform a number preserved rotate Y on two qubits. 
+	 */
+	void npRotateY(unsigned q1, unsigned q2, Fp angle);
+
+	/**
+	 * \brief Perform a number preserved Hadamard on two qubits. 
+	 */
+	void npHadamard(unsigned q1, unsigned q2);
 	
     	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.
