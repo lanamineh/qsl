@@ -258,6 +258,10 @@ std::map<std::size_t, std::size_t> qsl::Qubits<qsl::Type::Omp, Fp>::sampleAll(st
     
     // Sample from the vector nmeas times
     int nthreads = omp_get_num_threads();
+
+    // This must be a C style array because a std::vector also gives
+    // segfaults. I think you can't write into the std::vector
+    // concurrently in the openmp loop because it is not thread safe.
     std::map<std::size_t, std::size_t>  maps[nthreads];
 
 #pragma omp parallel for num_threads(nthreads)
