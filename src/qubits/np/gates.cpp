@@ -268,6 +268,17 @@ void qsl::Qubits<qsl::Type::NP, Fp>::swap(unsigned q1, unsigned q2)
 }
 
 
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::NP, Fp>::fswap(unsigned q1, unsigned q2)
+{
+    // Since we would have to use two lookup tables (and therefore two loops)
+    // to implement the swapping of |01> and |10> and then the phase shift on |11>,
+    // it is best just to use separate functions for them
+    swap(q1, q2);
+    controlZ(q1, q2);
+}
+
+
 // Explicit instantiations
 template class qsl::Qubits<qsl::Type::NP, float>;
 template class qsl::Qubits<qsl::Type::NP, double>;

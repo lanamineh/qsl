@@ -524,6 +524,25 @@ namespace qsl {
 	 * \param q2 The second qubit to swap.
 	 */
 	void swap(unsigned q1, unsigned q2);
+
+	/**
+	 * \brief Perform a fermionic swap gate on two qubits. 
+	 *
+	 * \ingroup qubits_gates
+
+	 * \f[ 
+	 * FSWAP = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 0 & 1 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & 0 & -1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param q1 The first qubit to fswap.
+	 * \param q2 The second qubit to fswap.
+	 */
+	void fswap(unsigned q1, unsigned q2);
 	
 	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.

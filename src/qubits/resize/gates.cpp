@@ -511,13 +511,13 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::swap(unsigned q1, unsigned q2)
     std::size_t q1_bit = (1 << q1);
     std::size_t q2_bit = (1 << q2);
 
-    // Increment through the indices above largest bit (ctrl or targ)
+    // Increment through the indices above largest bit
     for (std::size_t i = 0; i < dim; i += high_incr) {
 	// Increment through the middle set of bits
 	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
 	    // Increment through the low set of bits
 	    for (std::size_t k = 0; k < small_bit; k++) {
-		// Get the |01> and |11> indices
+		// Get the |01> and |10> indices
 		std::size_t index1 = i + j + k + q1_bit;
 		std::size_t index2 = i + j + k + q2_bit;
 
@@ -526,6 +526,40 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::swap(unsigned q1, unsigned q2)
 	}
     }    
 }
+
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Resize, Fp>::fswap(unsigned q1, unsigned q2)
+{
+    std::size_t small_bit = 1 << std::min(q1, q2);
+    std::size_t large_bit = 1 << std::max(q1, q2);
+
+    std::size_t mid_incr = (small_bit << 1);
+    std::size_t high_incr = (large_bit << 1);
+    std::size_t q1_bit = (1 << q1);
+    std::size_t q2_bit = (1 << q2);
+
+    // Increment through the indices above largest bit
+    for (std::size_t i = 0; i < dim; i += high_incr) {
+	// Increment through the middle set of bits
+	for (std::size_t j = 0; j < large_bit; j += mid_incr) {
+	    // Increment through the low set of bits
+	    for (std::size_t k = 0; k < small_bit; k++) {
+		// Get the |01> and |10> indices and swap them
+		std::size_t index1 = i + j + k + q1_bit;
+		std::size_t index2 = i + j + k + q2_bit;
+
+		std::swap(state[index1], state[index2]);
+
+		// Get the |11> index and apply a -1 phase
+		std::size_t index = index1 + q2_bit;
+		state[index].real *= -1;
+		state[index].imag *= -1;
+	    }
+	}
+    }    
+}
+
 
 // Explicit instantiations
 template class qsl::Qubits<qsl::Type::Resize, float>;

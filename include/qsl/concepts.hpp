@@ -80,6 +80,7 @@ namespace qsl {
 
 	// Number preserved two qubit gates
 	sim.swap(ctrl,targ); // Actually q1 and q2, but still unsigned
+	sim.fswap(ctrl,targ);
     };
     
     template<typename Sim>

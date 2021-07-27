@@ -531,6 +531,18 @@ TYPED_TEST(Gates, TwoQubitGate)
 		       sim.swap(ctrl, targ);
 		   };
     gates.push_back({fn_swap, swap});
+
+    // fswap
+    arma::Mat<std::complex<Fp>> fswap(4, 4, arma::fill::zeros);
+    fswap(0b00,0b00) = 1;
+    fswap(0b01,0b10) = 1;
+    fswap(0b10,0b01) = 1;
+    fswap(0b11,0b11) = -1;
+    auto fn_fswap = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.fswap(ctrl, targ);
+		   };
+    gates.push_back({fn_fswap, fswap});
+
     
     for (const auto & [fn, mat] : gates) {    
 
@@ -622,6 +634,18 @@ TYPED_TEST(NPGates, TwoQubitGate)
 		       sim.swap(ctrl, targ);
 		   };
     gates.push_back({fn_swap, swap});
+
+    // fswap
+    arma::Mat<std::complex<Fp>> fswap(4, 4, arma::fill::zeros);
+    fswap(0b00,0b00) = 1;
+    fswap(0b01,0b10) = 1;
+    fswap(0b10,0b01) = 1;
+    fswap(0b11,0b11) = -1;
+    auto fn_fswap = [=](Sim & sim, unsigned ctrl, unsigned targ) {
+	sim.fswap(ctrl, targ);
+		   };
+    gates.push_back({fn_fswap, fswap});
+
     
     for (const auto & [fn, mat] : gates) {    
 

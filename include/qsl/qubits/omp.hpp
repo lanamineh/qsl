@@ -233,6 +233,11 @@ namespace qsl {
 	 * \brief Perform a swap gate on two qubits. 
  	 */
 	void swap(unsigned q1, unsigned q2);
+
+	/**
+	 * \brief Perform a fermionic swap gate on two qubits. 
+	 */
+	void fswap(unsigned q1, unsigned q2);
 	
 	/**
 	 * \brief Measure a qubit and collapse the state to its outcome.

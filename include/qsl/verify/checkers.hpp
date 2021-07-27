@@ -1047,6 +1047,12 @@ namespace qsl {
 		"swap",
 		this->check(os, &Sim1::swap, &Sim2::swap));
 
+	    os << "Checking fswap" << std::endl;
+	    results.emplace(
+		"fswap",
+		this->check(os, &Sim1::fswap, &Sim2::fswap));
+
+	    
 	    return results;
 	}
     };
@@ -1119,6 +1125,11 @@ namespace qsl {
 		"swap",
 		this->check(os, &Sim1::swap, &Sim2::swap));
 
+	    os << "Checking fswap" << std::endl;
+	    results.emplace(
+		"fswap",
+		this->check(os, &Sim1::fswap, &Sim2::fswap));
+	    
 	    return results;
 	}
     };
