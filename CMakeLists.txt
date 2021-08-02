@@ -58,28 +58,31 @@ add_executable(resize examples/resize.cpp)
 target_link_libraries(resize PUBLIC qsl)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-if(CMAKE_COMPILER_IS_GNUCXX)
-  # Output is used by codecov
-  include(CodeCoverage)
-  #set(COVERAGE_EXCLUDES "dir1/*" "dir2/*")
-  setup_target_for_coverage_lcov(
-    NAME coverage
-    EXECUTABLE ./bin/run-gtest
-    DEPENDENCIES run-gtest
-    BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2/*"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/gtest/*"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/*"
-    EXCLUDE "${CMAKE_BINARY_DIR}/*"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark/*"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/examples/*"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/utils/timer.hpp"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/verify*"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/timer.cpp"
-    EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/print.cpp"
-    EXCLUDE "/usr/*"
-    )
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+  if(CMAKE_COMPILER_IS_GNUCXX)
+    # Output is used by codecov
+    include(CodeCoverage)
+    append_coverage_compiler_flags()
+    #set(COVERAGE_EXCLUDES "dir1/*" "dir2/*")
+    setup_target_for_coverage_lcov(
+      NAME coverage
+      EXECUTABLE ./bin/run-gtest
+      DEPENDENCIES run-gtest
+      BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/"
+      EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/catch2/*"
+      EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/gtest/*"
+      EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/tests/*"
+      EXCLUDE "${CMAKE_BINARY_DIR}/*"
+      EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/benchmark/*"
+      EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/examples/*"
+      EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/utils/timer.hpp"
+      EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/include/qsl/verify*"
+      EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/timer.cpp"
+      EXCLUDE "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/print.cpp"
+      EXCLUDE "/usr/*"
+      )
+  endif()
 endif()
-
+  
 install(TARGETS qsl LIBRARY DESTINATION lib)
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/qsl DESTINATION include)
