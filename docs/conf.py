@@ -24,7 +24,7 @@ subprocess.call('cd ../; doxygen docs/Doxyfile', shell=True)
 # -- Project information -----------------------------------------------------
 
 project = 'QSL'
-copyright = '2020, Lana Mineh and John Scott'
+copyright = '2021, Lana Mineh and John Scott'
 author = 'Lana Mineh and John Scott'
 
 # Replace |project| with the project name above in docs
