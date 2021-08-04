@@ -238,6 +238,6 @@ Less important
 License
 #######
 
-The code and documentation is covered by the GNU General Public License below.
+The code and documentation is covered by the Apache 2.0 License below.
 
-.. literalinclude:: ../COPYING
+.. literalinclude:: ../LICENSE

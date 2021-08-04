@@ -1,21 +1,3 @@
-# Copyright (C) 2020 Lana Mineh and John Scott.
-#
-# This file is part of qsim, the quantum computer simulator.
-#
-# qsim is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# qsim is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with qsim.  If not, see <https://www.gnu.org/licenses/>.
-#
-
 #
 # Bash script for updating the license notice in all source files
 #
@@ -39,7 +21,9 @@ proj_name=QSL
 # src contains the top level source file location. This
 # location is recursively searched for files ending in
 # .hpp, .cpp and .tpp. 
-src=../src/
+#src=../src/
+#src=../include/
+src=../other/
 
 # tmpl contains the directory of the source file
 # templates, which are used to generate new
