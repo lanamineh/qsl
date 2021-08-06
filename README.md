@@ -49,7 +49,13 @@ cmake --build . # Build the library
 sudo cmake . --target install # Install the library to /usr/include/ and /usr/lib/
 ```
 
-Now you should be able to compile the example above using `g++-10` as the compiler. If you encounter any errors, have a look at the documentation for more detailed installation instructions. 
+Now you should be able to compile the example above using the following line (assuming its in a file called main.cpp):
+
+```bash
+g++-10 -std=c++20 main.cpp -lqsl
+```
+
+If you encounter any errors, have a look at the documentation for more detailed installation instructions. 
 
 # How to remove the library
 
