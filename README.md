@@ -46,7 +46,7 @@ mkdir build # Make a build directory
 cd build # Change to the build directory
 CC=gcc-10 CXX=g++-10 cmake .. # Configure the build to use g++-10
 cmake --build . # Build the library
-sudo cmake . --target install # Install the library to /usr/include/ and /usr/lib/
+sudo cmake --build . --target install # Install the library to /usr/include/ and /usr/lib/
 ```
 
 Now you should be able to compile the example above using the following line (assuming its in a file called main.cpp):
