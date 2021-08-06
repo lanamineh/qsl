@@ -22,22 +22,26 @@ find_package(OpenMP REQUIRED)
 set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall -Wextra -g -pg -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5 -fprofile-arcs -ftest-coverage")
 set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall -Wextra -O2 -fopenmp")
 
-set(INSTALL_GTEST OFF)
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
-  )
-FetchContent_MakeAvailable(googletest)
+# Compile tests if they are enabled
+if(WITH_TESTS)
+  set(INSTALL_GTEST OFF)
+  include(FetchContent)
+  FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+    )
+  FetchContent_MakeAvailable(googletest)
 
-enable_testing()
+  enable_testing()
 
-add_executable(run-gtest src/gtest/utils.cpp src/gtest/sim-constructors.cpp src/gtest/gates.cpp src/gtest/measurements.cpp src/gtest/test-utils.cpp src/gtest/resize-test.cpp)
-target_link_libraries(run-gtest gtest_main qsl armadillo)
+  add_executable(run-gtest src/gtest/utils.cpp src/gtest/sim-constructors.cpp src/gtest/gates.cpp src/gtest/measurements.cpp src/gtest/test-utils.cpp src/gtest/resize-test.cpp)
+  target_link_libraries(run-gtest gtest_main qsl armadillo)
 
-include(GoogleTest)
-gtest_discover_tests(run-gtest)
+  include(GoogleTest)
+  gtest_discover_tests(run-gtest)
 
+endif()
+  
 include_directories(${PROJECT_SOURCE_DIR}/include/)
 
 # add source directories
@@ -59,6 +63,7 @@ target_link_libraries(resize PUBLIC qsl)
 
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 if(CMAKE_BUILD_TYPE MATCHES Debug)
+  set(WITH_TESTS yes)
   if(CMAKE_COMPILER_IS_GNUCXX)
     # Output is used by codecov
     include(CodeCoverage)
