@@ -51,8 +51,9 @@ namespace qsl {
     template<std::floating_point Fp>
     class Qubits<Type::Resize, Fp>
     {
-	unsigned nqubits;
+	unsigned nqubits; ///< Current number of qubits
 	std::size_t dim; ///< The length of the state vector
+	std::size_t dim_max; ///< The available space in the state vector
 	std::vector<complex<Fp>> state; ///< State vector for the qubits
 
 	qsl::Random<Fp> random;
@@ -143,22 +144,41 @@ namespace qsl {
 	void setBasisState(std::size_t index);
 
 	/**
-	 * \brief Add a qubit to the state vector
-	 * \ingroup qubits_resize
+	 * \brief Add a qubit in a particular position 
 	 *
-	 * This function adds a qubit to the end of the list of qubits.
-	 * The resulting state is a tensor product between the previous
-	 * state vector and the |0) state of the newly added qubit.
+	 * This function adds a qubit at index specified by targ. All the
+	 * pre-existing qubits at index k >= targ will now be accessible
+	 * at index k+1 (i.e. all the qubits get bumped up by one to make
+	 * room for k). 
 	 *
-	 * The index of the new qubit is one larger than the index of
-	 * the largest qubit in the previous state vector.
+	 * This function may trigger the allocation of more space for the
+	 * state vector, unless the state vector is already big enough. This
+	 * can happen if you have removed qubits and not called the 
+	 * reallocateState function.
+	 * 
+	 */
+	void addQubit(unsigned targ);
+
+	/**
+	 * \brief Append a qubit to the end of the state vector
 	 *
-	 * Calling getNumQubits() will return the new number of qubits,
-	 * which is one larger than before the function is called.
+	 * This is the same as addQubit but it always adds the qubit to
+	 * the end of the state vector. It is the same as 
+	 * addQubit(getNumQubits()).
 	 *
 	 */
-	void addQubit();
-
+	void appendQubit();
+	
+	/**
+	 * \brief Re-allocate the state vector using minimal memory
+	 *
+	 * This function can be called after qubits have been removed to
+	 * trim excess space from the state vector (by default, removing
+	 * a qubit does not trigger re-allocation for performance reasons)
+	 * 
+	 */
+	void reallocateState();
+	
 	/**
 	 * \brief Rotate around the x-axis of the Bloch sphere 
 	 */

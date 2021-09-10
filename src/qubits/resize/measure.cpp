@@ -64,31 +64,31 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::collapseOut(unsigned targ,
 						     Fp factor)
 {
     // Collapse to outcome and renormalise the state vector   
-    std::size_t k = 1 << targ;
-    std::size_t not_res = (outcome ^ 1) * k; 
-
-    // Remove the qubit by deleting all the state vector
-    // amplitudes which do not correspond to the measured
-    // qubit outcome
-    const auto it{ std::begin(state) }; // Iterator pointing to start of state
-
-    // Traverse backwards through the state vector to erase elements
-    for (int s = dim-2*k; s >= 0; s -= 2*k) {
-	for (int r = k-1; r >= 0; r--) {
-	    // Get the indices that need to be erased
-	    auto index = it + s + not_res + r;
-	    state.erase(index);
-	}
-    }
+    std::size_t k = 1 << targ; // Stride length between blocks
 
     // update the dimension and the number of qubits
     nqubits--;
-    dim = state.size();
+    dim >>= 1;
+    
+    // To collapse the state vector to a particular outcome on a particular
+    // qubit, it is necessary to zero all the amplitudes that correspond to
+    // the outcome which was not measured, and then rearrange the state
+    // vector. The loops below do the copying of the correct amplitudes into
+    // the new state vector, which is half as long and occupies the first
+    // half of the allocated state vector memory. The state vector is not
+    // resized.
+    for (std::size_t n = 0; n < (dim >> targ); n++) {
+	for (std::size_t p = 0; p < k; p++) {
+	    std::size_t from = (2*n+outcome)*k + p;
+	    std::size_t to = n*k + p;
+	    state[to] = state[from];
+	}
+    }    
 
     // Renormalise everything in the compressed state vector
     for (std::size_t i = 0; i < dim; i++) {
-	state[i].real *= factor;
-	state[i].imag *= factor;
+    	state[i].real *= factor;
+    	state[i].imag *= factor;
     }
     
 }

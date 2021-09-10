@@ -39,7 +39,7 @@ const std::string qsl::Qubits<qsl::Type::Resize, float>::name =
 template<std::floating_point Fp>
 qsl::Qubits<qsl::Type::Resize, Fp>::Qubits(unsigned nqubits_in) 
     : nqubits{ nqubits_in }, dim{ std::size_t(1) << nqubits },
-      state(dim), random(0,1)
+      dim_max{ dim }, state(dim), random(0,1)
 {
     // Make the all-zero state
     reset();   
@@ -47,7 +47,8 @@ qsl::Qubits<qsl::Type::Resize, Fp>::Qubits(unsigned nqubits_in)
 
 template<std::floating_point Fp>
 qsl::Qubits<qsl::Type::Resize, Fp>::Qubits(const std::vector<qsl::complex<Fp>> & state)
-    : nqubits{ qsl::checkStateSize(state) }, dim{ state.size() }, state{state},
+    : nqubits{ qsl::checkStateSize(state) }, 
+      dim{ state.size() }, dim_max{ dim }, state{state},
       random(0,1)
 {
     //std::cout << "nqubits = " << nqubits << std::endl;
@@ -90,17 +91,62 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::setBasisState(std::size_t index)
 }
 
 template<std::floating_point Fp>
-void qsl::Qubits<qsl::Type::Resize, Fp>::addQubit()
+void qsl::Qubits<qsl::Type::Resize, Fp>::reallocateState()
 {
-    // Push zeros to the back of the state vector
-    for (std::size_t k = 0; k < dim; k++) {
-	state.push_back({0,0});
+    // This function should trim the state vector down to
+    // the smallest possible size (i.e. set dim_max = dim)
+    state.resize(dim);
+}
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Resize, Fp>::appendQubit()
+{
+    addQubit(getNumQubits());
+}
+
+template<std::floating_point Fp>
+void qsl::Qubits<qsl::Type::Resize, Fp>::addQubit(unsigned targ)
+{
+    // Check if there is any space left in the
+    // state vector to allocate more qubits
+    if (dim == dim_max) {
+	// In this case, you need to make more space at the end
+	// of the state vector. Call a resize operation which
+	// address initialised memory
+	state.resize(2*dim);
+	// Update the max dim to the new state vector size
+	dim_max = state.size();
     }
 
-    // Store the new number of qubits and the state vector size
+    // Now you need to shuffle the amplitudes so that they are
+    // in the correct positions for the new qubit. This amounts
+    // to doing the opposite of the operation in collapseOut.
+    // You need to go backwards (otherwise you're going to
+    // overwrite amplitudes with zeros... think about it...)
+    std::size_t k = 1 << targ; // Stride length between blocks
+    for (long long int n = (dim >> targ)-1; n >= 0 ; n--) {
+	for (std::size_t p = 0; p < k; p++) {
+	    // This is opposite to collapseOut. Use
+	    // outcome = 0 to copy to the position of the
+	    // zero amplitude.
+	    std::size_t from = n*k + p;
+	    std::size_t to = 2*n*k + p;
+	    // This is the state to zero, corresponding to the
+	    // one amplitude.
+	    std::size_t to_zero = (2*n+1)*k + p;
+	    state[to] = state[from];
+	    state[to_zero].real = 0;
+	    state[to_zero].imag = 0;
+	}
+    }    
+
+    
+    // Update the state vector dimension and number of qubits
+    dim <<= 1;
     nqubits++;
-    dim = state.size();
+
 }
+
 
 template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::Resize, Fp>::operator = (const Qubits & old)
@@ -119,7 +165,9 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::operator = (const Qubits & old)
 template<std::floating_point Fp>
 std::vector<qsl::complex<Fp>> qsl::Qubits<qsl::Type::Resize, Fp>::getState() const
 {
-    return state;
+    auto first = std::begin(state);
+    auto last = first + dim;
+    return std::vector<qsl::complex<Fp>>(first, last);
 }
 
 template<std::floating_point Fp>
@@ -133,7 +181,13 @@ template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::Resize, Fp>::print(std::ostream & os) const
 {
     os << "Number of qubits = " << nqubits << std::endl;
-    os << state << std::endl;
+
+    // Need to print manually because some of the state vector
+    // at the end might be ignored
+    for (std::size_t n = 0; n < dim; n++) {
+	os << state[n] << std::endl;
+    }
+    os << std::endl;
 }
 
 

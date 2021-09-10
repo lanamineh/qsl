@@ -284,7 +284,7 @@ TYPED_TEST(ResizeTests, AddQubitTest)
     arma::Col<std::complex<Fp>> v{ toArmaState(q) };
 
     // Add a qubit in the highest position
-    q.addQubit();
+    q.appendQubit();
 
     // Check that the state collapses to the correct thing
     arma::Col<std::complex<Fp>> state_1{ toArmaState(q) };
