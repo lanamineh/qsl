@@ -1,6 +1,6 @@
-mkdir build
+mkdir -p build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release -DNUM_QUBITS=16 -DTEST_LEN=1000
+cmake .. -DCMAKE_BUILD_TYPE=Release -DNUM_QUBITS=16 -DTEST_LEN=1000 -DGATE=2
 cmake --build . -j8
 echo -e "\nFinished. Binaries are in build/bin/tests/"
 echo -e "\nstd::complex test"

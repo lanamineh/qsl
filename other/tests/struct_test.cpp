@@ -229,9 +229,13 @@ int main()
     for(std::size_t k=0; k<test_length; k++) {
 	// Apply Pauli X and phase shift to all qubits
 	for(int i=0; i<nqubits; i++) {
-	    //pauliX(state_list[k], i);
-	    //phaseShift(state_list[k], i, phase_list[nqubits*k + i]);
+#if GATE == 0
+	    pauliX(state_list[k], i);
+#elif GATE == 1
+	    phaseShift(state_list[k], i, phase_list[nqubits*k + i]);
+#elif GATE == 2
 	    rotateX(state_list[k], i, phase_list[nqubits*k + i]);
+#endif
 	}
     }
     t.stop();
