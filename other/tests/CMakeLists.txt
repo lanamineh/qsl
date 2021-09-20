@@ -3,9 +3,6 @@ cmake_minimum_required(VERSION 3.12.4) # To get std=c++20
 # set the project name
 project(statevec-tests VERSION 0.1 LANGUAGES CXX)
 
-set(NUM_QUBITS 12)
-set(TEST_LEN 2000)
-
 configure_file(cmake_defines.hpp.in cmake_defines.hpp)
 
 include_directories("${PROJECT_BINARY_DIR}")
