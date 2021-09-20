@@ -29,6 +29,7 @@
 #include <cstdint>
 #include <random>
 #include "qsl/utils.hpp"
+#include <qsl/qubits.hpp>
 
 #include "cmake_defines.hpp"
 
@@ -233,6 +234,12 @@ int main()
     // 	state_list.push_back(makeRandomState(nqubits));
     // }
     std::vector<complex> state_list = makeRandomState(nqubits);
+
+    // Copy the initial state vector to use for checking
+    std::vector<qsl::complex<double>> state_list_copy;
+    for (std::size_t n = 0; n < state_list.size(); n++) {
+	state_list_copy.push_back({state_list[n].real, state_list[n].imag});
+    }
     
     // Make a list of random phases
     std::vector<double> phase_list{
@@ -269,8 +276,47 @@ int main()
     }
     t.stop();
     std::cout << t.printElapsed() << std::endl;
-    
 
-    
+    // Now make check that the answer is correct
+    qsl::Qubits<qsl::Type::Default> q{nqubits};
+
+    // Create the correct input state
+    q.setState(state_list_copy);
+
+    // Now apply the one-qubit gates
+    for(std::size_t k=0; k<test_length; k++) {
+	// Apply Pauli X and phase shift to all qubits
+	for(int i=0; i<nqubits; i++) {
+#if GATE == 0
+	    q.pauliX(i);
+#elif GATE == 1
+	    q.phase(i, phase_list[i]);
+#elif GATE == 2
+	    q.rotateX(i, phase_list[i]);
+#endif
+	}
+    }
+
+    // Apply the CNOT gate
+    for(std::size_t k=0; k<test_length; k++) {
+	// Apply Pauli X and phase shift to all qubits
+	for(int i=0; i<nqubits-1; i++) {
+	    q.controlNot(i, i+1); 
+	}
+    }    
+
+    // Now get the state vector
+    std::vector<qsl::complex<double>> true_state = q.getState();
+
+    // Convert the other state to the qsl format
+    std::vector<qsl::complex<double>> test_state;
+    for (std::size_t n = 0; n < state_list.size(); n++) {
+	test_state.push_back({state_list[n].real, state_list[n].imag});
+    }
+
+    // Compare the states
+    std::cout << "Distance = " << qsl::fubiniStudy(true_state, test_state)
+	      << std::endl;
+        
     return 0;
 }
