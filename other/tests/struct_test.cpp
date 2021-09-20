@@ -28,16 +28,20 @@
 #include <cmath>
 #include <cstdint>
 #include <random>
-#include "qsl/utils/timer.hpp"
-#include "qsl/utils/complex.hpp"
-#include "qsl/utils/misc.hpp"
+#include "qsl/utils.hpp"
 
 #include "cmake_defines.hpp"
+
+struct complex
+{
+    double real;
+    double imag;
+};
 
 /**
  * \brief Apply the Pauli X gate to qubit number targ.
  */
-void pauliX(std::vector<qsl::complex<double>> &state, std::uint8_t targ)
+void pauliX(std::vector<complex> &state, std::uint8_t targ)
 {
     std::size_t k = 1 << targ;
     for (std::size_t s = 0; s < state.size(); s += 2*k) { 
@@ -56,9 +60,9 @@ void pauliX(std::vector<qsl::complex<double>> &state, std::uint8_t targ)
 /**
  * \brief Apply a phase shift to qubit number targ.
  */
-void phaseShift(std::vector<qsl::complex<double>> &state, std::uint8_t targ, double angle)
+void phaseShift(std::vector<complex> &state, std::uint8_t targ, double angle)
 {
-    const qsl::complex<double> phase = qsl::complex<double>(std::cos(angle), std::sin(angle));
+    const complex phase = complex(std::cos(angle), std::sin(angle));
     
     std::size_t k = 1 << targ;
     for (std::size_t s = 0; s < state.size(); s += 2*k) { 
@@ -67,7 +71,7 @@ void phaseShift(std::vector<qsl::complex<double>> &state, std::uint8_t targ, dou
 	    std::size_t index = s + k + r;
 
 	    //state[index] *= phase;
-	    qsl::complex<double> temp = state[index];
+	    complex temp = state[index];
 	    state[index].real = phase.real * temp.real - phase.imag * temp.imag;
 	    state[index].imag = phase.real * temp.imag + phase.imag * temp.real;
 	}
@@ -88,7 +92,7 @@ void phaseShift(std::vector<qsl::complex<double>> &state, std::uint8_t targ, dou
  *
  *
  */
-void rotateX(std::vector<qsl::complex<double>> &state, std::uint8_t targ, double angle)
+void rotateX(std::vector<complex> &state, std::uint8_t targ, double angle)
 {
     // Store variables
     const double cos = std::cos(angle/2);
@@ -103,8 +107,8 @@ void rotateX(std::vector<qsl::complex<double>> &state, std::uint8_t targ, double
 	    std::size_t index_1 = s + k + r;
 
 	    // Store the values of |0> and |1> amplitudes
-	    qsl::complex<double> a0 = state[index_0];
-	    qsl::complex<double> a1 = state[index_1];
+	    complex a0 = state[index_0];
+	    complex a1 = state[index_1];
 
 	    // Write the new |0> amplitude
 	    state[index_0].real = a0.real * cos + a1.imag * sin;
@@ -121,7 +125,7 @@ void rotateX(std::vector<qsl::complex<double>> &state, std::uint8_t targ, double
 /**
  * \brief Perform the CNOT gate on two qubits.
  */
-void controlNot(std::vector<qsl::complex<double>> &state, std::uint8_t ctrl, std::uint8_t targ)
+void controlNot(std::vector<complex> &state, std::uint8_t ctrl, std::uint8_t targ)
 {
     std::size_t small_bit = 1 << std::min(ctrl, targ);
     std::size_t large_bit = 1 << std::max(ctrl, targ);
@@ -155,7 +159,7 @@ void controlNot(std::vector<qsl::complex<double>> &state, std::uint8_t ctrl, std
 /**
  * \brief Normalise the state vector.
  */
-double normalise(std::vector<qsl::complex<double>> &state)
+double normalise(std::vector<complex> &state)
 {
     // Find the norm of the vector
     double norm = 0;
@@ -175,27 +179,9 @@ double normalise(std::vector<qsl::complex<double>> &state)
 }
 
 /**
- * \brief Generate a random number between a and b
- */
-double makeRandomNumber(double a, double b) {
-
-    // Make the random int generator from -500 to 500
-    std::random_device r;
-    std::default_random_engine generator(r());
-    std::uniform_int_distribution<int> distribution(-500,500);
-
-    double val = static_cast<double>(distribution(generator));
-    
-    // Return the number
-    double result =  (b+a)/2 + val*(b-a)/1000;
-
-    return result;
-}
-
-/**
  * \brief Make a random state vector with nqubits
  */
-std::vector<qsl::complex<double>> makeRandomState(std::uint8_t nqubits)
+std::vector<complex> makeRandomState(std::uint8_t nqubits)
 {
     std::size_t dim = 1 << nqubits;
     // Make the random int generator from -500 to 500
@@ -203,11 +189,11 @@ std::vector<qsl::complex<double>> makeRandomState(std::uint8_t nqubits)
     std::default_random_engine generator(r());
     std::uniform_int_distribution<int> distribution(-500,500);
 
-    std::vector<qsl::complex<double>> state;
+    std::vector<complex> state;
     for(std::size_t i=0; i<dim; i++) {
 	double val_real = static_cast<double>(distribution(generator)) / 500;
 	double val_imag = static_cast<double>(distribution(generator)) / 500;
-	state.push_back(qsl::complex<double>(val_real, val_imag));
+	state.push_back(complex(val_real, val_imag));
     }
 
     // Normalise the state vector
@@ -226,17 +212,16 @@ int main()
     std::cout << "Generating random vectors..." << std::endl;
     
     // Make a list of random state vectors
-    std::vector<std::vector<qsl::complex<double>>> state_list;
+    std::vector<std::vector<complex>> state_list;
     for(std::size_t k=0; k<test_length; k++) {
 	state_list.push_back(makeRandomState(nqubits));
     }
 
     // Make a list of random phases
-    std::vector<double> phase_list;
-    for(std::size_t k=0; k<test_length*nqubits; k++) {
-	phase_list.push_back(makeRandomNumber(-M_PI, M_PI));
-    }
-
+    std::vector<double> phase_list{
+	qsl::makeRandomPhases<double>(test_length * nqubits)
+	    };
+    
     std::cout << "Starting test..." << std::endl;
     qsl::Timer t;
     t.start();
@@ -244,8 +229,9 @@ int main()
     for(std::size_t k=0; k<test_length; k++) {
 	// Apply Pauli X and phase shift to all qubits
 	for(int i=0; i<nqubits; i++) {
-	    pauliX(state_list[k], i);
+	    //pauliX(state_list[k], i);
 	    //phaseShift(state_list[k], i, phase_list[nqubits*k + i]);
+	    rotateX(state_list[k], i, phase_list[nqubits*k + i]);
 	}
     }
     t.stop();

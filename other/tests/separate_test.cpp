@@ -32,8 +32,7 @@
 #include <cmath>
 #include <cstdint>
 #include <random>
-#include "qsl/utils/timer.hpp"
-#include "qsl/utils/misc.hpp"
+#include "qsl/utils.hpp"
 
 #include "cmake_defines.hpp"
 
@@ -63,6 +62,51 @@ void pauliX(State &state, std::uint8_t targ)
 	    
 	    state.real[index2] = tempr;
 	    state.imag[index2] = tempi;
+	}
+    }
+}
+
+/**
+ * \brief Rotate around the x-axis of the Bloch sphere. e^{-i*t*X/2}
+ *
+ * This single qubit gate applies the following 2x2 matrix to each
+ * pair of |0> and |1> amplitudes for angle t:
+ *
+ * 
+ *    -                        - 
+ *   |   cos(t/2)   -i sin(t/2) |
+ *   | -i sin(t/2)    cos(t/2)  |
+ *    -                        - 
+ *
+ *
+ */
+void rotateX(State & state, std::uint8_t targ, double angle)
+{
+    // Store variables
+    const double cos = std::cos(angle/2);
+    const double sin = std::sin(angle/2);
+
+    std::size_t k = 1 << targ;
+    for (std::size_t s = 0; s < state.real.size(); s += 2*k) { 
+	for (std::size_t r = 0; r < k; r++) {
+
+	    // Get the index of |0> and |1>
+	    std::size_t index_0 = s + r;
+	    std::size_t index_1 = s + k + r;
+
+	    // Store the values of |0> and |1> amplitudes
+	    double a0r = state.real[index_0];
+	    double a0i = state.imag[index_0];
+	    double a1r = state.real[index_1];
+	    double a1i = state.imag[index_1];
+
+	    // Write the new |0> amplitude
+	    state.real[index_0] = a0r * cos + a1i * sin;
+	    state.imag[index_0] = a0i * cos - a1r * sin;
+
+	    // Write the new |1> amplitude
+	    state.real[index_1] = a1r * cos + a0i * sin;
+	    state.imag[index_1] = a1i * cos - a0r * sin;	    
 	}
     }
 }
@@ -156,24 +200,6 @@ double normalise(State &state)
 }
 
 /**
- * \brief Generate a random number between a and b
- */
-double makeRandomNumber(double a, double b) {
-
-    // Make the random int generator from -500 to 500
-    std::random_device r;
-    std::default_random_engine generator(r());
-    std::uniform_int_distribution<int> distribution(-500,500);
-
-    double val = static_cast<double>(distribution(generator));
-    
-    // Return the number
-    double result =  (b+a)/2 + val*(b-a)/1000;
-
-    return result;
-}
-
-/**
  * \brief Make a random state vector with nqubits
  */
 State makeRandomState(std::uint8_t nqubits)
@@ -214,11 +240,10 @@ int main()
     }
 
     // Make a list of random phases
-    std::vector<double> phase_list;
-    for(std::size_t k=0; k<test_length*nqubits; k++) {
-	phase_list.push_back(makeRandomNumber(-M_PI, M_PI));
-    }
-
+    std::vector<double> phase_list{
+	qsl::makeRandomPhases<double>(test_length * nqubits)
+	    };
+    
     std::cout << "Starting 1-qubit gate test..." << std::endl;
     qsl::Timer t;
     t.start();
@@ -226,8 +251,9 @@ int main()
     for(std::size_t k=0; k<test_length; k++) {
 	// Apply Pauli X and phase shift to all qubits
 	for(std::size_t i=0; i<nqubits; i++) {
-	    pauliX(state_list[k], i);
+	    //pauliX(state_list[k], i);
 	    //phaseShift(state_list[k], i, phase_list[nqubits*k + i]);
+	    rotateX(state_list[k], i, phase_list[nqubits*k + i]);
 	}
     }
     t.stop();
