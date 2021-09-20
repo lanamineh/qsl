@@ -234,14 +234,15 @@ int main()
     std::cout << "Generating random vectors..." << std::endl;
     
     // Make a list of random state vectors
-    std::vector<State> state_list;
-    for(std::size_t k=0; k<test_length; k++) {
-	state_list.push_back(makeRandomState(nqubits));
-    }
+    // std::vector<State> state_list;
+    // for(std::size_t k=0; k<test_length; k++) {
+    // 	state_list.push_back(makeRandomState(nqubits));
+    // }
+    State state_list = makeRandomState(nqubits);
 
     // Make a list of random phases
     std::vector<double> phase_list{
-	qsl::makeRandomPhases<double>(test_length * nqubits)
+	qsl::makeRandomPhases<double>(nqubits)
 	    };
     
     std::cout << "Starting 1-qubit gate test..." << std::endl;
@@ -252,11 +253,11 @@ int main()
 	// Apply Pauli X and phase shift to all qubits
 	for(std::size_t i=0; i<nqubits; i++) {
 #if GATE == 0
-	    pauliX(state_list[k], i);
+	    pauliX(state_list, i);
 #elif GATE == 1
-	    phaseShift(state_list[k], i, phase_list[nqubits*k + i]);
+	    phaseShift(state_list, i, phase_list[i]);
 #elif GATE == 2
-	    rotateX(state_list[k], i, phase_list[nqubits*k + i]);
+	    rotateX(state_list, i, phase_list[i]);
 #endif
 	}
     }
@@ -269,7 +270,7 @@ int main()
     for(std::size_t k=0; k<test_length; k++) {
 	// Apply Pauli X and phase shift to all qubits
 	for(int i=0; i<nqubits-1; i++) {
-	    controlNot(state_list[k], i, i+1); 
+	    controlNot(state_list, i, i+1); 
 	}
     }
     t.stop();
