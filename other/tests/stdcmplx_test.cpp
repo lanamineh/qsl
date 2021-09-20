@@ -102,9 +102,8 @@ void controlNot(std::vector<std::complex<double>> &state, std::uint8_t ctrl, std
 		std::size_t indexUp = i + j + k + ctrl_bit;
 		std::size_t indexLo = indexUp + targ_bit;
 		
-		std::complex<double> temp = state[indexUp];
-		state[indexUp] = state[indexLo];
-		state[indexLo] = temp;
+		// Doesn't seem slower to use std::swap
+		std::swap(state[indexUp], state[indexLo]);
             }
 	}
     }    
@@ -202,7 +201,7 @@ int main()
     for(std::size_t k=0; k<test_length; k++) {
 	// Apply Pauli X and phase shift to all qubits
 	for(std::size_t i=0; i<nqubits; i++) {
-	    pauliX(state_list[k], i);
+	    //pauliX(state_list[k], i);
 	    phaseShift(state_list[k], i, phase_list[nqubits*k + i]);
 	}
     }
