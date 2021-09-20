@@ -89,9 +89,12 @@ void qsl::Qubits<qsl::Type::OmpNP, Fp>::setState(const std::vector<qsl::complex<
 	throw std::logic_error(msg);
     }
 
+    unsigned nones_old = nones;
     nones = checkStateNP(state_in);
-    initLookup();
-    
+    if (nones_old != nones) {
+	initLookup();
+    }
+       
     // Set the new state vector
     state = state_in;
 }
