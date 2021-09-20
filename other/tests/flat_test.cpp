@@ -24,7 +24,6 @@
 
 #include <vector>
 #include <iostream>
-#include <complex>
 #include <bitset>
 #include <cstddef>
 #include <cmath>
@@ -32,6 +31,8 @@
 #include <random>
 #include "qsl/utils/timer.hpp"
 #include "qsl/utils/misc.hpp"
+
+#include "cmake_defines.hpp"
 
 /**
  * \brief Apply the Pauli X gate to qubit number targ.
@@ -191,12 +192,11 @@ std::vector<double> makeRandomState(std::uint8_t nqubits)
 
 int main()
 {
-    std::uint8_t nqubits = 12;
-    //std::size_t dim = 1 << nqubits;
+    // Number of qubits and test length
+    const std::uint8_t nqubits = NUM_QUBITS;
+    const std::size_t test_length = TEST_LEN;
     
     std::cout << "Generating random vectors..." << std::endl;
-    // Length of random tests
-    std::size_t test_length = 20000;
     
     // Make a list of random state vectors
     std::vector<std::vector<double>> state_list;

@@ -24,7 +24,7 @@
 
 #include <vector>
 #include <iostream>
-#include <complex>
+#include <qsl::complex>
 #include <bitset>
 #include <cstddef>
 #include <cmath>
@@ -33,12 +33,14 @@
 #include "qsl/utils/timer.hpp"
 #include <QuEST.h>
 
+#include "cmake_defines.hpp"
+
 using complex = std::complex<double>;
 
 /**
  * \brief Apply the Pauli X gate to qubit number targ.
  */
-void pauliX(std::vector<complex> &state, std::uint8_t targ)
+void pauliX(std::vector<qsl::complex> &state, std::uint8_t targ)
 {
     std::size_t k = 1 << targ;
     for (std::size_t s = 0; s < state.size(); s += 2*k) { 
@@ -58,7 +60,7 @@ void pauliX(std::vector<complex> &state, std::uint8_t targ)
 /**
  * \brief Apply a phase shift to qubit number targ.
  */
-void phaseShift(std::vector<complex> &state, std::uint8_t targ, double angle)
+void phaseShift(std::vector<qsl::complex> &state, std::uint8_t targ, double angle)
 {
     complex phase = complex(std::cos(angle), std::sin(angle));
     
@@ -77,7 +79,7 @@ void phaseShift(std::vector<complex> &state, std::uint8_t targ, double angle)
 /**
  * \brief Normalise the state vector.
  */
-double normalise(std::vector<complex> &state)
+double normalise(std::vector<qsl::complex> &state)
 {
     // Find the norm of the vector
     double norm = 0;
@@ -115,7 +117,7 @@ double makeRandomNumber(double a, double b) {
 /**
  * \brief Make a random state vector with nqubits
  */
-std::vector<complex> makeRandomState(std::uint8_t nqubits)
+std::vector<qsl::complex> makeRandomState(std::uint8_t nqubits)
 {
     std::size_t dim = 1 << nqubits;
     // Make the random int generator from -500 to 500
@@ -123,11 +125,11 @@ std::vector<complex> makeRandomState(std::uint8_t nqubits)
     std::default_random_engine generator(r());
     std::uniform_int_distribution<int> distribution(-500,500);
 
-    std::vector<complex> state;
+    std::vector<qsl::complex> state;
     for(std::size_t i=0; i<dim; i++) {
 	double val_real = static_cast<double>(distribution(generator)) / 500;
 	double val_imag = static_cast<double>(distribution(generator)) / 500;
-	state.push_back(complex(val_real, val_imag));
+	state.push_back(qsl::complex(val_real, val_imag));
     }
 
     // Normalise the state vector
@@ -139,16 +141,17 @@ std::vector<complex> makeRandomState(std::uint8_t nqubits)
 
 int main()
 {
-    std::uint8_t nqubits = 12;
-    std::size_t dim = 1 << nqubits;
 
+    // Number of qubits and test length
+    const std::uint8_t nqubits = NUM_QUBITS;
+    const std::size_t test_length = TEST_LEN;
+    
+    std::size_t dim = 1 << nqubits;
     
     std::cout << "Generating random vectors..." << std::endl;
-    // Length of random tests
-    std::size_t test_length = 20000;
     
     // Make a list of random state vectors
-    std::vector<std::vector<complex>> state_list;
+    std::vector<std::vector<qsl::complex>> state_list;
     for(std::size_t k=0; k<test_length; k++) {
 	state_list.push_back(makeRandomState(nqubits));
     }

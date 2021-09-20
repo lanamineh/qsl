@@ -35,6 +35,8 @@
 #include "qsl/utils/timer.hpp"
 #include "qsl/utils/misc.hpp"
 
+#include "cmake_defines.hpp"
+
 struct State
 {
     std::vector<double> real;
@@ -199,12 +201,11 @@ State makeRandomState(std::uint8_t nqubits)
 
 int main()
 {
-    std::uint8_t nqubits = 12;
-    //std::size_t dim = 1 << nqubits;
+    // Number of qubits and test length
+    const std::uint8_t nqubits = NUM_QUBITS;
+    const std::size_t test_length = TEST_LEN;
     
     std::cout << "Generating random vectors..." << std::endl;
-    // Length of random tests
-    std::size_t test_length = 20000;
     
     // Make a list of random state vectors
     std::vector<State> state_list;

@@ -27,6 +27,7 @@
 #define QSL_COMPLEX_HPP
 
 #include <ostream>
+#include <concepts>
 
 namespace qsl {
 

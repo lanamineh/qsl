@@ -37,13 +37,14 @@
 #include "qsl/utils/quantum.hpp"
 #include "qsl/utils/random.hpp"
 
+#include "cmake_defines.hpp"
 
 /**
  * \brief Apply a phase shift to qubit number targ.
  */
-void phaseShift(std::vector<complex<double>> &state, std::uint8_t targ, double angle)
+void phaseShift(std::vector<qsl::complex<double>> &state, std::uint8_t targ, double angle)
 {
-    const complex<double> phase = complex<double>(std::cos(angle), std::sin(angle));
+    const qsl::complex<double> phase = qsl::complex<double>(std::cos(angle), std::sin(angle));
     
     std::size_t k = 1 << targ;
     for (std::size_t s = 0; s < state.size(); s += 2*k) { 
@@ -52,7 +53,7 @@ void phaseShift(std::vector<complex<double>> &state, std::uint8_t targ, double a
 	    std::size_t index = s + k + r;
 
 	    //state[index] *= phase;
-	    complex<double> temp = state[index];
+	    qsl::complex<double> temp = state[index];
 	    state[index].real = phase.real * temp.real - phase.imag * temp.imag;
 	    state[index].imag = phase.real * temp.imag + phase.imag * temp.real;
 	}
@@ -62,15 +63,14 @@ void phaseShift(std::vector<complex<double>> &state, std::uint8_t targ, double a
 
 int main()
 {
-    std::uint8_t nqubits = 12;
-    std::size_t dim = 1 << nqubits;
+    // Number of qubits and test length
+    const std::uint8_t nqubits = NUM_QUBITS;
+    const std::size_t test_length = TEST_LEN;
     
     std::cout << "Generating random vectors..." << std::endl;
-    // Length of random tests
-    std::size_t test_length = 20000;
     
     // Make a list of random state vectors
-    std::vector<std::vector<complex<double>>> state_list;
+    std::vector<std::vector<qsl::complex<double>>> state_list;
     for(std::size_t k=0; k<test_length; k++) {
 	state_list.push_back(makeRandomState(nqubits));
     }

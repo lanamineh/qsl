@@ -1,0 +1,7 @@
+#ifndef CMAKE_DEFINES
+#define CMAKE_DEFINES
+
+#define NUM_QUBITS @NUM_QUBITS@
+#define TEST_LEN @TEST_LEN@
+
+#endif
