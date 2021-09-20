@@ -106,17 +106,33 @@ void rotateX(std::vector<complex> &state, std::uint8_t targ, double angle)
 	    std::size_t index_0 = s + r;
 	    std::size_t index_1 = s + k + r;
 
+	    // // Store the values of |0> and |1> amplitudes
+	    // complex a0 = state[index_0];
+	    // complex a1 = state[index_1];
+
+	    // // Write the new |0> amplitude
+	    // state[index_0].real = a0.real * cos + a1.imag * sin;
+	    // state[index_0].imag = a0.imag * cos - a1.real * sin;
+
+	    // // Write the new |1> amplitude
+	    // state[index_1].real = a1.real * cos + a0.imag * sin;
+	    // state[index_1].imag = a1.imag * cos - a0.real * sin;	    
+
 	    // Store the values of |0> and |1> amplitudes
-	    complex a0 = state[index_0];
-	    complex a1 = state[index_1];
+	    double a0r = state[index_0].real;
+	    double a0i = state[index_0].imag;
+	    double a1r = state[index_1].real;
+	    double a1i = state[index_1].imag;
 
 	    // Write the new |0> amplitude
-	    state[index_0].real = a0.real * cos + a1.imag * sin;
-	    state[index_0].imag = a0.imag * cos - a1.real * sin;
+	    state[index_0].real = a0r * cos + a1i * sin;
+	    state[index_0].imag = a0i * cos - a1r * sin;
 
 	    // Write the new |1> amplitude
-	    state[index_1].real = a1.real * cos + a0.imag * sin;
-	    state[index_1].imag = a1.imag * cos - a0.real * sin;	    
+	    state[index_1].real = a1r * cos + a0i * sin;
+	    state[index_1].imag = a1i * cos - a0r * sin;	    
+
+
 	}
     }
 }
