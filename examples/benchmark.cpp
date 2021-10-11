@@ -17,7 +17,7 @@ int main ()
     auto result = verify.check<qsl::DefaultGateChecker>();
     result.at("phase").print();
 	
-    qsl::Compare<qsl::Test::SingleSim,Sim1, Sim2> cmp{8,100};
+    qsl::Compare<qsl::Test::SingleSim,Sim1, Sim2> cmp{16,100};
     cmp.phase();
     cmp.pauliX();
     cmp.rotateX();

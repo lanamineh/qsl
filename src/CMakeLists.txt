@@ -3,11 +3,22 @@ set(UTILS_SRC utils/complex.cpp utils/quantum.cpp
   utils/timer.cpp utils/misc.cpp utils/random.cpp
   utils/print.cpp)
 
+# Threads source file list
+set(THREADS_SRC threads/joiner.cpp threads/pool.cpp)
+
 # Qubits object source file list
 set(QUBITS_SRC qubits/default/default.cpp qubits/default/gates.cpp qubits/default/measure.cpp qubits/omp/omp.cpp qubits/omp/gates.cpp qubits/omp/measure.cpp qubits/np/np.cpp qubits/np/gates.cpp qubits/np/measure.cpp qubits/resize/resize.cpp qubits/resize/gates.cpp qubits/resize/measure.cpp qubits/omp_np/omp_np.cpp qubits/omp_np/gates.cpp qubits/omp_np/measure.cpp qubits/experimental/experimental.cpp qubits/experimental/gates.cpp qubits/experimental/measure.cpp)
 
+# set(QUBITS_SRC qubits/default/default.cpp qubits/omp/omp.cpp qubits/np/np.cpp
+# qubits/qubits_thread.cpp qubits/qubits_asm.cpp qubits/x86_64/pauliX.S qubits/x86_64/rotateX.S)
+
 # Make the utilities library
 add_library(utils ${UTILS_SRC})
+
+# Make the threads library
+find_package(Threads REQUIRED)
+add_library(threads ${THREADS_SRC})
+target_link_libraries(threads PRIVATE Threads::Threads)
 
 # Make the qubits library
 find_package(OpenMP REQUIRED)
