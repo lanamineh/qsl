@@ -51,6 +51,7 @@ namespace qsl {
 	NP, ///< Number preserving simulator
 	OmpNP, ///< Number preserving simulator with multithreading
 	Resize, ///< Resizeable simulator
+	Experimental, ///< Experimenting with different implementations
     };
 
     /**
@@ -73,6 +74,7 @@ namespace qsl {
 #include "qubits/np.hpp"
 #include "qubits/omp_np.hpp"
 #include "qubits/resize.hpp"
+#include "qubits/experimental.hpp"
 
 namespace qsl {
 

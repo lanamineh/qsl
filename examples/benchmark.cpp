@@ -1,15 +1,23 @@
 #include "qsl/qubits.hpp"
 #include "qsl/benchmark/compare.hpp"
 #include "qsl/benchmark/time.hpp"
+#include "qsl/verify.hpp"
 
 int main ()
 {
     unsigned nqubits = 3;
     qsl::Qubits<qsl::Type::Default, double> q{nqubits};
 
-    qsl::Compare<qsl::Test::SingleSim,
-		 qsl::Qubits<qsl::Type::Omp, double>,
-		 qsl::Qubits<qsl::Type::Default, double>> cmp{16,100};
+    using Sim1 = qsl::Qubits<qsl::Type::Experimental, double>;
+    using Sim2 = qsl::Qubits<qsl::Type::Default, double>;
+    
+    qsl::Verify<Sim1, Sim2, qsl::DefaultStateGen<double>,
+		qsl::DefaultGateChecker> verify;
+    verify.configureState(12);
+    auto result = verify.check<qsl::DefaultGateChecker>();
+    result.at("phase").print();
+	
+    qsl::Compare<qsl::Test::SingleSim,Sim1, Sim2> cmp{8,100};
     cmp.phase();
     cmp.pauliX();
     cmp.rotateX();
