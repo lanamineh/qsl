@@ -31,11 +31,11 @@ Full documentation for how to install and use the library is contained in the [d
 
 # Try it out: quick installation
 
-If you want to get the library up and running quickly to try it out, follow these instructions on a recent Linux distribution. To install the prerequisite `g++-10` compiler and `cmake` build system, run
+If you want to get the library up and running quickly to try it out, follow these instructions. You need a linux distribution based on **Ubuntu 20.04 LTS** or more recent. If you are using a distribution based on Ubuntu 18.04, you can still install the library, but you will need to install some recent packages not on the package manager. Have a look at the instructions [below](#installation-using-ubuntu-1804-lts) for what to do.
+
+To install the prerequisite `g++-10` compiler and `cmake` build system, run
 
 ```bash
-sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-sudo apt update
 sudo apt install gcc-10 g++-10 cmake
 ```
 
@@ -46,7 +46,7 @@ mkdir build # Make a build directory
 cd build # Change to the build directory
 CC=gcc-10 CXX=g++-10 cmake .. # Configure the build to use g++-10
 cmake --build . # Build the library
-sudo cmake --build . --target install # Install the library to /usr/include/ and /usr/lib/
+sudo cmake --install . # Install the library to /usr/include/ and /usr/lib/
 ```
 
 Now you should be able to compile the example above using the following line (assuming its in a file called main.cpp):
@@ -56,6 +56,7 @@ g++-10 -std=c++20 main.cpp -lqsl
 ```
 
 If you encounter any errors, have a look at the documentation for more detailed installation instructions. 
+
 
 # How to remove the library
 
@@ -68,3 +69,25 @@ sudo rm /usr/lib/libqsl.so # Remove the shared object file
 
 You can also delete the repository you cloned.
 
+# Installation using Ubuntu 18.04 LTS
+
+To build the library, you will need to install gcc-10, g++-10. Run the following commands to install the compilers:
+
+```bash
+# This will work on Ubuntu 18.04, but not on Ubuntu 16.04.
+sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+sudo apt update
+sudo apt install gcc-10 g++-10
+```
+
+You will need to install cmake version 3.12.4 or more recent. See the [instructions for doing this](https://qsl.readthedocs.io/en/latest/install.html#cmake-at-least-version-3-12-4) in the main documentation.
+
+Now you should be able to build the library using the following commands:
+
+```bash
+mkdir build # Make a build directory
+cd build # Change to the build directory
+CC=gcc-10 CXX=g++-10 cmake .. # Configure the build to use g++-10
+cmake --build . # Build the library
+sudo cmake --build . --target install # Install the library to /usr/include/ and /usr/lib/
+```
