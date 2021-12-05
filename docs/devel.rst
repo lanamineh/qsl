@@ -190,13 +190,21 @@ Interface Improvements
 **********************
 
 * Do something about the really long type names! (general redesign required)
-* ALlow copy-construction and copy-assignment between different simulator types (if they make sense). 
+* Allow copy-construction and copy-assignment between different simulator types (if they make sense). 
 * Consider making postselect and measure both return the outcome (even though it is redundant in the former case) to avoid possible mistakes mixing up returned value (outcome vs. probability). Might not be worth it though.
+* Overload ``qsl::norm``, ``qsl::distance``, etc. to take simulators as arguments. Allow different types of simulators to be compared
+* Finish off the integration of concepts
 
 Functionality Improvements
 **************************
 
 * Add the ability to perform a read-only measureOut operation in the resize simulator, that returns the state which would be obtained by the measureOut, but which does not modify the simulator state (or number of qubits). (This function should work a bit like the sample functions.)
+* Add an easy way to turn on a debugging mode which throws exceptions for out-of-bounds indices, etc., which does not introduce a performance penalty when it is not required. 
+
+Implementation Improvements
+***************************
+
+* Add SSE and AVX support to the simulators
   
 Version 0.1
 ===========
