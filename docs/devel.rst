@@ -178,6 +178,33 @@ Template files
 
 Template files (``.tpp``) should contain implementations of template functions, analogously to ``.cpp`` files. However, they should be wrapped in header guards and included at the end of their corresponding header file. Template files do not need extensive comments.
 
+Release Planning
+################
+
+Change proposals
+================
+
+This section contains unsorted proposals. Things here should be moved into the the sections for each version according to when it would be best incorporated.
+
+Interface Improvements
+**********************
+
+* Do something about the really long type names! (general redesign required)
+* ALlow copy-construction and copy-assignment between different simulator types (if they make sense). 
+* Consider making postselect and measure both return the outcome (even though it is redundant in the former case) to avoid possible mistakes mixing up returned value (outcome vs. probability). Might not be worth it though.
+
+Functionality Improvements
+**************************
+
+* Add the ability to perform a read-only measureOut operation in the resize simulator, that returns the state which would be obtained by the measureOut, but which does not modify the simulator state (or number of qubits). (This function should work a bit like the sample functions.)
+  
+Version 0.1
+===========
+
+The following changes should be included in the release.
+
+* Change ``qsl::complex`` struct to ``std::complex`` throughout program. Test there is no performance reduction.
+
 Notes
 #####
 
