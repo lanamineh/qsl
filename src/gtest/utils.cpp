@@ -190,7 +190,6 @@ TYPED_TEST(FpUtilities, FubiniStudySimulatorTest)
     EXPECT_NEAR(a, b, 1e-13);
 }
 
-
 /// Check the next (number with fixed number of ones) function
 TEST(Utilities, NextFunctionTest)
 {
