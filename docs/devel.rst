@@ -194,17 +194,27 @@ Interface Improvements
 * Consider making postselect and measure both return the outcome (even though it is redundant in the former case) to avoid possible mistakes mixing up returned value (outcome vs. probability). Might not be worth it though.
 * Overload ``qsl::norm``, ``qsl::distance``, etc. to take simulators as arguments. Allow different types of simulators to be compared
 * Finish off the integration of concepts
+* Make good use of language helper features -- for example, attributes like nodiscard, check everything is const if it can be, check if any arguments can be made explicit, passed by reference, etc.
 
 Functionality Improvements
 **************************
 
 * Add the ability to perform a read-only measureOut operation in the resize simulator, that returns the state which would be obtained by the measureOut, but which does not modify the simulator state (or number of qubits). (This function should work a bit like the sample functions.)
 * Add an easy way to turn on a debugging mode which throws exceptions for out-of-bounds indices, etc., which does not introduce a performance penalty when it is not required. 
+* Add measurement in an arbitrary basis. For example, specify the Euler angles, or have a few specific measurement types (e.g. measureX, measureY maybe). Maybe have some way to perform multi-qubit measurements? Needs a bit of thinking about.
+* Add arbitrary one- and two-qubit gates.
 
 Implementation Improvements
 ***************************
 
-* Add SSE and AVX support to the simulators
+* Add SSE, AVX and GPU support to the simulators.
+* Investigate whether the parallelisation (using openmp) is optimal.
+* Check if binary search from standard library can replace manual version.
+  
+Unbreak Immediately!
+********************
+
+* We have a sampleAll and a sampleAll2 function!
   
 Version 0.1
 ===========
@@ -212,6 +222,7 @@ Version 0.1
 The following changes should be included in the release.
 
 * Change ``qsl::complex`` struct to ``std::complex`` throughout program. Test there is no performance reduction.
+* Add some more access functions e.g. ``getAmplitude``, etc.
 
 Notes
 #####
