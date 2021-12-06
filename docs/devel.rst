@@ -195,6 +195,8 @@ Interface Improvements
 * Overload ``qsl::norm``, ``qsl::distance``, etc. to take simulators as arguments. Allow different types of simulators to be compared
 * Finish off the integration of concepts
 * Make good use of language helper features -- for example, attributes like nodiscard, check everything is const if it can be, check if any arguments can be made explicit, passed by reference, etc.
+* Consider renaming ``qsl::fubiniStudy`` to ``qsl::distance``, since we only have one distance, and probably won't add more.
+* Consider renaming ``qsl::makeRandomState`` to ``qsl::randomState``.
 
 Functionality Improvements
 **************************
