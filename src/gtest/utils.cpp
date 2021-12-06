@@ -26,6 +26,7 @@
 #include <qsl/utils.hpp>
 #include <list>
 #include <sstream>
+#include <qsl/qubits.hpp>
 
 /**
  * \brief Typed test suite for the floating point utilities
@@ -78,6 +79,8 @@ TYPED_TEST(FpUtilities, VectorSubtraction)
     // Cannot subtract vectors of different sizes
     EXPECT_THROW(state1 - state2, std::logic_error);  
 }
+
+
 
 /// Test the convertState function
 TEST(Utilities, ConvertStateTest)
@@ -163,8 +166,30 @@ TYPED_TEST(FpUtilities, FubiniStudyTest)
     TypeParam scaled_distance_a_b = fubiniStudy(a,TypeParam_b);
 
     EXPECT_NEAR(std::abs(distance_a_b - scaled_distance_a_b), 0, 1e-13);
-    
 }
+
+/// Simulator distances
+TYPED_TEST(FpUtilities, FubiniStudySimulatorTest)
+{
+    qsl::Qubits<qsl::Type::Default, TypeParam> q1{3};
+    qsl::Qubits<qsl::Type::Resize, TypeParam> q2{3};
+    
+    // Test that distance between equal simulators is zero
+    EXPECT_NEAR(fubiniStudy(q1,q2), 0, 1e-13);
+
+    // Perform some gates
+    q1.rotateX(0, 1.2);
+    q1.rotateY(1, -0.3);
+    q1.rotateZ(2, 2.4);
+
+    // Check that the fubini-study distance for the simulators
+    // comes out the same as for the vectors
+    TypeParam a = fubiniStudy(q1,q2);
+    TypeParam b = fubiniStudy(q1.getState(),q2.getState());
+    
+    EXPECT_NEAR(a, b, 1e-13);
+}
+
 
 /// Check the next (number with fixed number of ones) function
 TEST(Utilities, NextFunctionTest)

@@ -126,7 +126,7 @@ namespace qsl {
     template<std::floating_point Fp = double>
     Fp fubiniStudy(const std::vector<complex<Fp>> & v,
 		   const std::vector<complex<Fp>> & w);
-
+    
     /**
      * \brief Normalise the state vector.
      */

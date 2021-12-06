@@ -74,6 +74,8 @@ namespace qsl {
 #include "qubits/omp_np.hpp"
 #include "qubits/resize.hpp"
 
+#include "concepts.hpp"
+
 namespace qsl {
 
     ///\todo Maybe these typedefs are a bad idea?
@@ -86,5 +88,14 @@ namespace qsl {
     template<typename Sim, typename... Args>
     using TwoQubitGate = Gate<Sim, unsigned, unsigned, Args...>;
 
+
+    ///\todo Maybe this should go in utils?
+    template<Simulator S1, Simulator S2>
+    requires std::is_same_v<typename S1::Fp_type, typename S2::Fp_type>
+    S1::Fp_type fubiniStudy(const S1 & s1, const S2 & s2)
+    {
+	return qsl::fubiniStudy(s1.getState(), s2.getState());
+    }
+    
 }
 #endif
