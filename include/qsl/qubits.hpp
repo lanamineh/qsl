@@ -27,6 +27,11 @@
 
 #include <concepts>
 
+///\todo At the moment this is only required because of the use
+/// of fubiniStudy in the template function below. Maybe the
+/// fubiniStudy function should be moved somewhere else.
+#include <qsl/utils.hpp>
+
 namespace qsl {
     /**
      * \defgroup gates Quantum gates
@@ -87,7 +92,6 @@ namespace qsl {
 
     template<typename Sim, typename... Args>
     using TwoQubitGate = Gate<Sim, unsigned, unsigned, Args...>;
-
 
     ///\todo Maybe this should go in utils?
     template<Simulator S1, Simulator S2>
