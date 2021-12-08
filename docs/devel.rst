@@ -197,7 +197,8 @@ Interface Improvements
 * Make good use of language helper features -- for example, attributes like nodiscard, check everything is const if it can be, check if any arguments can be made explicit, passed by reference, etc.
 * Consider renaming ``qsl::fubiniStudy`` to ``qsl::distance``, since we only have one distance, and probably won't add more.
 * Consider renaming ``qsl::makeRandomState`` to ``qsl::randomState``.
-
+* Consider changing ``getNumQubits()`` to ``size()``. The disadvantage is it might be confused with ``getDimension()``. At the least, those member functions could probably do without the ``get``. 
+  
 Functionality Improvements
 **************************
 
