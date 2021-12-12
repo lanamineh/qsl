@@ -58,10 +58,9 @@ public:
     
 };
 
-template<std::floating_point Fp>
-class SequentialStateSetter : public Base<Fp>
+template<std::floating_point Fp, bool Debug = false>
+struct SequentialStateSetter : public Base<Fp>
 {
-public:
     void setState(const std::vector<Fp> & new_state)
     	{
 	    Base<Fp>::state = new_state;
@@ -69,6 +68,18 @@ public:
 };
 
 template<std::floating_point Fp>
+struct SequentialStateSetter<Fp, true> : public Base<Fp>
+{
+    void setState(const std::vector<Fp> & new_state)
+    	{
+	    if (new_state.size() != Base<Fp>::state.size()) {
+		throw std::logic_error("Cannot set state: wrong dimension");
+	    }
+	    Base<Fp>::state = new_state;
+    	}    
+};
+
+template<std::floating_point Fp, bool Debug>
 class OmpStateSetter : public Base<Fp>
 {
 public:
@@ -83,9 +94,28 @@ public:
 	}
 };
 
-template<std::floating_point Fp,
-	 template<std::floating_point> class StateSetterPolicy>
-class BetterBase : public StateSetterPolicy<Fp>
+template<std::floating_point Fp>
+class OmpStateSetter<Fp, true> : public Base<Fp>
+{
+public:
+    void setState(const std::vector<Fp> & new_state)
+    	{
+	    if (new_state.size() != Base<Fp>::state.size()) {
+		throw std::logic_error("Cannot set state: wrong dimension");
+	    }
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+	    for (std::size_t index = 0; index < Base<Fp>::dim; index++) {
+		Base<Fp>::state[index] = new_state[index];
+	    }
+	}
+};
+
+
+template<std::floating_point Fp, bool Debug,
+	 template<std::floating_point, bool> class StateSetterPolicy>
+class BetterBase : public StateSetterPolicy<Fp, Debug>
 {
 #ifndef _OPENMP
     static_assert(not std::is_same_v<StateSetterPolicy<Fp>, OmpStateSetter<Fp>>,
@@ -94,29 +124,19 @@ class BetterBase : public StateSetterPolicy<Fp>
 #endif
 };
 
-// struct Omp_Yes
-// {
-//     using SetStatePolicy = OmpSetStatePolicy;
-// };
-
-// struct Omp_No
-// {
-//     using SetStatePolicy = SequentialSetStatePolicy;
-// };
-
-template<std::floating_point Fp,
-	 template <std::floating_point> class StateSetterPolicy = SequentialStateSetter>
-class Generic : public BetterBase<Fp, StateSetterPolicy>
+template<std::floating_point Fp, bool Debug,
+	 template <std::floating_point, bool> class StateSetterPolicy = SequentialStateSetter>
+class Generic : public BetterBase<Fp, Debug, StateSetterPolicy>
 {
     
 };
 
 int main()
 {
-    Generic<double, OmpStateSetter> q{2};
+    Generic<double, true, OmpStateSetter> q{2};
     q.print();
 
-    q.setState({1,0,0,1});
+    q.setState({1,0,0});
     q.print();
 }
 
