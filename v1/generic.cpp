@@ -1,33 +1,15 @@
 #include <vector>
 #include <iostream>
 
-// struct SequentialSetStatePolicy
-// {
-//     template<std::floating_point Fp>
-//     static void setState([[maybe_unused]] std::size_t dim,
-// 			 std::vector<Fp> & state,
-// 			 const std::vector<Fp> & new_state)
-// 	{
-// 	    state = new_state;
-// 	}
-// };
-
-// struct OmpSetStatePolicy
-// {
-//     template<std::floating_point Fp>
-//     static void setState(std::size_t dim,
-// 			 std::vector<Fp> & state,
-// 			 const std::vector<Fp> & new_state)
-// 	{
-// #pragma omp parallel for
-// 	    for (std::size_t index= 0; index < dim; index++) {
-// 		state[index] = new_state[index];
-// 	    }
-// 	}
-// };
-
-
-
+/**
+ * \brief Base class for quantum simulators
+ *
+ * Contains only methods which do not depend on any template
+ * parameter other than the floating-point precision. The class
+ * is augmented with other classes which specify other parts of
+ * the behaviour of the simulation.
+ *
+ */
 template<std::floating_point Fp>
 class Base
 {
@@ -49,59 +31,44 @@ public:
 	    for (std::size_t index = 0; index < dim; index++) {
 		std::cout << index << ": " << state[index] << std::endl;
 	    }
-	}
-
-    // void setState(const std::vector<Fp> & new_state)
-    // 	{
-    // 	    SetStatePolicy::template setState<Fp>(dim, state, new_state);
-    // 	}
-    
+	}  
 };
 
-template<std::floating_point Fp, bool Debug = false>
+/**
+ * \brief Set the state to a particular value
+ *
+ * This class sets the state sequentially (without OpenMP). A bool is used
+ * to specify whether debugging checks should be performed.
+ *
+ */
+template<std::floating_point Fp, bool Debug>
 struct SequentialStateSetter : public Base<Fp>
 {
     void setState(const std::vector<Fp> & new_state)
     	{
+	    if constexpr (Debug == true) {
+		if (new_state.size() != Base<Fp>::state.size()) {
+		    throw std::logic_error("Cannot set state: wrong dimension");
+		}
+	    }
 	    Base<Fp>::state = new_state;
     	}
 };
 
-template<std::floating_point Fp>
-struct SequentialStateSetter<Fp, true> : public Base<Fp>
-{
-    void setState(const std::vector<Fp> & new_state)
-    	{
-	    if (new_state.size() != Base<Fp>::state.size()) {
-		throw std::logic_error("Cannot set state: wrong dimension");
-	    }
-	    Base<Fp>::state = new_state;
-    	}    
-};
-
+/**
+ * \brief Same set state function but uses OpenMP
+ *
+ */
 template<std::floating_point Fp, bool Debug>
 class OmpStateSetter : public Base<Fp>
 {
 public:
     void setState(const std::vector<Fp> & new_state)
     	{
-#ifdef _OPENMP
-#pragma omp parallel for
-#endif
-	    for (std::size_t index = 0; index < Base<Fp>::dim; index++) {
-		Base<Fp>::state[index] = new_state[index];
-	    }
-	}
-};
-
-template<std::floating_point Fp>
-class OmpStateSetter<Fp, true> : public Base<Fp>
-{
-public:
-    void setState(const std::vector<Fp> & new_state)
-    	{
-	    if (new_state.size() != Base<Fp>::state.size()) {
-		throw std::logic_error("Cannot set state: wrong dimension");
+	    if constexpr (Debug == true) {
+		if (new_state.size() != Base<Fp>::state.size()) {
+		    throw std::logic_error("Cannot set state: wrong dimension");
+		}
 	    }
 #ifdef _OPENMP
 #pragma omp parallel for
@@ -111,7 +78,6 @@ public:
 	    }
 	}
 };
-
 
 template<std::floating_point Fp, bool Debug,
 	 template<std::floating_point, bool> class StateSetterPolicy>
@@ -133,7 +99,7 @@ class Generic : public BetterBase<Fp, Debug, StateSetterPolicy>
 
 int main()
 {
-    Generic<double, true, OmpStateSetter> q{2};
+    Generic<double, false, OmpStateSetter> q{2};
     q.print();
 
     q.setState({1,0,0});
