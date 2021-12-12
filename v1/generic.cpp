@@ -31,15 +31,6 @@ public:
     Base(unsigned num_qubits_in)
 	: num_qubits{num_qubits_in}, dim{ 1UL << num_qubits }, state(dim)
 	{}
-
-    std::size_t dimension() const { return dim; }
-    void print() const
-	{
-	    std::cout << "State on " << num_qubits << " qubits:" << std::endl;
-	    for (std::size_t index = 0; index < dim; index++) {
-		std::cout << index << ": " << state[index] << std::endl;
-	    }
-	}  
 };
 
 /**
@@ -51,7 +42,7 @@ public:
  *
  */
 template<std::floating_point Fp>
-struct StateSetter : virtual public Base<Fp>
+struct StateSetter : virtual private Base<Fp>
 {
     void checkInputState(const std::vector<Fp> & new_state) const {
 
@@ -72,7 +63,7 @@ struct StateSetter : virtual public Base<Fp>
  *
  */
 template<std::floating_point Fp, bool Debug>
-struct SequentialStateSetter : public StateSetter<Fp>
+struct SequentialStateSetter : virtual private Base<Fp>, public StateSetter<Fp>
 {
     void setState(const std::vector<Fp> & new_state)
     	{
@@ -88,7 +79,7 @@ struct SequentialStateSetter : public StateSetter<Fp>
  *
  */
 template<std::floating_point Fp, bool Debug>
-class OmpStateSetter : public StateSetter<Fp>
+class OmpStateSetter : virtual private Base<Fp>, public StateSetter<Fp>
 {
 public:
     void setState(const std::vector<Fp> & new_state)
@@ -113,7 +104,7 @@ public:
  *
  */
 template<std::floating_point Fp>
-struct SequentialStateResetter : virtual public Base<Fp>
+struct SequentialStateResetter : virtual private Base<Fp>
 {
     void reset()
     	{
@@ -126,7 +117,7 @@ struct SequentialStateResetter : virtual public Base<Fp>
 
 /// OMP state resetter
 template<std::floating_point Fp>
-class OmpStateResetter : virtual public Base<Fp>
+class OmpStateResetter : virtual private Base<Fp>
 {
 public:
     void reset()
@@ -144,7 +135,8 @@ public:
 template<std::floating_point Fp, bool Debug,
 	 template<std::floating_point, bool> class StateSetterPolicy,
 	 template<std::floating_point> class StateResetterPolicy>
-class BetterBase : public StateSetterPolicy<Fp, Debug>,
+class BetterBase : virtual private Base<Fp>,
+		   public StateSetterPolicy<Fp, Debug>,
 		   public StateResetterPolicy<Fp> 
 {
 #ifndef _OPENMP
@@ -153,6 +145,19 @@ class BetterBase : public StateSetterPolicy<Fp, Debug>,
 		  "You have requested an OpenMP implementation, but _OPENMP "
 		  "is not defined. Did you forget -fopenmp?");
 #endif
+
+public:
+    std::size_t dimension() const { return Base<Fp>::dim; }
+    void print() const
+	{
+	    std::cout << "State on " << Base<Fp>::num_qubits
+		      << " qubits:" << std::endl;
+	    for (std::size_t index = 0; index < Base<Fp>::dim; index++) {
+		std::cout << index << ": " << Base<Fp>::state[index] << std::endl;
+	    }
+	}  
+
+    
 };
 
 /**
@@ -198,4 +203,3 @@ int main()
     q.print();
 
 }
-
