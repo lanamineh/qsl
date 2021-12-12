@@ -14,12 +14,20 @@ template<std::floating_point Fp>
 class Base
 {
 protected:
-    unsigned num_qubits;
-    std::size_t dim;
+    unsigned num_qubits = 0;
+    std::size_t dim = 0;
     std::vector<Fp> state{};
     
 public:
 
+    /**
+     * \brief Default constructor to make the virtual inheritance happy...
+     *
+     * ...without going to the effort of writing all the non-default
+     * constructors in the derived classes, if that is what is needed.
+     * Need to figure out exactly what is best to do here.
+     */
+    Base() = default;
     Base(unsigned num_qubits_in)
 	: num_qubits{num_qubits_in}, dim{ 1UL << num_qubits }, state(dim)
 	{}
@@ -43,7 +51,7 @@ public:
  *
  */
 template<std::floating_point Fp>
-struct StateSetter : public Base<Fp>
+struct StateSetter : virtual public Base<Fp>
 {
     void checkInputState(const std::vector<Fp> & new_state) const {
 
@@ -97,9 +105,47 @@ public:
 	}
 };
 
+/**
+ * \brief Set the state to a particular value
+ *
+ * This class sets the state sequentially (without OpenMP). A bool is used
+ * to specify whether debugging checks should be performed.
+ *
+ */
+template<std::floating_point Fp>
+struct SequentialStateResetter : virtual public Base<Fp>
+{
+    void reset()
+    	{
+	    for (auto & amp : Base<Fp>::state) {
+		amp = 0;
+	    }
+	    Base<Fp>::state[0] = 1;
+    	}
+};
+
+/// OMP state resetter
+template<std::floating_point Fp>
+class OmpStateResetter : virtual public Base<Fp>
+{
+public:
+    void reset()
+    	{
+#ifdef _OPENMP
+#pragma omp parallel for
+#endif
+	    for (auto & amp : Base<Fp>::state) {
+		amp = 0;
+	    }
+	    Base<Fp>::state[0] = 1;
+	}
+};
+
 template<std::floating_point Fp, bool Debug,
-	 template<std::floating_point, bool> class StateSetterPolicy>
-class BetterBase : public StateSetterPolicy<Fp, Debug>
+	 template<std::floating_point, bool> class StateSetterPolicy,
+	 template<std::floating_point> class StateResetterPolicy>
+class BetterBase : public StateSetterPolicy<Fp, Debug>,
+		   public StateResetterPolicy<Fp> 
 {
 #ifndef _OPENMP
     static_assert(not std::is_same_v<StateSetterPolicy<Fp,Debug>,
@@ -117,27 +163,39 @@ struct Sequential
 {
     template<std::floating_point Fp, bool Debug>
     using StateSetterPolicy = SequentialStateSetter<Fp, Debug>;
+
+    template<std::floating_point Fp>
+    using StateResetterPolicy = SequentialStateResetter<Fp>;
 };
 
 struct Omp
 {
     template<std::floating_point Fp, bool Debug>
     using StateSetterPolicy = OmpStateSetter<Fp, Debug>;
+
+    template<std::floating_point Fp>
+    using StateResetterPolicy = OmpStateResetter<Fp>;
 };
 
-template<std::floating_point Fp, bool Debug = false, typename SeqPar = Sequential>
-class Generic : public BetterBase<Fp, Debug, SeqPar::template StateSetterPolicy>
+template<std::floating_point Fp, typename SeqPar = Sequential, bool Debug = false>
+class Generic : public BetterBase<Fp, Debug, SeqPar::template StateSetterPolicy,
+				  SeqPar::template StateResetterPolicy>
 {
-    
-};
 
+public:
+    Generic(unsigned num_qubits_in) : Base<Fp>{num_qubits_in} {}
+};
 
 int main()
 {
-    Generic<double, true, Sequential> q{2};
+    Generic<double, Omp, false> q{2};
+    q.print();
+    
+    q.setState({1,0,0,1});
     q.print();
 
-    q.setState({1,0,0,0});
+    q.reset();
     q.print();
+
 }
 
