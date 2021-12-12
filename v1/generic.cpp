@@ -35,6 +35,28 @@ public:
 };
 
 /**
+ * \brief StateSetter base class to provide generic functions
+ *
+ * This class contains the code for checking the input state. It 
+ * is used as a base class for the StateSetter implementations so
+ * that they do not have to duplicate the checking code.
+ *
+ */
+template<std::floating_point Fp>
+struct StateSetter : public Base<Fp>
+{
+    void checkInputState(const std::vector<Fp> & new_state) const {
+
+	// Check the state size
+	if (new_state.size() != Base<Fp>::state.size()) {
+	    throw std::logic_error("Cannot set state: wrong dimension");
+	}
+
+	// Check the input state is normalised? etc.
+    }
+};
+
+/**
  * \brief Set the state to a particular value
  *
  * This class sets the state sequentially (without OpenMP). A bool is used
@@ -42,14 +64,12 @@ public:
  *
  */
 template<std::floating_point Fp, bool Debug>
-struct SequentialStateSetter : public Base<Fp>
+struct SequentialStateSetter : public StateSetter<Fp>
 {
     void setState(const std::vector<Fp> & new_state)
     	{
 	    if constexpr (Debug == true) {
-		if (new_state.size() != Base<Fp>::state.size()) {
-		    throw std::logic_error("Cannot set state: wrong dimension");
-		}
+		StateSetter<Fp>::checkInputState(new_state);
 	    }
 	    Base<Fp>::state = new_state;
     	}
@@ -60,15 +80,13 @@ struct SequentialStateSetter : public Base<Fp>
  *
  */
 template<std::floating_point Fp, bool Debug>
-class OmpStateSetter : public Base<Fp>
+class OmpStateSetter : public StateSetter<Fp>
 {
 public:
     void setState(const std::vector<Fp> & new_state)
     	{
 	    if constexpr (Debug == true) {
-		if (new_state.size() != Base<Fp>::state.size()) {
-		    throw std::logic_error("Cannot set state: wrong dimension");
-		}
+		StateSetter<Fp>::checkInputState(new_state);		
 	    }
 #ifdef _OPENMP
 #pragma omp parallel for
@@ -84,25 +102,42 @@ template<std::floating_point Fp, bool Debug,
 class BetterBase : public StateSetterPolicy<Fp, Debug>
 {
 #ifndef _OPENMP
-    static_assert(not std::is_same_v<StateSetterPolicy<Fp>, OmpStateSetter<Fp>>,
+    static_assert(not std::is_same_v<StateSetterPolicy<Fp,Debug>,
+		  OmpStateSetter<Fp,Debug>>,
 		  "You have requested an OpenMP implementation, but _OPENMP "
 		  "is not defined. Did you forget -fopenmp?");
 #endif
 };
 
-template<std::floating_point Fp, bool Debug,
-	 template <std::floating_point, bool> class StateSetterPolicy = SequentialStateSetter>
-class Generic : public BetterBase<Fp, Debug, StateSetterPolicy>
+/**
+ * \brief A collection of all the settings required for sequential operation
+ *
+ */
+struct Sequential
+{
+    template<std::floating_point Fp, bool Debug>
+    using StateSetterPolicy = SequentialStateSetter<Fp, Debug>;
+};
+
+struct Omp
+{
+    template<std::floating_point Fp, bool Debug>
+    using StateSetterPolicy = OmpStateSetter<Fp, Debug>;
+};
+
+template<std::floating_point Fp, bool Debug = false, typename SeqPar = Sequential>
+class Generic : public BetterBase<Fp, Debug, SeqPar::template StateSetterPolicy>
 {
     
 };
 
+
 int main()
 {
-    Generic<double, false, OmpStateSetter> q{2};
+    Generic<double, true, Sequential> q{2};
     q.print();
 
-    q.setState({1,0,0});
+    q.setState({1,0,0,0});
     q.print();
 }
 
