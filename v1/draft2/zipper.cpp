@@ -142,10 +142,10 @@ struct meas3 {
 };
 
 
-typedef zipper<meas, meas, meas3> meas_type;
-typedef zipper<meas2, meas_type, meas2> meas_type2;
+using meas_type = zipper<meas, meas, meas3>;
+using meas_type_2 = zipper<meas2, meas_type, meas2>;
 
-using  nicer_meas_type2 = typename zipper <meas_type2 >::type;
+using  nicer_meas_type2 = typename zipper <meas_type2>::type;
 
 
 int main ( int, char** )

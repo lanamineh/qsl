@@ -37,25 +37,85 @@ class C : public Args...
     
 };
 
-template<typename... Args>
+template<typename... Others>
 struct TypeList
-{
-    using type = std::tuple<Args...>;
-}
+{};
 
-template<typename... Args>
-struct Deduce
+/// General case
+template<typename First, typename... Others>
+struct TypeList<First, Others...>
 {
-    C<double, Args...> c;
-    Deduce(std::tuple<Args...> &) {}
+    static void print()
+	{
+	    std::cout << typeid(First).name() << ",";
+	    TypeList<Others...>::print();
+	}
+};
+
+/// Base case
+template<>
+struct TypeList<>
+{
+    static void print()
+	{
+	    std::cout << std::endl;
+	}
 };
 
 
+
+
+template<typename TL_in, typename TL_out = TypeList<>>
+struct UniqueTypeList
+{};
+
+// Check whether type First is in typenames Others...
+template<typename First, typename... Others>
+static constexpr bool contains {
+    std::disjunction_v<std::is_same<First, Others>...>
+};
+
+
+template<typename First, typename... Others, typename... Pruned>
+struct UniqueTypeList<TypeList<First, Others...>, TypeList<Pruned...>>
+{    
+    // Whether to push the new type of not
+    static constexpr bool push = contains<First, Pruned...>;
+
+    // The new type including First
+    using WithFirst = TypeList<Pruned..., First>; 
+
+    // The new type excluding First
+    using WithoutFirst = TypeList<Pruned...>; 
+    
+    // The new typelist
+    using NewTypeList = std::conditional_t<push, WithoutFirst, WithFirst>;
+    
+    // Recursive traversal of the list
+    using next = UniqueTypeList<TypeList<Others...>, NewTypeList>::next;
+};
+
+template<typename... Pruned>
+struct UniqueTypeList<TypeList<>, TypeList<Pruned...>>
+{
+    // The new type excluding First
+    using next = TypeList<Pruned...>; 
+    
+    // No need -- Recursive traversal of the list
+    //using next = UniqueTypeList<TypeList<Others...>, NewTypeList>::next;
+};
+
 int main()
 {
-    C<double, A, B> c;
-    std::tuple<A,B> tuple;
-    Deduce d{tuple};
+    //C<double, A, B> c;
+    //std::tuple<A,B> tuple;
     //std::cout << c.a << std::endl;
     //std::cout << c.b << std::endl;
+
+    using TestTL = TypeList<double,int,float,double,double,int,unsigned,unsigned>;
+    
+    TestTL::print();
+
+    using UniqueTL = UniqueTypeList<TestTL>::next;
+    UniqueTL::print();
 }
