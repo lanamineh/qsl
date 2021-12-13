@@ -37,9 +37,25 @@ class C : public Args...
     
 };
 
+template<typename... Args>
+struct TypeList
+{
+    using type = std::tuple<Args...>;
+}
+
+template<typename... Args>
+struct Deduce
+{
+    C<double, Args...> c;
+    Deduce(std::tuple<Args...> &) {}
+};
+
+
 int main()
 {
     C<double, A, B> c;
+    std::tuple<A,B> tuple;
+    Deduce d{tuple};
     //std::cout << c.a << std::endl;
     //std::cout << c.b << std::endl;
 }
