@@ -18,6 +18,7 @@ public:
 
 class A
 {
+    using Default = A_def; 
 public:
     int a = 3;
     A() { std::cout << "A" << std::endl; }
@@ -25,6 +26,7 @@ public:
 
 class B
 {
+    using Default = B_def; 
 public:
     int b = 4;
     B() { std::cout << "B" << std::endl; }    
@@ -63,18 +65,15 @@ struct TypeList<>
 };
 
 
-
-
-template<typename TL_in, typename TL_out = TypeList<>>
-struct UniqueTypeList
-{};
-
 // Check whether type First is in typenames Others...
 template<typename First, typename... Others>
 static constexpr bool contains {
     std::disjunction_v<std::is_same<First, Others>...>
 };
 
+template<typename TL_in, typename TL_out = TypeList<>>
+struct UniqueTypeList
+{};
 
 template<typename First, typename... Others, typename... Pruned>
 struct UniqueTypeList<TypeList<First, Others...>, TypeList<Pruned...>>
@@ -100,9 +99,38 @@ struct UniqueTypeList<TypeList<>, TypeList<Pruned...>>
 {
     // The new type excluding First
     using next = TypeList<Pruned...>; 
+};
+
+template<typename Find, typename Replace,
+	 typename TL_in, typename TL_out = TypeList<>>
+struct ReplaceType
+{};
+
+template<typename Find, typename Replace,
+	 typename First, typename... Others, typename... Pruned>
+struct ReplaceType<Find, Replace, TypeList<First, Others...>, TypeList<Pruned...>>
+{    
+    // Check whether the next type First is equal to Find
+    static constexpr bool replace = std::is_same_v<Find, First>;
+
+    // The next type after replacing First with Replace
+    using WithReplace = TypeList<Pruned..., Replace>; 
+
+    // The type after leaving First alone
+    using WithFirst = TypeList<Pruned..., First>; 
     
-    // No need -- Recursive traversal of the list
-    //using next = UniqueTypeList<TypeList<Others...>, NewTypeList>::next;
+    // The new typelist
+    using NewTypeList = std::conditional_t<replace, WithReplace, WithFirst>;
+    
+    // Recursive traversal of the list
+    using next = ReplaceType<Find, Replace, TypeList<Others...>, NewTypeList>::next;
+};
+
+template<typename Find, typename Replace, typename... Pruned>
+struct ReplaceType<Find, Replace, TypeList<>, TypeList<Pruned...>>
+{
+    // The new type excluding First
+    using next = TypeList<Pruned...>; 
 };
 
 int main()
@@ -118,4 +146,7 @@ int main()
 
     using UniqueTL = UniqueTypeList<TestTL>::next;
     UniqueTL::print();
+
+    using ReplaceTL = ReplaceType<unsigned, double, TestTL>::next;
+    ReplaceTL::print();
 }
