@@ -157,6 +157,25 @@ struct ParseTypeList<TypeList<>, TypeList<Pruned...>>
     using next = TypeList<Pruned...>; 
 };
 
+template<typename... Args>
+class Generic : public Args...
+{ };
+
+template<typename TL_in, typename TL_parsed>
+class GenericBuilder;
+
+template<typename... Args, typename... ParsedArgs>
+struct GenericBuilder<TypeList<Args...>, TypeList<ParsedArgs...>>
+{
+    using type = Generic<ParsedArgs...>;
+};
+
+
+
+// Deduction guide
+template<typename... Args>
+using G = GenericBuilder<TypeList<Args...>,
+			 typename ParseTypeList<TypeList<Args...>>::next>::type;
 
 int main()
 {
@@ -183,5 +202,6 @@ int main()
     using Parsed = ParseTypeList<Test>::next;
     Parsed::print();
 
+    G<B> g;
 
 }
