@@ -133,7 +133,7 @@ struct ReplaceType<Find, Replace, TypeList<>, TypeList<Pruned...>>
     using next = TypeList<Pruned...>; 
 };
 
-template<typename TL_in, typename TL_out = TypeList<A_def, B_def>>
+template<typename TL_in, typename TL_out/* = TypeList<A_def, B_def>*/>
 struct ParseTypeList
 {};
 
@@ -158,7 +158,7 @@ struct ParseTypeList<TypeList<>, TypeList<Pruned...>>
 };
 
 template<typename... Args>
-class Generic : public Args...
+class GenericClass : public Args...
 { };
 
 template<typename TL_in, typename TL_parsed>
@@ -167,15 +167,14 @@ class GenericBuilder;
 template<typename... Args, typename... ParsedArgs>
 struct GenericBuilder<TypeList<Args...>, TypeList<ParsedArgs...>>
 {
-    using type = Generic<ParsedArgs...>;
+    using type = GenericClass<ParsedArgs...>;
 };
 
-
-
-// Deduction guide
 template<typename... Args>
-using G = GenericBuilder<TypeList<Args...>,
-			 typename ParseTypeList<TypeList<Args...>>::next>::type;
+using Generic = GenericBuilder<TypeList<Args...>,
+			       typename ParseTypeList<TypeList<Args...>,
+						      TypeList<A_def, B_def>
+						      >::next>::type;
 
 int main()
 {
@@ -199,9 +198,9 @@ int main()
     using Test = TypeList<>;
     Test::print();
 
-    using Parsed = ParseTypeList<Test>::next;
+    using Parsed = ParseTypeList<Test, TypeList<A_def, B_def>>::next;
     Parsed::print();
 
-    G<B> g;
+    Generic<A,A> g;
 
 }
