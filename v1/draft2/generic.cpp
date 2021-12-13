@@ -18,16 +18,16 @@ public:
 
 class A
 {
-    using Default = A_def; 
 public:
+    using Default = A_def; 
     int a = 3;
     A() { std::cout << "A" << std::endl; }
 };
 
 class B
 {
-    using Default = B_def; 
 public:
+    using Default = B_def; 
     int b = 4;
     B() { std::cout << "B" << std::endl; }    
 };
@@ -133,6 +133,31 @@ struct ReplaceType<Find, Replace, TypeList<>, TypeList<Pruned...>>
     using next = TypeList<Pruned...>; 
 };
 
+template<typename TL_in, typename TL_out = TypeList<A_def, B_def>>
+struct ParseTypeList
+{};
+
+template<typename First, typename... Others, typename... Pruned>
+struct ParseTypeList<TypeList<First, Others...>, TypeList<Pruned...>>
+{
+    // The default type to be replaced
+    using Default = First::Default;
+    
+    // The next type after replacing First with Replace
+    using NewTypeList = ReplaceType<Default, First, TypeList<Pruned...>>::next;
+    
+    // Recursive traversal of the list
+    using next = ParseTypeList<TypeList<Others...>, NewTypeList>::next;
+};
+
+template<typename... Pruned>
+struct ParseTypeList<TypeList<>, TypeList<Pruned...>>
+{
+    // The new type excluding First
+    using next = TypeList<Pruned...>; 
+};
+
+
 int main()
 {
     //C<double, A, B> c;
@@ -147,6 +172,16 @@ int main()
     using UniqueTL = UniqueTypeList<TestTL>::next;
     UniqueTL::print();
 
-    using ReplaceTL = ReplaceType<unsigned, double, TestTL>::next;
+    using ReplaceTL = ReplaceType<unsigned, double, UniqueTL>::next;
     ReplaceTL::print();
+
+
+    // Create the type list
+    using Test = TypeList<>;
+    Test::print();
+
+    using Parsed = ParseTypeList<Test>::next;
+    Parsed::print();
+
+
 }
