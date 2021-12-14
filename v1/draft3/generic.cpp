@@ -45,6 +45,9 @@ public:
 	}
 	state = new_state;
     }
+    void print() const {
+	std::cout << "Using sequential state setter" << std::endl;
+    }
 };
 
 template<std::floating_point Fp, bool debug>
@@ -66,9 +69,10 @@ public:
 	    state[n] = new_state[n];
 	}
     }
+    void print() const {
+	std::cout << "Using OpenMP state setter" << std::endl;
+    }
 };
-
-
 
 template<std::floating_point Fp, typename Debug, typename SeqPar>
 class GenericClass : virtual public Base<Fp>,
@@ -76,6 +80,12 @@ class GenericClass : virtual public Base<Fp>,
 {
 public:
     GenericClass(unsigned num_qubits) : Base<Fp>{num_qubits} {}
+    void print() const {
+	using T = typename SeqPar::StateSetterPolicy<Fp,Debug::value>;
+	T::print();
+	Debug::print();
+	Base<Fp>::print();
+    }
 };
 
 
@@ -85,11 +95,26 @@ public:
  * \brief Debug policy class -- choose debugging or not
  */
 template<bool state>
-struct Debug
+struct Debugging
 {
-    using Default = Debug<false>;
     static constexpr bool value{state};
 };
+
+struct NoDebug : Debugging<false>
+{
+    using Default = NoDebug;
+    static void print() {
+	std::cout << "Debugging is disabled" << std::endl;
+    }
+};
+
+struct Debug : Debugging<true>
+{
+    using Default = NoDebug;
+    static void print() {
+	std::cout << "Debugging is enabled" << std::endl;
+    }
+};  
 
 /**
  * \brief Sequential policy class
@@ -137,13 +162,17 @@ struct GenericBuilder<Fp, TypeList<Args...>, TypeList<ParsedArgs...>>
 template<std::floating_point Fp, typename... Args>
 using Generic = GenericBuilder<Fp, TypeList<Args...>,
 			       typename ParseTypeList<TypeList<Args...>,
-						      TypeList<Debug<false>, Sequential>
+						      TypeList<NoDebug, Sequential>
 						      >::next>::type;
 
 int main()
 {
-    //              { Debug<false>, Sequential}
-    Generic<double, Sequential, Debug<true>> g{2};
-    g.setState({1,0,0,0,2});
+    //Generic<double> g{2};
+    //Generic<double, Sequential, NoDebug> g{2};
+    //Generic<double, NoDebug, Sequential> g{2};
+    //Generic<double, Debug> g{2};
+    Generic<double, OpenMP, Debug> g{2};
+    
+    g.setState({1,0,0,0});
     g.print();
 }

@@ -4,6 +4,8 @@ template<typename... Others>
 struct TypeList
 {};
 
+/// TypeList<int,double,double>
+
 /// General case
 template<typename First, typename... Others>
 struct TypeList<First, Others...>
@@ -106,7 +108,7 @@ struct ParseTypeList<TypeList<First, Others...>, TypeList<Pruned...>>
     
     // The next type after replacing First with Replace
     using NewTypeList = ReplaceType<Default, First, TypeList<Pruned...>>::next;
-    
+
     // Recursive traversal of the list
     using next = ParseTypeList<TypeList<Others...>, NewTypeList>::next;
 };
