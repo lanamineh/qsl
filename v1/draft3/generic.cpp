@@ -88,7 +88,6 @@ public:
     }
 };
 
-
 // Interface layer
 
 /** 
@@ -161,12 +160,17 @@ struct GenericBuilder<Fp, TypeList<ParsedArgs...>>
     using type = GenericClass<Fp, ParsedArgs...>;
 };
 
+using DefaultList = TypeList<NoDebug, Sequential>;
+
+template<typename... Args>
+struct Opts : TypeList<Args...>
+{
+    using parse = ParseTypeList<TypeList<Args...>, DefaultList>::next; 
+};
+
 // Final level
 template<std::floating_point Fp, typename... Args>
-using Generic = GenericBuilder<Fp,
-			       typename ParseTypeList<TypeList<Args...>,
-						      TypeList<NoDebug, Sequential>
-						      >::next>::type;
+using Generic = GenericBuilder<Fp, typename Opts<Args...>::parse>::type;
 
 int main()
 {
