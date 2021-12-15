@@ -1,8 +1,12 @@
 #include <iostream>
+#include <tuple>
 
 template<typename... Args>
-struct PrintFn
+struct Typelist
 {
+    /// The length of the type list
+    static constexpr std::size_t size = sizeof...(Args);
+    
     /**
      * \brief Print the types in Args...
      */
@@ -11,24 +15,23 @@ struct PrintFn
 	    ((std::cout << typeid(Args).name() << ","), ...);
 	    std::cout << std::endl;
 	}
-};
 
-template<typename... Args> struct Typelist;
+    /**
+     * \brief Get the nth type in the list
+     */
+    template<std::size_t n>
+    using get = typename std::tuple_element<n, std::tuple<Args...>>::type;
 
-template<>
-struct Typelist<> : PrintFn<>
-{
-    static constexpr std::size_t size = 0;
-};
-
-template<typename First, typename... Rest>
-struct Typelist<First, Rest...> : PrintFn<First, Rest...>
-{
-    static constexpr std::size_t size = Typelist<Rest...>::size + 1;
 };
 
 int main()
 {
-    std::cout << Typelist<int,double,void>::size << std::endl;
-    Typelist<int,double,void*>::print();
+    using T = Typelist<int,double,void>;
+
+    std::cout << T::size << std::endl;
+    T::print();
+    
+    using R = T::get<1>; 
+    std::cout << typeid(R).name() << std::endl;
+
 }
