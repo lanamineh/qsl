@@ -160,17 +160,16 @@ struct GenericBuilder<Fp, TypeList<ParsedArgs...>>
     using type = GenericClass<Fp, ParsedArgs...>;
 };
 
-using DefaultList = TypeList<NoDebug, Sequential>;
-
 template<typename... Args>
-struct Opts : TypeList<Args...>
+struct Options : TypeList<Args...>
 {
+    using DefaultList = TypeList<NoDebug, Sequential>;
     using parse = ParseTypeList<TypeList<Args...>, DefaultList>::next; 
 };
 
 // Final level
 template<std::floating_point Fp, typename... Args>
-using Generic = GenericBuilder<Fp, typename Opts<Args...>::parse>::type;
+using Generic = GenericBuilder<Fp, typename Options<Args...>::parse>::type;
 
 int main()
 {
