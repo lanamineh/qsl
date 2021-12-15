@@ -142,7 +142,7 @@ struct OpenMP
 };
 
 /// Most general definition
-template<std::floating_point Fp, typename TL_in, typename TL_parsed>
+template<std::floating_point Fp, typename TL_parsed>
 struct GenericBuilder;
 
 /**
@@ -150,17 +150,20 @@ struct GenericBuilder;
  *
  * A parameter pack can only be deduced, so this class deduces the parameter
  * pack inside a typelist.
+ *
+ * \todo You don't need this because there won't ever be an unknown collection
+ * of arguments that need inheriting, as is written here. So this whole level
+ * of indirection can be omitted.
  */
-template<std::floating_point Fp, typename... Args, typename... ParsedArgs>
-struct GenericBuilder<Fp, TypeList<Args...>, TypeList<ParsedArgs...>>
+template<std::floating_point Fp, typename... ParsedArgs>
+struct GenericBuilder<Fp, TypeList<ParsedArgs...>>
 {
     using type = GenericClass<Fp, ParsedArgs...>;
 };
 
-
 // Final level
 template<std::floating_point Fp, typename... Args>
-using Generic = GenericBuilder<Fp, TypeList<Args...>,
+using Generic = GenericBuilder<Fp,
 			       typename ParseTypeList<TypeList<Args...>,
 						      TypeList<NoDebug, Sequential>
 						      >::next>::type;
