@@ -4,8 +4,8 @@ generic: generic.cpp
 bug: bug.cpp
 	g++ -std=c++20 -Wall -fconcepts-diagnostics-depth=3 bug.cpp -o bug 
 
-module: module.cpp speech.cpp
-	g++ -std=c++20 -Wall -fmodules-ts speech.cpp module.cpp -o module
+module: module.cpp test.cpp part1.cpp part2.cpp
+	g++ -std=c++20 -Wall -fmodules-ts part1.cpp part2.cpp test.cpp module.cpp  -o module
 
 # bug: bug.cpp
 # 	clang++ -std=c++20 -Wall bug.cpp -o bug 
