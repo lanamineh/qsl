@@ -1,5 +1,5 @@
 generic: generic.cpp
-	g++ -std=c++20 -Wall -fconcepts-diagnostics-depth=3 generic.cpp -o generic 
+	g++ -std=c++20 -Wall generic.cpp -o generic 
 
 bug: bug.cpp
 	g++ -std=c++20 -Wall -fconcepts-diagnostics-depth=3 bug.cpp -o bug 

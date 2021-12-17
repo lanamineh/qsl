@@ -85,8 +85,7 @@ template<std::floating_point Fp,
 	 template<std::floating_point,Derived<Base<Fp>>> typename First,
 	 template<std::floating_point,Derived<Base<Fp>>> typename... Rest>
 struct Generic<Fp, First, Rest...> : First<Fp, Generic<Fp, Rest...>>
-{
-};
+{};
 
 int main()
 {
@@ -94,8 +93,8 @@ int main()
     //def.setState({1,0,0});
     //def.print();
 
-    Generic<double, DefaultPrinter> base{3};
-    // //base.setState({1});
-    // base.print();
+    Generic<double, DefaultPrinter, DefaultStateSetter> base{3};
+    base.setState({1});
+    base.print();
     
 }
