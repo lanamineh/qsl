@@ -20,7 +20,7 @@ public:
     [[nodiscard]] unsigned dimension() const { return dim_; }
 };
 
-template<std::floating_point Fp>
+template<std::floating_point Fp, typename T>
 class Thing
 {
 
@@ -36,8 +36,10 @@ public:
     void setState(const std::vector<Fp> & state) { state_ = state; }
 };
 
-template<std::floating_point Fp, typename Previous>
-requires std::derived_from<Previous, Base<Fp>>
+template<typename Previous, typename Base>
+concept Derived = std::derived_from<Previous, Base>;
+
+template<std::floating_point Fp, Derived<Base<Fp>> Previous>
 class DefaultPrinter : public Previous
 {
 protected:
@@ -54,7 +56,25 @@ public:
 	}
 };
 
-template<std::floating_point Fp, template<typename...> typename... Args>
+template<std::floating_point Fp, Derived<Base<Fp>> Previous>
+class IndexedPrinter : public Previous
+{
+protected:
+    using Previous::num_qubits_;
+    using Previous::dim_;
+    using Previous::state_;
+public:
+    void print() const
+	{
+	    std::cout << num_qubits_ << " qubits" << std::endl;
+	    for (std::size_t n = 0; n < dim_; n++) {
+		std::cout << n << ": " << state_[n] << std::endl;
+	    }
+	}
+};
+
+template<std::floating_point Fp,
+	 template<std::floating_point,Derived<Base<Fp>>> typename... Args>
 struct Generic;
 
 template<std::floating_point Fp>
@@ -62,19 +82,11 @@ struct Generic<Fp> : Base<Fp>
 {};
 
 template<std::floating_point Fp,
-	 template<typename...> typename First,
-	 template<typename...> typename... Rest>
+	 template<std::floating_point,Derived<Base<Fp>>> typename First,
+	 template<std::floating_point,Derived<Base<Fp>>> typename... Rest>
 struct Generic<Fp, First, Rest...> : First<Fp, Generic<Fp, Rest...>>
 {
 };
-
-// template<std::floating_point Fp,
-// 	 template<std::floating_point,typename> typename First,
-// 	 template<std::floating_point,typename> typename... Rest>
-// struct Generic<Fp, First, Rest...> : First<Fp, Generic<Fp, Rest...>> 
-// {};
-
-
 
 int main()
 {
@@ -82,8 +94,8 @@ int main()
     //def.setState({1,0,0});
     //def.print();
 
-    Generic<double, DefaultPrinter, DefaultStateSetter> base{3};
-    //base.setState({1});
-    base.print();
+    Generic<double, DefaultPrinter> base{3};
+    // //base.setState({1});
+    // base.print();
     
 }
