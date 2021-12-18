@@ -1,0 +1,35 @@
+# g++ 11
+
+## Output of g++ --version
+
+g++ (Ubuntu 11.1.0-1ubuntu1~20.04) 11.1.0
+Copyright (C) 2021 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+## Errors when running "g++ -std=c++20 -Wall -Wextra bug.cpp"
+
+g++ -std=c++20 -Wall -Wextra bug.cpp -o bug
+bug.cpp:9:61: error: constraint mismatch at argument 1 in template parameter list for ‘template<template<class> class ... requires  floating_point< <template-parameter-2-1> > <template-parameter-1-1> > class A’
+    9 | template<template<std::floating_point> typename T> class A<T>;
+      |                                                             ^
+bug.cpp:9:61: note:   expected ‘template<class> class ... requires  floating_point< <template-parameter-2-1> > <template-parameter-1-1>’ but got ‘template<class> class requires  floating_point< <template-parameter-2-1> > T’
+make: *** [Makefile:2: bug] Error 1
+
+# g++ 11
+
+## Output of g++ --version
+
+g++ (Ubuntu 10.3.0-1ubuntu1~20.04) 10.3.0
+Copyright (C) 2020 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+## Errors when running "g++ -std=c++20 -Wall -Wextra bug.cpp"
+
+g++ -std=c++20 -Wall -Wextra bug.cpp -o bug
+bug.cpp:15:64: error: constraint mismatch at argument 1 in template parameter list for ‘template<template<class ...> class ... requires (... && floating_point< <template-parameter-2-1> >) <template-parameter-1-1> > class A’
+   15 | template<template<std::floating_point...> typename T> class A<T>;
+      |                                                                ^
+bug.cpp:15:64: note:   expected ‘template<class ...> class ... requires (... && floating_point< <template-parameter-2-1> >) <template-parameter-1-1>’ but got ‘template<class ...> class requires (... && floating_point< <template-parameter-2-1> >) T’
+make: *** [Makefile:2: bug] Error 1

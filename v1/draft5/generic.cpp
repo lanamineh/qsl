@@ -73,19 +73,42 @@ public:
 	}
 };
 
+// Unfortunately, adding concepts to the template template parameter's
+// template parameters does not seem to work. 
 template<std::floating_point Fp,
-	 template<std::floating_point,Derived<Base<Fp>>> typename... Args>
+	 template<typename,typename> typename... Args>
 struct Generic;
 
 template<std::floating_point Fp>
 struct Generic<Fp> : Base<Fp>
 {};
 
-template<std::floating_point Fp,
-	 template<std::floating_point,Derived<Base<Fp>>> typename First,
-	 template<std::floating_point,Derived<Base<Fp>>> typename... Rest>
+template<typename Fp,
+	 template<typename,typename> typename First,
+	 template<typename,typename> typename... Rest>
 struct Generic<Fp, First, Rest...> : First<Fp, Generic<Fp, Rest...>>
 {};
+
+template<std::floating_point Fp, template<typename,typename> typename... Args>
+struct GenLinear;
+
+template<std::floating_point Fp>
+struct GenLinear<Fp>
+{
+    using type = Base<Fp>;
+};
+
+template<std::floating_point Fp,
+	 template<typename,typename> typename First,
+	 template<typename,typename> typename... Rest>
+struct GenLinear<Fp, First, Rest...>
+{
+    struct inner : First<Fp, typename GenLinear<Fp, Rest...>::type> {};
+    using type = inner;
+};
+
+    
+
 
 int main()
 {
@@ -93,7 +116,7 @@ int main()
     //def.setState({1,0,0});
     //def.print();
 
-    Generic<double, DefaultPrinter, DefaultStateSetter> base{3};
+    GenLinear<double, DefaultPrinter, DefaultStateSetter>::type base{3};
     base.setState({1});
     base.print();
     
