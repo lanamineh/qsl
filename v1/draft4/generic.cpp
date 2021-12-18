@@ -56,38 +56,32 @@ struct ParseOptions
 };
 
 
-
 template<typename... Args>
 struct Generic : ParseOptions<Args...>::type
 {
     Generic() { std::cout << "I am Generic " << std::endl; }    
 };
 
+////////////////////////
+template<typename TL,
+	 typename TL_parsed = typename TL::parse<Typelist<A_def,B_def,C_def>>>
+struct GenericHelper;
 
-template<typename Av, typename Bv, typename Cv>
-struct Generic : Av, Bv, Cv
+template<typename... Args, typename... ParsedArgs>
+struct GenericHelper<Typelist<Args...>, Typelist<ParsedArgs...>> : ParsedArgs...
 {
-    Generic() { std::cout << "I am Generic " << std::endl; }    
+    GenericHelper() { std::cout << "I am Generic " << std::endl; }    
 };
 
-
-template<typename TL>
-struct GenericWrapper
-{
-    using type = Generic<Args...>;    
-};
-
-
-
-
-
-
-
-
+template<typename... Args>
+using GenericAlt = GenericHelper<Typelist<Args...>>;
+////////////////////
 
 int main()
 {
-    Generic<B> g;   
+    Generic<B> g1;   
+    GenericAlt<B> g2;   
+
 }
 
 
