@@ -33,6 +33,7 @@ class DefaultStateSetter : public Previous
 protected:
     using Previous::state_;
 public:
+    using Previous::Previous;
     void setState(const std::vector<Fp> & state) { state_ = state; }
 };
 
@@ -47,6 +48,8 @@ protected:
     using Previous::dim_;
     using Previous::state_;
 public:
+    using Previous::Previous;
+    
     void print() const
 	{
 	    std::cout << num_qubits_ << " qubits" << std::endl;
@@ -64,6 +67,7 @@ protected:
     using Previous::dim_;
     using Previous::state_;
 public:
+    using Previous::Previous;
     void print() const
 	{
 	    std::cout << num_qubits_ << " qubits" << std::endl;
@@ -81,33 +85,40 @@ struct Generic;
 
 template<std::floating_point Fp>
 struct Generic<Fp> : Base<Fp>
-{};
+{
+    using Base<Fp>::Base;
+};
 
 template<typename Fp,
 	 template<typename,typename> typename First,
 	 template<typename,typename> typename... Rest>
 struct Generic<Fp, First, Rest...> : First<Fp, Generic<Fp, Rest...>>
-{};
-
-template<std::floating_point Fp, template<typename,typename> typename... Args>
-struct GenLinear;
-
-template<std::floating_point Fp>
-struct GenLinear<Fp>
 {
-    using type = Base<Fp>;
+    using  First<Fp, Generic<Fp, Rest...>>::First;
 };
 
-template<std::floating_point Fp,
-	 template<typename,typename> typename First,
-	 template<typename,typename> typename... Rest>
-struct GenLinear<Fp, First, Rest...>
-{
-    struct inner : First<Fp, typename GenLinear<Fp, Rest...>::type> {};
-    using type = inner;
-};
+// template<std::floating_point Fp, template<typename,typename> typename... Args>
+// struct GenLinear;
 
-    
+// template<std::floating_point Fp>
+// struct GenLinear<Fp>
+// {
+//     using type = Base<Fp>;
+// };
+
+// template<std::floating_point Fp,
+// 	 template<typename,typename> typename First,
+// 	 template<typename,typename> typename... Rest>
+// struct GenLinear<Fp, First, Rest...>
+// {
+//     struct inner : First<Fp, typename GenLinear<Fp, Rest...>::type> {};
+//     using type = inner;
+// };
+
+template<typename a, typename b>
+struct AAA
+{
+};
 
 
 int main()
@@ -116,7 +127,7 @@ int main()
     //def.setState({1,0,0});
     //def.print();
 
-    GenLinear<double, DefaultPrinter, DefaultStateSetter>::type base{3};
+    Generic<double, DefaultPrinter, DefaultStateSetter> base{3};
     base.setState({1});
     base.print();
     
