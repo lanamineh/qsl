@@ -79,8 +79,9 @@ using GenericAlt = GenericHelper<Typelist<Args...>>;
 
 int main()
 {
-    Generic<B> g1;   
-    GenericAlt<B> g2;   
+    Generic<B> g1;
+    std::cout << std::endl;
+    GenericAlt<B,C> g2;   
 
 }
 

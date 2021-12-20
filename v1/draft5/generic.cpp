@@ -20,25 +20,37 @@ public:
     [[nodiscard]] unsigned dimension() const { return dim_; }
 };
 
+template<typename Previous, typename Base>
+concept Derived = std::derived_from<Previous, Base>;
+
 template<std::floating_point Fp, typename T>
 class Thing
 {
 
 };
 
-template<std::floating_point Fp, typename Previous>
-requires std::derived_from<Previous, Base<Fp>>
+template<std::floating_point Fp, Derived<Base<Fp>> Previous, bool debug>
 class DefaultStateSetter : public Previous
 {
 protected:
     using Previous::state_;
+    using Previous::dim_;
 public:
     using Previous::Previous;
-    void setState(const std::vector<Fp> & state) { state_ = state; }
+    void setState(const std::vector<Fp> & state);
 };
 
-template<typename Previous, typename Base>
-concept Derived = std::derived_from<Previous, Base>;
+template<std::floating_point Fp, Derived<Base<Fp>> Previous, bool debug>
+void DefaultStateSetter<Fp, Previous, debug>::setState(const std::vector<Fp> & state)
+{
+    if constexpr (debug == true) {
+    	if (state.size() != dim_) {
+    	    throw std::logic_error("Incorrect dimension "
+    				   "when setting state");
+    	}
+    }
+    state_ = state;
+}
 
 template<std::floating_point Fp, Derived<Base<Fp>> Previous>
 class DefaultPrinter : public Previous
@@ -81,10 +93,10 @@ public:
 // template parameters does not seem to work. 
 template<std::floating_point Fp,
 	 template<typename,typename> typename... Args>
-struct Generic;
+struct GenericWrapper;
 
 template<std::floating_point Fp>
-struct Generic<Fp> : Base<Fp>
+struct GenericWrapper<Fp> : Base<Fp>
 {
     using Base<Fp>::Base;
 };
@@ -92,42 +104,37 @@ struct Generic<Fp> : Base<Fp>
 template<typename Fp,
 	 template<typename,typename> typename First,
 	 template<typename,typename> typename... Rest>
-struct Generic<Fp, First, Rest...> : First<Fp, Generic<Fp, Rest...>>
+struct GenericWrapper<Fp, First, Rest...> : First<Fp, GenericWrapper<Fp, Rest...>>
 {
-    using  First<Fp, Generic<Fp, Rest...>>::First;
+    using  First<Fp, GenericWrapper<Fp, Rest...>>::First;
 };
 
-// template<std::floating_point Fp, template<typename,typename> typename... Args>
-// struct GenLinear;
-
-// template<std::floating_point Fp>
-// struct GenLinear<Fp>
-// {
-//     using type = Base<Fp>;
-// };
-
-// template<std::floating_point Fp,
-// 	 template<typename,typename> typename First,
-// 	 template<typename,typename> typename... Rest>
-// struct GenLinear<Fp, First, Rest...>
-// {
-//     struct inner : First<Fp, typename GenLinear<Fp, Rest...>::type> {};
-//     using type = inner;
-// };
-
-template<typename a, typename b>
-struct AAA
+template<template<typename,typename,bool> typename Policy, bool debug>
+struct StateSetter
 {
+    template<std::floating_point Fp, Derived<Base<Fp>> Previous>
+    using type = Policy<Fp, Previous, debug>;
 };
 
+template<template<typename,typename> typename Policy>
+struct Printer
+{
+    template<std::floating_point Fp, Derived<Base<Fp>> Previous>
+    using type = Policy<Fp, Previous>;
+};
 
+template<std::floating_point Fp, typename... Args>
+using Generic = GenericWrapper<Fp, Args::template type...>;
+					  
 int main()
 {
     //DefaultStateSetter<double, DefaultPrinter<double, Base<double>>> def;
     //def.setState({1,0,0});
     //def.print();
 
-    Generic<double, DefaultPrinter, DefaultStateSetter> base{3};
+    Generic<double,
+	    Printer<DefaultPrinter>,
+	    StateSetter<DefaultStateSetter, false>> base{3};
     base.setState({1});
     base.print();
     
