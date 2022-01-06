@@ -55,7 +55,7 @@ namespace qsl {
 	std::uniform_real_distribution<Fp> distribution;
 
     public:
-
+	
 	/**
 	 * \brief Construct the class and specify the range
 	 *

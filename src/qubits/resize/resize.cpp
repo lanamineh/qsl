@@ -39,7 +39,7 @@ const std::string qsl::Qubits<qsl::Type::Resize, float>::name =
 template<std::floating_point Fp>
 qsl::Qubits<qsl::Type::Resize, Fp>::Qubits(unsigned nqubits_in) 
     : nqubits{ nqubits_in }, dim{ std::size_t(1) << nqubits },
-      dim_max{ dim }, state(dim), random(0,1)
+      dim_max{ dim }, state(dim)
 {
     // Make the all-zero state
     reset();   
@@ -48,8 +48,7 @@ qsl::Qubits<qsl::Type::Resize, Fp>::Qubits(unsigned nqubits_in)
 template<std::floating_point Fp>
 qsl::Qubits<qsl::Type::Resize, Fp>::Qubits(const std::vector<qsl::complex<Fp>> & state)
     : nqubits{ qsl::checkStateSize(state) }, 
-      dim{ state.size() }, dim_max{ dim }, state{state},
-      random(0,1)
+      dim{ state.size() }, dim_max{ dim }, state{state}
 {
     //std::cout << "nqubits = " << nqubits << std::endl;
     //std::cout << "dim = " << dim << std::endl;
@@ -148,6 +147,7 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::addQubit(unsigned targ)
 }
 
 
+/*
 template<std::floating_point Fp>
 void qsl::Qubits<qsl::Type::Resize, Fp>::operator = (const Qubits & old)
 {
@@ -155,12 +155,14 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::operator = (const Qubits & old)
     // simulator object without causing an exception (unless the state is
     // an invalid size)
     dim = old.dim;
+    dim_max = old.dim_max;
     nqubits = old.nqubits;
-
+    random = old.random;
+    
     // Set the new state vector
     state = old.state;
 }
-
+*/
 /// Get the state vector associated to the qubits
 template<std::floating_point Fp>
 std::vector<qsl::complex<Fp>> qsl::Qubits<qsl::Type::Resize, Fp>::getState() const
@@ -194,3 +196,6 @@ void qsl::Qubits<qsl::Type::Resize, Fp>::print(std::ostream & os) const
 // Explicit instantiations
 template class qsl::Qubits<qsl::Type::Resize, float>;
 template class qsl::Qubits<qsl::Type::Resize, double>;
+
+template<> qsl::Random<float> qsl::Qubits<qsl::Type::Resize, float>::random{0,1};
+template<> qsl::Random<double> qsl::Qubits<qsl::Type::Resize, double>::random{0,1};

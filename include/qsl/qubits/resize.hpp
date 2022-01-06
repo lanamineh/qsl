@@ -56,7 +56,7 @@ namespace qsl {
 	std::size_t dim_max; ///< The available space in the state vector
 	std::vector<complex<Fp>> state; ///< State vector for the qubits
 
-	qsl::Random<Fp> random;
+	static qsl::Random<Fp> random;
 
 	struct Dist {
 	    std::size_t index;
@@ -118,12 +118,12 @@ namespace qsl {
 	/**
 	 * \brief Copy constructor
 	 */
-	Qubits(const Qubits & ) = default;
+	//Qubits(const Qubits & ) = default;
 
 	/**
 	 * \brief Copy-assignment operator
 	 */
-	void operator = (const Qubits & old);
+	//void operator = (const Qubits & old);
 
 	/// Return the number of qubits
 	unsigned getNumQubits() const;
@@ -375,6 +375,8 @@ namespace qsl {
     template<> const std::string Qubits<Type::Resize, float>::name;
 #endif
 
+    
+    
 }
     
 #endif

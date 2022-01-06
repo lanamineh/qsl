@@ -297,3 +297,39 @@ TYPED_TEST(ResizeTests, AddQubitTest)
     EXPECT_TRUE(arma::approx_equal(state_1, v, "both", 1e-6, 1e-8));
     
 }
+
+TYPED_TEST(ResizeTests, AddQubitTestWithAssignment)
+{
+    using Sim = TypeParam::Sim;
+    using Fp = TypeParam::Sim::Fp_type;
+    const unsigned num_qubits{ 5 };
+
+    // Make a random state
+    Sim q{num_qubits};
+    const std::vector<qsl::complex<Fp>> state
+	= qsl::makeRandomState<Fp>(num_qubits);
+    q.setState(state);
+    
+    // Set an armadillo vector to the same state
+    arma::Col<std::complex<Fp>> v{ toArmaState(q) };
+
+    // Now create a new object and assign to it
+    // This is to test the problem that arose where the
+    // assignment operator was wrong, causing invalid appendQubit
+    Sim q_other{q};
+    
+    // Add a qubit in the highest position
+    q_other.appendQubit();
+
+    // Check that the state collapses to the correct thing
+    arma::Col<std::complex<Fp>> state_1{ toArmaState(q_other) };
+
+    // Add a qubit by doubling the size of the state vector
+    // and filling the second half with zeros
+    v.insert_rows(v.size(), v.size(), true);
+
+    // Check for equality
+    EXPECT_TRUE(arma::approx_equal(state_1, v, "both", 1e-6, 1e-8));
+    
+}
+
