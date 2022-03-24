@@ -1,0 +1,44 @@
+#+TITLE: Planning for Version 1
+
+* Steps (overview)
+1. [ ] Plan features and interface
+   - Write down overall library purpose
+   - What gates to support?
+   - Support for omp, sse, avx, gpu, etc?
+   - Types of simulators? (np, resize, normal, etc?)
+   - Interface requirements (gate names, how to choose simulator, etc.)
+   - Any additional utilities? (fidelity, distance, etc?)
+2. [ ] Plan seeding/reproducibility
+3. [ ] Plan how to test each feature
+   - [ ] How to cover simulator variants without repetition?
+   - [ ] Any need for mocks?
+   - [ ] Plan for checking random elements based on seeds
+4. [ ] Plan how to check performance of each feature
+5. [ ] Sketch-plan eventual build system, and set up development build system. 
+6. [ ] Implement basic state vector functions for each simulator type
+   - [ ] State vector initialisation and manipulation
+   - [ ] Test basic state vector functions
+   - [ ] Perform performance test
+   - [ ] Document functions
+7. [ ] Implement one-qubit and two-qubit gates for each simulator type
+   - [ ] Test
+   - [ ] Perform performance test
+   - [ ] Document functions
+8. [ ] Measurement, postselection, sampling for each simulator type
+   - [ ] Test 
+   - [ ] Perform performance test
+   - [ ] Document functions
+9. [ ] Implement and test each simulator variant (omp, sse, etc.)
+   - [ ] Omp
+   - [ ] Others here...
+   - [ ] Test simulator variants
+   - [ ] Document new simulator variants
+10. Finalise the library ready for release
+    - [ ] Find any major design flaws and re-implement if necessary
+    - [ ] Test use cases (e.g. test in mbqcsim).
+11. [ ] Get a release ready
+    - [ ] Develop a "production" build system
+    - [ ] Document build and install process
+    - [ ] Set up CI for the release (for fixing issues)
+    - [ ] Release library!
+

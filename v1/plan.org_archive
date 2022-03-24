@@ -1,0 +1,17 @@
+#    -*- mode: org -*-
+
+
+Archived entries from file /home/jrs/Documents/git/qsl/v1/plan.org
+
+
+* Steps (overview)
+  :PROPERTIES:
+  :ARCHIVE_TIME: 2022-03-24 Thu 15:58
+  :ARCHIVE_FILE: ~/Documents/git/qsl/v1/plan.org
+  :ARCHIVE_CATEGORY: plan
+  :END:
+1. [ ] Plan features and interface 
+2. [ ] Plan seeding/reproducibility
+3. [ ] Plan how to test each feature
+4. [ ] Implement basic functions
+   - [ ] state initialisation
