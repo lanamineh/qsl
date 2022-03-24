@@ -143,6 +143,16 @@ int qsl::Qubits<qsl::Type::Resize, Fp>::measure(unsigned targ)
     return outcome;
 }
 
+/**
+ * \todo Just in case this is not written elsewhere, it is very important
+ * that the interface for measureOut and postselectOut are the same (i.e.
+ * both return the target qubit, or the probability, or whatever) because
+ * when a client swaps the two functions, they are expecting to get the
+ * same return value (so that nothing else in their code needs to change).
+ * This is particularly a problem for "return measureOut(...)", which may
+ * silently convert an int to a double return value and produce no warnings
+ * at all.
+ */
 template<std::floating_point Fp>
 int qsl::Qubits<qsl::Type::Resize, Fp>::measureOut(unsigned targ)
 {
