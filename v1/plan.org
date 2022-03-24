@@ -1,7 +1,7 @@
 #+TITLE: Planning for Version 1
 
 * Steps (overview)
-1. [ ] Plan features and interface
+1. [ ] Plan features and interface (see [[#planning][Planning]]).
    - Write down overall library purpose
    - What gates to support?
    - Support for omp, sse, avx, gpu, etc?
@@ -42,3 +42,24 @@
     - [ ] Set up CI for the release (for fixing issues)
     - [ ] Release library!
 
+* Planning
+  :PROPERTIES:
+  :CUSTOM_ID: planning
+  :END:
+
+** Overall purpose
+
+The overall goals of QSL:
+
+- Written in modern C++.
+- Simple to use.
+- High performance (optimised for one- and two-qubit gates, and measurement/sampling).
+- Minimal features (simple full-state-vector simulator; no automatic optimisation of circuits; no density matrices; maximum number of qubits about 28; etc.)
+- Fully tested using googletest.
+- Fully documented using doxygen+sphinx.
+
+Use cases for QSL:
+
+- Quantum simulation where sampling is important: e.g. VQE simulations
+- Situations when dynamic resizing of the state vector is important (e.g. for MBQC)
+- Situations where speed is important, but where a large number of qubits is not
