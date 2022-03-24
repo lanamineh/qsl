@@ -126,8 +126,69 @@ qsl::optim;
 
 *** Simulator constructors
 
-Constructors for the basic simulator:
+Simulators should be constructible by specifying the number of qubits or the state vector, or from any other simulator object (when this conversion is valid). Similarly, it should be possible to move-construct the simulator from other simulators. The copy/move constructors/assignment should not be defined manually (if possible), otherwise the rule-of-five applies. Constructions are only allowed between simulators of the same floating point precision (denoted Fp in the following) -- however, see [[#fp-convert][Conversions]] below. Constructions between any simulator variants (omp, debug, etc.) should be possible.
+
+Constructors for the basic simulator (and the resizeable simulator):
 
 #+BEGIN_SRC cpp
-explict simname()
+
+// Basic constructors
+explict basic(unsigned); // from number of qubits
+explict basic(const std::vector<std::complex<Fp>> &); // from state vector
+
+// Copy/move constructor/assignment (compiler-generated)
+// Maybe they can't be compiler generated if the template parameters
+// are different? Need to cehck.
+basic(const basic<Fp,...> &);
+basic(const basic<Fp,...> &&);
+basic & operator = (const basic<Fp,...> &);
+basic & operator = (const basic<Fp,...> &&);
+
+// Copy/move constructor/assignment (not compiler-generated)
+basic(const numpres<Fp,...> &); // from number-preserving simulator
+basic(const numpres<Fp,...> &&);
+basic(const resize<Fp,...> &); // from resizeable simulator
+basic(const resize<Fp,...> &&);
+
+#+END_SRC
+
+Constructors for the number-preserving simulator are:
+
+#+BEGIN_SRC cpp
+
+// Basic constructors
+explict numpres(unsigned); // from number of qubits, default to 0 ones.
+explict numpres(unsigned, unsigned); // from number of qubits and number of ones
+explict numpres(const std::vector<std::complex<Fp>> &); // from state vector
+
+// Copy/move constructor/assignment (compiler-generated)
+numpres(const numpres<Fp,...> &);
+numpres(const numpres<Fp,...> &&);
+numpres & operator = (const numpres<Fp,...> &);
+numpres & operator = (const numpres<Fp,...> &&);
+
+// Copy/move constructor/assignment (not compiler-generated)
+numpres(const resize<Fp,...> &); // from resizeable simulator
+numpres(const resize<Fp,...> &&);
+numpres(const basic<Fp,...> &); // from basic
+numpres(const basic<Fp,...> &&);
+
+#+END_SRC
+
+*** Conversion between different floating-point precisions
+  :PROPERTIES:
+  :CUSTOM_ID: fp-convert
+  :END:
+
+
+The conversion between any precisions should probably be implemented using some kind of explicit conversion, so that it does nto accidentally happen. For example, only define (explicit) constructors for the same precision, but define conversion operators to any other precision. Then the user can use static_cast to convert from one precision to another. This mechanism is not required for the other variant options (omp, etc.) because they do not potentially involve narrowing conversions. It might also be possible to use concepts to restrict the static cast to narrowing conversions only.
+
+In order to stop the implicit conversion between precisions, it might be necessary to make copy/move constructors explicit. Is there a way to do that while still using compiler-generated functions? (maybe =default?).
+
+#+BEGIN_SRC cpp
+
+// Example user-defined conversion operator (defined in class basic<Fp1,...>)
+operator basic<Fp2, ...>() const &; // copy-conversion to basic<Fp2,...>
+operator basic<Fp2, ...>() &&; // move-conversion
+
 #+END_SRC
