@@ -1,7 +1,7 @@
 #+TITLE: Planning for Version 1
 
 * Steps (overview)
-1. [ ] Plan features and interface (see [[#planning][Planning]]).
+1. [ ] Plan features and interface (see [[#planning][Specification]]).
    - Write down overall library purpose
    - What gates to support?
    - Support for omp, sse, avx, gpu, etc?
@@ -42,7 +42,7 @@
     - [ ] Set up CI for the release (for fixing issues)
     - [ ] Release library!
 
-* Planning
+* Specification
   :PROPERTIES:
   :CUSTOM_ID: planning
   :END:
@@ -63,3 +63,71 @@ Use cases for QSL:
 - Quantum simulation where sampling is important: e.g. VQE simulations
 - Situations when dynamic resizing of the state vector is important (e.g. for MBQC)
 - Situations where speed is important, but where a large number of qubits is not
+
+The object of QSL is provide an optimal implementation of a basic quantum computing simulator targetting "normal" computers (e.g. laptops), that is simple to use.
+
+
+** Interface specification
+
+*** General simulator types and variants
+
+General simulator names, and how to construct simulators:
+
+#+BEGIN_SRC cpp
+#include <qsl.hpp>
+int main()
+{
+/////// Simulator types (basic, number preserving, etc.)
+
+// Create a simulator with no bells or whistles
+// (just the default state-vector simulator)
+qsl::simple<double> q{4}; // 4 qubits
+qsl::basic<float> q{4};
+qsl::generic<double> q{4}; // Too long
+
+// Number-preserving simulator
+qsl::npr<float> q{4,2}; // 4 qubits, 2 ones
+qsl::np<long double> q{};
+qsl::numpres<long double> q{};
+
+// Resizeable simulator
+qsl::resize<double> q{3}; // 3 qubits
+
+/////// Variants (template parameters, specify simulator details)
+
+// If no template parameters are specified, then the simulators
+// default to sequential and no debugging.  
+qsl::basic<float, qsl::omp, qsl::debug> q{3};
+qsl::basic<double, qsl::seq, qsl::fast> q{3};
+// Simulators should require the specification of the floating point
+// precision as the first argument, but allow any order for the others. 
+
+// Parallel
+qsl::omp; // This one also says how it will do it.
+qsl::par;
+qsl::parallel;
+
+// Sequential
+qsl::seq;
+qsl::sequential; // Too long
+
+// Debugging
+qsl::debug;
+
+// No debugging
+qsl::nodebug; // Bad -- looks like "node bug"
+qsl::nocheck;
+qsl::fast; // Says what it does
+qsl::opt; // For optimised (maybe confused with option)
+qsl::optim;
+
+}
+#+END_SRC
+
+*** Simulator constructors
+
+Constructors for the basic simulator:
+
+#+BEGIN_SRC cpp
+explict simname()
+#+END_SRC
