@@ -89,6 +89,7 @@ qsl::generic<double> q{4}; // Too long
 qsl::npr<float> q{4,2}; // 4 qubits, 2 ones
 qsl::np<long double> q{};
 qsl::numpres<long double> q{};
+qsl::number<double> q{};
 
 // Resizeable simulator
 qsl::resize<double> q{3}; // 3 qubits
@@ -121,8 +122,23 @@ qsl::fast; // Says what it does
 qsl::opt; // For optimised (maybe confused with option)
 qsl::optim;
 
+// Another possibility is to just used fixed positional arguments:
+qsl::basic<double, false> q{10}; // Second parameter debug
+qsl::basic<double, true, qsl::omp> q{10}; // Third parameter parallel/sequential
+qsl::basic<double> q{10}; 
+
 }
 #+END_SRC
+
+Some advantages of the positional system over the "options" system are:
+- More idomatic to use positional arguments in C++ (rather than arbitrary-order options)
+- Simpler to implement (probably not as much need for fancy metaprogramming)
+- Reduces the qsl::debug to a simple true/false
+- Probably the most common option is debuggingm, which comes first after precision.
+
+Disadvantages of the positional systeM;
+- Might not generalise well if other options are required later
+- Forces user to specify debug flag if they want to specify parallel/sequential
 
 *** Simulator constructors
 
@@ -138,7 +154,7 @@ explict basic(const std::vector<std::complex<Fp>> &); // from state vector
 
 // Copy/move constructor/assignment (compiler-generated)
 // Maybe they can't be compiler generated if the template parameters
-// are different? Need to cehck.
+// are different? Need to check.
 basic(const basic<Fp,...> &);
 basic(const basic<Fp,...> &&);
 basic & operator = (const basic<Fp,...> &);
