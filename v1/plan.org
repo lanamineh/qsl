@@ -67,7 +67,9 @@ Use cases for QSL:
 The object of QSL is provide an optimal implementation of a basic quantum computing simulator targetting "normal" computers (e.g. laptops), that is simple to use.
 
 
-** Interface specification
+** Interface notes
+
+This section contains interface possibilities along with notes, advantages/disadvantages, etc.
 
 *** General simulator types and variants
 
@@ -125,7 +127,7 @@ qsl::optim;
 // Another possibility is to just used fixed positional arguments:
 qsl::basic<double, false> q{10}; // Second parameter debug
 qsl::basic<double, true, qsl::omp> q{10}; // Third parameter parallel/sequential
-qsl::basic<double> q{10}; 
+qsl::basic<double> q{10}; // Picks debug = false, an parallelisation if available.
 
 }
 #+END_SRC
@@ -196,7 +198,6 @@ numpres(const basic<Fp,...> &&);
   :CUSTOM_ID: fp-convert
   :END:
 
-
 The conversion between any precisions should probably be implemented using some kind of explicit conversion, so that it does nto accidentally happen. For example, only define (explicit) constructors for the same precision, but define conversion operators to any other precision. Then the user can use static_cast to convert from one precision to another. This mechanism is not required for the other variant options (omp, etc.) because they do not potentially involve narrowing conversions. It might also be possible to use concepts to restrict the static cast to narrowing conversions only.
 
 In order to stop the implicit conversion between precisions, it might be necessary to make copy/move constructors explicit. Is there a way to do that while still using compiler-generated functions? (maybe =default?).
@@ -208,3 +209,23 @@ operator basic<Fp2, ...>() const &; // copy-conversion to basic<Fp2,...>
 operator basic<Fp2, ...>() &&; // move-conversion
 
 #+END_SRC
+
+** Interface specification 
+
+This section contains the full specification for the interface.
+
+*** Namespace
+
+Every class or function in QSL is in the "qsl" namespace. 
+
+*** Simulator classes
+
+This section contains one subsection for each class. Inside each section, the member functions (prototypes) for that class are listed, along with behaviour notes.
+
+*** Other QSL classes
+
+Classes which are not simulators are provided here.
+
+*** QSL functions
+
+Functions are provided here.
