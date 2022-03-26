@@ -230,6 +230,7 @@ q[23]; // Return std::complex<Fp>& (renormalise after edit -- have const version
 // Can use this to set computational basis state. What happens if they try to set all the values to zero?
 // Accessing is definitely fine. Probably setting values might be a bad idea. If you want a computational basis state,
 // reset() and then do X gate.
+q.randomise(); // set the simulator to a random state. Maybe q.set_random_state(), q.make_random()
 #+END_SRC
 
 Add additional functions to specific simulators (e.g. q.ones() in the number simulator, allocated size in the resize simulator).
@@ -237,8 +238,6 @@ Add additional functions to specific simulators (e.g. q.ones() in the number sim
 **** Random utilities
 
 - Generating a random state, and random number-preserved state. Could be a member function of the simulator classes, or could be a stand-alone function that generates a std::vector for use in the simulator constructors (or other member functions). 
-
-
 
 **** Standard quantum-info calculations
 
@@ -361,7 +360,6 @@ q.u(targ0, targ1, {... <16 items>... ); // Or u2?
 #+END_SRC
 
 *** Measurement and sampling
-
 **** Measurement and postselection
 
 #+BEGIN_SRC cpp
@@ -382,6 +380,36 @@ q.sample(targ, n);  // Returns std::vector
 q.sample_all(n);  // Returns std::map<std::size_t, std::size_t>
 #+END_SRC
 
+*** Seeding and reproducibility
+
+**** Uses for randomness
+
+There are two uses for randomness in the simulator classes:
+1. Generation of random states in the simulators
+2. Measuring and sampling the state vector
+
+In MBQCSIM, it would be helpful to be able to provide the simulator with a seed and then have the simulator produce all the same measurement outcomes, provided that all the same gates are performed.
+
+The options for when to specify a seed are as follows:
+1. Provide a seed when the simulator is constructed. Provided that the same seed is provided, and the same sequence of operations is performed with the simulator, then any function involving randomness will return the same result. Advantages: this is simple and clear, and does not require fully characterising what combination of randomness-fixing a user might want. It is also simple. 
+
+#+BEGIN_SRC cpp
+// Class members of simulators
+q.seed(qsl::seed_t seed); // Set the seed ("seed it with syz")
+q.seed(); // Get the seed -- returns qsl::seed_t
+
+class seed
+{
+   //...
+}
+
+void seed(qsl::seed seed = qsl::seed())
+
+q.seed(12323)
+
+#+END_SRC
+
+The standard library passes generators into the functions that produces random numbers -- possibly because the generators are bulky (have large internal state). That might cause a performance problem for a simulation involving lots of small quantum simulators.
 
 ** Interface specification 
 
@@ -389,7 +417,7 @@ This section contains the full specification for the interface.
 
 *** Namespace
 
-Every class or function in QSL is in the "qsl" namespace. 
+Every class or function in QSL is in the "qsl" namespace, and is available in a C++ program by including "qsl.hpp"
 
 *** Simulator classes
 
