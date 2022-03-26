@@ -9,34 +9,35 @@
    - Interface requirements (gate names, how to choose simulator, etc.)
    - Any additional utilities? (fidelity, distance, etc?)
 2. [ ] Plan seeding/reproducibility
-3. [ ] Plan how to test each feature
+3. [ ] Create header files for the interface
+4. [ ] Plan how to test each feature
    - [ ] How to cover simulator variants without repetition?
    - [ ] Any need for mocks?
    - [ ] Plan for checking random elements based on seeds
-4. [ ] Plan how to check performance of each feature
-5. [ ] Sketch-plan eventual build system, and set up development build system. 
-6. [ ] Implement basic state vector functions for each simulator type
+5. [ ] Plan how to check performance of each feature
+6. [ ] Sketch-plan eventual build system, and set up development build system. 
+7. [ ] Implement basic state vector functions for each simulator type
    - [ ] State vector initialisation and manipulation
    - [ ] Test basic state vector functions
    - [ ] Perform performance test
    - [ ] Document functions
-7. [ ] Implement one-qubit and two-qubit gates for each simulator type
+8. [ ] Implement one-qubit and two-qubit gates for each simulator type
    - [ ] Test
    - [ ] Perform performance test
    - [ ] Document functions
-8. [ ] Measurement, postselection, sampling for each simulator type
+9. [ ] Measurement, postselection, sampling for each simulator type
    - [ ] Test 
    - [ ] Perform performance test
    - [ ] Document functions
-9. [ ] Implement and test each simulator variant (omp, sse, etc.)
-   - [ ] Omp
-   - [ ] Others here...
-   - [ ] Test simulator variants
-   - [ ] Document new simulator variants
-10. Finalise the library ready for release
+10. [ ] Implement and test each simulator variant (omp, sse, etc.)
+    - [ ] Omp
+    - [ ] Others here...
+    - [ ] Test simulator variants
+    - [ ] Document new simulator variants
+11. Finalise the library ready for release
     - [ ] Find any major design flaws and re-implement if necessary
     - [ ] Test use cases (e.g. test in mbqcsim).
-11. [ ] Get a release ready
+12. [ ] Get a release ready
     - [ ] Develop a "production" build system
     - [ ] Document build and install process
     - [ ] Set up CI for the release (for fixing issues)
@@ -58,6 +59,8 @@ The overall goals of QSL:
 - Fully tested using googletest.
 - Fully documented using doxygen+sphinx.
 
+QSL should not re-implement standard functionality available elsewhere (e.g. random classes, timers, etc.)
+
 Use cases for QSL:
 
 - Quantum simulation where sampling is important: e.g. VQE simulations
@@ -66,10 +69,13 @@ Use cases for QSL:
 
 The object of QSL is provide an optimal implementation of a basic quantum computing simulator targetting "normal" computers (e.g. laptops), that is simple to use.
 
+QSL should only take and return standard library types. The user does not want to learn a new framework.
 
 ** Interface notes
 
 This section contains interface possibilities along with notes, advantages/disadvantages, etc.
+
+*The interface should expose the minimum amount of functions necessary for performing the quantum simulation and doing releted calculations*
 
 *** General simulator types and variants
 
@@ -211,8 +217,170 @@ operator basic<Fp2, ...>() &&; // move-conversion
 #+END_SRC
 
 *** General utilities
+
+**** Basics
+
+#+BEGIN_SRC cpp
+q.size(); // Gets the number of qubits
+q.dim(); // Get the dimension of the Hilbert space
+q.get_state(); // Return a std::vector<std::complex>
+q.set_state(const std::vector<std::complex<Fp>> &); // Get the move semantics working for large state vectors
+q.reset(); // To all-zero state
+q[23]; // Return std::complex<Fp>& (renormalise after edit -- have const version too)
+// Can use this to set computational basis state. What happens if they try to set all the values to zero?
+// Accessing is definitely fine. Probably setting values might be a bad idea. If you want a computational basis state,
+// reset() and then do X gate.
+#+END_SRC
+
+Add additional functions to specific simulators (e.g. q.ones() in the number simulator, allocated size in the resize simulator).
+
+**** Random utilities
+
+- Generating a random state, and random number-preserved state. Could be a member function of the simulator classes, or could be a stand-alone function that generates a std::vector for use in the simulator constructors (or other member functions). 
+
+
+
+**** Standard quantum-info calculations
+
+- Measure of inequality between two state vectors (e.g. Fubini-Study (~qsl::distance~), fidelity (~qsl::fidelity~), inner product, etc.). Probably has to be a function that takes two simulator objects (rather than being a member function of a simulator). Also possibly overload for comparison with std::vector for ease of use.
+- Norm? Reasons for: maybe want it if the simulators do not check whether the input state is normalised (if they require a normalised state). Reasons against: the state of the simulators will always be normalised. Simulators should allow initialisation from any vector; there is no reason you ever want the norm (perhaps there should be a normalise function if you want to do that). *The norm is not physically relevant in quantum mechanics*. (There should probably be a norm function internally, but that is not part of the interface.
+- Normalise? Probably no need if the simulators normalise state vectors automatically. If you want to produce state vectors for other purposes, use a general linear algebra library.
+- Any other useful things?
+
+**** Printing
+
+- std::cout could print just the state vector, with no trailing newline (or maybe one, if it is a column vector)
+- print method in simulators could print more information (e.g. num qubits, numb ones, additional simulator-specific information). Could also take a stream and do the same thing.
+- Anything else?
+
+**** Serialisation
+
+All the simulators should support serialising themself, and initialisation from the serialisation. A round trip should produce a simulator with exactly the same state.
+
+- JSON: Advantages: supported everywhere, readable easily in text editors, parsable with standard linux tools. Disadvantage: not compressed, might cause problems with large state vectors (potentially on the order 5 GiB for a 28 qubit file)? Could potentially allow this for small numbers of qubits?
+- Some compressed format: HDF5, netcdf. Requirements:
+  - Good library support for c++ and python
+  - Capable of storing a 28-qubit state vector in a reasonable size (do some experiments).
+
+Maybe don't need JSON if you have a compressed format? Maybe JSON is friendly for small numbers? On the other hand, more code to maintain, and redundancy. JSON support might be so easy that it makes sense to just throw it in -- people know about JSON, but maybe don't know about random compressed formats.
+
+#+BEGIN_SRC cpp
+
+// Write JSON to file
+
+class basic {
+
+   // Write json to file specified by path
+   
+   void toJson(const std::filesystem::path & path);
+   void to_json(...)
+   void saveJson(...);
+   void save_json(...);
+   void write_json(...);
+   void json(...); // This might be best -- simpler to type
+   void load_json(); // Except, what about loading? Need a separate word
+
+   // Same for compressed...
+   void hdf5(const std::filesystem::path & path);
+
+   // Possible pairs:
+   // - save and load
+   // - store and load
+   // - to and from
+   // - read and write
+   q.to_json() // These are the winners!
+   q.from_json()
+
+   q.save_json()
+   q.load_json()
+   
+}
+
+#+END_SRC
+
+Also there should be a file constructor that can make a simulator from an JSON or compressed format file.
+
+Todo: work out what exceptional conditions these functions need to handle.
+
 *** Gates
+
+**** One-qubit gates
+
+The only one-qubit gates we need are:
+
+#+BEGIN_SRC cpp
+q.rotate_x(targ, angle); // Or q.rx?
+q.rotate_y(targ, angle);
+q.rotate_z(targ, angle);
+q.phase(targ, angle); // or q.p() maybe? Maybe phase is fine though -- quite short
+q.hadamard(targ); // q.h (lowercase for H)
+q.pauli_x(targ); // q.x, q.y (lowercase, even though Pauli X, Y, Z)
+q.pauli_y(targ);
+q.pauli_z(targ);
+q.unitary(targ, matrix); // or q.u -- Multiple overloads for real matrix, complex matrix 
+q.unitary(targ, {a,b,c,d}); // Can use std::vector literal for reals...
+q.unitary(targ, {{a,b},{c,d},{e,f},{g,h}}); // ...and complex (will this even work?)
+#+END_SRC
+
+**** Controlled two-qubit gates
+
+#+BEGIN_SRC cpp
+q.crx(ctrl, targ, angle);
+q.cry(ctrl, targ, angle);
+q.crz(ctrl, targ, angle);
+q.cphase(ctrl, targ, angle);
+q.ch(ctrl, targ);
+q.cnot(ctrl, targ);
+q.cy(ctrl, targ);
+q.cz(ctrl, targ);
+q.cu(ctrl, targ, matrix); // Multiple overloads for real matrix, complex matrix 
+q.cu(ctrl, targ, {a,b,c,d}); // Can use std::vector literal for reals...
+q.cu(ctrl, targ, {{a,b},{c,d},{e,f},{g,h}}); // ...and complex (will this even work?)
+#+END_SRC
+
+**** Fixed-number gates
+
+#+BEGIN_SRC cpp
+q.nrx(targ0, targ1, angle); // Sometimes q.xy()
+q.nry(targ0, targ1, angle);
+q.nrz(targ0, targ1, angle);
+q.swap(targ0, targ1);
+q.fswap(targ0, targ1);
+q.iswap(targ0, targ1);
+// Other swaps?
+q.nh(targ0, targ1);
+q.nu(targ0, targ1, {a,b,c,d}, angle);
+#+END_SRC cpp
+
+Could maybe delete copies of the same gate? Or allow gate aliases (different names).
+
+**** Arbitrary two-qubit gate
+
+#+BEGIN_SRC cpp
+q.u(targ0, targ1, {... <16 items>... ); // Or u2?
+#+END_SRC
+
 *** Measurement and sampling
+
+**** Measurement and postselection
+
+#+BEGIN_SRC cpp
+q.measure(targ); // Returns 0 or 1
+q.measure_all(); // Returns std::size_t (or maybe std::uint32_t? Pick a convention)
+q.postselect(targ, outcome); // Return the outcome (for interface consistency with measure())
+q.prob(targ, outcome); // Returns probability float/double (call this one if you want prob)
+#+END_SRC
+
+**** Sampling
+
+#+BEGIN_SRC cpp
+
+// Return std::vector, because you want to do val[0] and val[1]. std::pair would be better,
+// but don't want the user to have to use .first and .second (which is zero, which is one?)
+// std::map is overkill for a two element structure, with int keys.
+q.sample(targ, n);  // Returns std::vector
+q.sample_all(n);  // Returns std::map<std::size_t, std::size_t>
+#+END_SRC
 
 
 ** Interface specification 
@@ -234,3 +402,4 @@ Classes which are not simulators are provided here.
 *** QSL functions
 
 Functions are provided here.
+
