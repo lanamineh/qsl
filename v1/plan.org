@@ -411,6 +411,8 @@ q.seed(12323)
 
 The standard library passes generators into the functions that produces random numbers -- possibly because the generators are bulky (have large internal state). That might cause a performance problem for a simulation involving lots of small quantum simulators.
 
+[[https://blog.unity.com/technology/a-primer-on-repeatable-random-numbers][This]] may be helpful for cases involving more than one random process. The jist is that you can't seed parallel generators and hope that the results will be uncorrelated, unless you hash the seeds first.
+
 ** Interface specification 
 
 This section contains the full specification for the interface.

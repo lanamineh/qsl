@@ -1,2 +1,2 @@
 main: main.cpp
-	g++ -O2 -Wall -Wextra main.cpp -o main
+	g++ -std=c++20 -O2 -Wall -Wextra main.cpp -o main
