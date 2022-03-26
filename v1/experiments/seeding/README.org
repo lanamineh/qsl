@@ -1,0 +1,5 @@
+#+TITLE: Is it a performance problem to store std::mt19937 in the simulator
+
+The object of this experiment is to check how severe is the performance penalty to storing std::mt19937 in the simulator, due to its large size. 
+
+
