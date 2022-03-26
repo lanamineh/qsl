@@ -210,6 +210,11 @@ operator basic<Fp2, ...>() &&; // move-conversion
 
 #+END_SRC
 
+*** General utilities
+*** Gates
+*** Measurement and sampling
+
+
 ** Interface specification 
 
 This section contains the full specification for the interface.
