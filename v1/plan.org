@@ -251,7 +251,7 @@ Add additional functions to specific simulators (e.g. q.ones() in the number sim
 - std::cout could print just the state vector, with no trailing newline (or maybe one, if it is a column vector)
 - print method in simulators could print more information (e.g. num qubits, numb ones, additional simulator-specific information). Could also take a stream and do the same thing.
 - Anything else?
-
+  
 **** Serialisation
 
 All the simulators should support serialising themself, and initialisation from the serialisation. A round trip should produce a simulator with exactly the same state.
@@ -428,6 +428,123 @@ Every class or function in QSL is in the "qsl" namespace, and is available in a 
 *** Simulator classes
 
 This section contains one subsection for each class. Inside each section, the member functions (prototypes) for that class are listed, along with behaviour notes.
+
+**** Shared member functions
+#+BEGIN_SRC cpp
+// Get the number of qubits
+unsigned size() const;
+// Get the dimension of the Hilbert space
+unsigned dim() const;
+// Return std::vector of state
+std::vector<std::complex<F>> get_state() const;
+// Set a state
+void set_state(const std::vector<std::complex<F>> & state);
+// Reset to the all zero computational basis state
+void reset();
+// Access state vector elements (read-only). Const reference only makes sense if we have a std::vector<std::complex> wihin our implementation.
+const std::complex<F> & operator[](std::size_t index) const;
+// Generate random state, need to pass in a generator which will default to our global one.
+void make_random(std::uniform_random_bit_generator gen = qsl::gen)
+// Print state vector
+void print(std::ostream & os = std::cout) const;
+// Serialisation
+void save_json(const std::filesystem::path & path) const;
+void load_json(const std::filesystem::path & path);
+// Picking one compressed format -- do some research into exactly which one
+void save_hdf5(const std::filesystem::path & path) const;
+void load_hdf5(const std::filesystem::path & path);
+
+// One-qubit gates
+void rx(unsigned targ, F angle);
+void ry(unsigned targ, F angle);
+void rz(unsigned targ, F angle);  // Number
+void phase(unsigned targ, F angle);   // Number
+void h(unsigned targ);
+void x(unsigned targ);
+void y(unsigned targ);
+void z(unsigned targ);  // Number
+void u1(unsigned targ, const std::vector<std::complex<F>> & matrix);
+
+// Controlled gates
+void crx(unsigned ctrl, unsigned targ, F angle);
+void cry(unsigned ctrl, unsigned targ, F angle);
+void crz(unsigned ctrl, unsigned targ, F angle);  // Number
+void cphase(unsigned ctrl, unsigned targ, F angle);   // Number
+void ch(unsigned ctrl, unsigned targ);
+void cnot(unsigned ctrl, unsigned targ);
+void cy(unsigned ctrl, unsigned targ);
+void cz(unsigned ctrl, unsigned targ);  // Number
+void cu1(unsigned ctrl, unsigned targ, const std::vector<std::complex<F>> & matrix);
+
+// Rest of the number gates
+void nrx(unsigned targ1, unsigned targ2, F angle);
+void nry(unsigned targ1, unsigned targ2, F angle);
+void nrz(unsigned targ1, unsigned targ2, F angle);
+void swap(unsigned targ1, unsigned targ2);
+void fswap(unsigned targ1, unsigned targ2);
+void iswap(unsigned targ1, unsigned targ2);
+void nh(unsigned targ1, unsigned targ2);
+void nu1(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & matrix);
+
+// Arbitrary two-qubit unitary
+void u2(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & matrix);
+
+// Measurement and sampling
+F prob(unsigned targ, unsigned outcome) const;
+unsigned measure(unsigned targ, std::uniform_random_bit_generator gen = qsl::gen);
+std::size_t measure_all(std::uniform_random_bit_generator gen = qsl::gen);
+unsigned postselect(unsigned targ, unsigned outcome) const;
+std::vector<std::size_t> sample(unsigned targ, std::size_t samples, std::uniform_random_bit_generator gen = qsl::gen) const;
+std::map<std::size_t, std::size_t> sample_all(std::size_t samples, std::uniform_random_bit_generator gen = qsl::gen) const;
+
+
+#+END_SRC
+
+**** Standard simulator
+#+BEGIN_SRC cpp
+// Specify precision, debugging, and level of parallelisation
+// Always have to specify the first
+qsl::basic<std::floating_point F, bool debug = false, typename parallelisation = qsl::omp>;  
+
+// Constructors - double check the use of explicit
+explicit qsl::basic<F, D, P>(unsigned num_qubits);
+explicit qsl::basic<F, D, P>(const std::vector<std::complex<F>> & state);
+#+END_SRC
+
+**** Fixed-number simulator
+#+BEGIN_SRC cpp
+qsl::number<std::floating_point F, bool debug = false, typename parallelisation = qsl::omp>;  
+
+// Constructors 
+explicit qsl::number<F, D, P>(unsigned num_qubits);  // Default to zero ones
+qsl::number<F, D, P>(unsigned num_qubits, unsigned num_ones);
+explicit qsl::number<F, D, P>(const std::vector<std::complex<F>> & state);
+
+// Simulator specific functions
+// Get and set number of ones -- sets the lowest computational basis state with num_ones.
+unsigned get_ones() const;
+void set_ones(unsigned num_ones);
+#+END_SRC
+
+**** Resizeable simulator
+#+BEGIN_SRC cpp
+qsl::resize<std::floating_point F, bool debug = false, typename parallelisation = qsl::omp>;  
+
+// Constructors  
+explicit qsl::resize<F, D, P>(unsigned num_qubits);  // Default to zero ones
+explicit qsl::resize<F, D, P>(const std::vector<std::complex<F>> & state);
+
+// Simulator specific functions
+void add_qubit();  // Adds to end of state vector
+void add_qubit(unsigned targ);   // More targeted add function
+
+unsigned measure_out(unsigned targ, std::uniform_random_bit_generator gen = qsl::gen);  // Measures and deletes qubit
+unsigned postselect_out(unsigned targ, unsigned outcome) const; 
+
+void trim();  // Trims the state vector to the current qubit size
+#+END_SRC
+
+
 
 *** Other QSL classes
 
