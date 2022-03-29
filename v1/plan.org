@@ -423,7 +423,10 @@ This section contains the full specification for the interface.
 
 *** Namespace
 
-Every class or function in QSL is in the "qsl" namespace, and is available in a C++ program by including "qsl.hpp"
+Every class or function in QSL is in the ~qsl~ namespace, and is available in a
+C++ program by including ~qsl.hpp~.
+
+QSL will define a ~qsl::simulator~ concept.
 
 *** Simulator classes
 
@@ -550,7 +553,52 @@ void trim();  // Trims the state vector to the current qubit size
 
 Classes which are not simulators are provided here.
 
+#+BEGIN_SRC cpp
+// QSL random generator
+class gen_t
+{
+private:
+    result_type seed_;
+    std::mt19937_64 gen_;
+public:    
+    using result_type = std::mt19937_64::result_type;
+    static result_type min() {return std::mt19937_64::min();};
+    static result_type max() {return std::mt19937_64::max();};
+    result_type operator() () { return gen_(); }
+    gen_t(); // Generate a random seed properly
+    explicit gen_t(result_type seed) : gen_{seed} {}
+    result_type seed() const { return seed_; }
+    void seed(result_type seed) { gen_.seed(seed); }
+};
+
+// In a header file (global variable)
+gen_t gen;
+
+// Then in a user file, if you want, seed it
+gen.seed(1234);
+
+
+#+END_SRC
+
 *** QSL functions
 
 Functions are provided here.
+
+#+BEGIN_SRC cpp
+// Fubini-study, figure out when to do debugging, should pick the most precise F of the two simulators/vectors
+F distance(const qsl::simulator &, const qsl::simulator &);
+F distance(const qsl::simulator &, const std::vector<std::complex<F>> &);
+F distance(const std::vector<std::complex<F>> &, const qsl::simulator &);
+
+// Fidelity
+F fidelity(const qsl::simulator &, const qsl::simulator &);
+//...
+
+// Inner product
+F inner_prod(const qsl::simulator &, const qsl::simulator &);
+//...
+
+// Overloads for printing simulators to std::cout
+//...
+#+END_SRC
 
