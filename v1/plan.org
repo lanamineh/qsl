@@ -432,6 +432,12 @@ QSL will define a ~qsl::simulator~ concept.
 
 This section contains one subsection for each class. Inside each section, the member functions (prototypes) for that class are listed, along with behaviour notes.
 
+All simulators will support ~float~, ~double~ and ~long double~. 
+They will support turning debugging on or off.
+There will be three types of parallelisation, always sequential ~qsl::seq~, omp
+always switched on ~qsl::omp~, or an automatic mode where we have picked a cut
+off for the number of qubits that works well in general (but maybe not optimal the whole time) ~qsl::switch~.
+
 **** Shared member functions
 #+BEGIN_SRC cpp
 // Get the number of qubits
