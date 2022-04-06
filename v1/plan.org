@@ -1,14 +1,14 @@
 #+TITLE: Planning for Version 1
 
-* Steps (overview)
-1. [ ] Plan features and interface (see [[#planning][Specification]]).
+* Steps (overview) [2/11]
+1. [X] Plan features and interface (see [[#planning][Specification]]).
    - Write down overall library purpose
    - What gates to support?
    - Support for omp, sse, avx, gpu, etc?
    - Types of simulators? (np, resize, normal, etc?)
    - Interface requirements (gate names, how to choose simulator, etc.)
    - Any additional utilities? (fidelity, distance, etc?)
-2. [ ] Plan seeding/reproducibility
+2. [X] Plan seeding/reproducibility
 3. [ ] Create header files for the interface
 4. [ ] Plan how to test each feature
    - [ ] How to cover simulator variants without repetition?

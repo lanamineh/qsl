@@ -9,6 +9,7 @@ test_quest
 disasm/
 callgrind*
 *.out
+*.gch
 
 # Ignore cmake output
 build/
