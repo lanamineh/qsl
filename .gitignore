@@ -25,3 +25,6 @@ docs/doctrees
 
 # C++ module files
 gcm.cache
+
+# HDF5 files
+*.h5
