@@ -55,7 +55,7 @@ int main()
 	static constexpr unsigned max() { return 5; };
 	unsigned operator() () { return 3; } // Very random
     } g2;
-    q1.make_random(g2);
+    q1.make_random(g2); // Make a random state using a custom generator
     
     // TODO
     //std::cout << q1 << std::endl; // Send any simulator to an ostream
