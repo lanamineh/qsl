@@ -72,7 +72,13 @@ namespace qsl
 	/// Access state vector elements (read-only). 
 	const std::complex<F> & operator[](std::size_t index) const;
 	/// Generate random state, need to pass in a generator which will default to our global one.
-	void make_random(std::uniform_random_bit_generator auto & gen = gen);
+	void make_random(std::uniform_random_bit_generator auto & gen = gen)
+	    {
+		// In order for this to work, the body of this function must
+		// be in the header file (if the user is allowed to pass custom
+		// gen types)
+		gen(); // Just to surpress unused-variable warning for now
+	    }
 	
 	/// Print state vector
 	void print(std::ostream & os = std::cout) const;
@@ -164,7 +170,14 @@ namespace qsl
 	/// Access state vector elements (read-only). 
 	const std::complex<F> & operator[](std::size_t index) const;
 	/// Generate random state, need to pass in a generator which will default to our global one.
-	void make_random(std::uniform_random_bit_generator auto & gen = gen);
+	void make_random(std::uniform_random_bit_generator auto & gen = gen)
+	    {
+		// In order for this to work, the body of this function must
+		// be in the header file (if the user is allowed to pass custom
+		// gen types)
+		gen(); // Just to surpress unused-variable warning for now
+	    }
+
 
 	/// Add a qubit to the end of the state vector
 	void add_qubit();
@@ -269,7 +282,14 @@ namespace qsl
 	/// Access state vector elements (read-only). 
 	const std::complex<F> & operator[](std::size_t index) const;
 	/// Generate random state, need to pass in a generator which will default to our global one.
-	void make_random(std::uniform_random_bit_generator auto & gen = gen);
+	void make_random(std::uniform_random_bit_generator auto & gen = gen)
+	    {
+		// In order for this to work, the body of this function must
+		// be in the header file (if the user is allowed to pass custom
+		// gen types)
+		gen(); // Just to surpress unused-variable warning for now
+	    }
+
 
 	/// Get the number of ones
 	unsigned get_ones() const;

@@ -10,6 +10,7 @@
 #include "qsl.hpp"
 #include <vector>
 #include <iostream>
+#include <random>
 
 int main()
 {
@@ -32,15 +33,31 @@ int main()
 
     // Basic functions
     [[maybe_unused]] std::size_t d{q1.dim()}; // Get the dimension of the state vector
-    unsigned n{q2.size()}; // Get the number of qubits
-    n = q3.get_ones(); // Get the number of ones in a fixed-number simulator
+    [[maybe_unused]] unsigned n1{q2.size()}; // Get the number of qubits
+    [[maybe_unused]] unsigned n2{q3.get_ones()}; // Get the number of ones in a fixed-number simulator
     
     std::vector<std::complex<double>> s2{{1,0},{0,0},{0,0},{1,0}};
     q2.set_state(s2); // You can set the state to an arbitrary number of qubits
     // q4.set_state(s2); // You cannot implicitly change the floating point type
-    q3.make_random();
+
+    // TODO
+    //q3.make_random(); // Set the simulator to a random state
+
+    std::mt19937_64 g1;
+    q1.make_random(g1); // Make a random state using your own generator
+    q2.make_random(g1);
+    q3.make_random(g1);
+    q4.make_random(g1);
+
+    struct VeryRandom
+    {
+	static constexpr unsigned min() { return 0; };
+	static constexpr unsigned max() { return 5; };
+	unsigned operator() () { return 3; } // Very random
+    } g2;
+    q1.make_random(g2);
     
-    //TODO
+    // TODO
     //std::cout << q1 << std::endl; // Send any simulator to an ostream
     //std::cout << q2 << std::endl;
     //std::cerr << q3 << std::endl;
