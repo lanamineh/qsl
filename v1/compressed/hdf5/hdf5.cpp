@@ -18,54 +18,52 @@
 
 #include <iostream>
 #include <string>
+#include <concepts>
 
 #include "H5Cpp.h"
 
 // Removed using namespace H5. It is not clear when something is in this
 // namespace and when it is in the global namespace.
 
-const std::string FILE_NAME("test.h5");
-const std::string DATASET_NAME("dset");
-const int          NX   = 4; // dataset dimensions
-const int          NY   = 6;
-const int          RANK = 2;
+const std::string filename{"test.h5"};
+const std::string dataset_name{"dset"};
+const int x{4}; // dataset dimensions
+const int y{6};
+const int rank{2};
+
+template<std::floating_point A>
+class Thingy{};
 
 int main()
 {
-    // Try block to detect exceptions raised by any of the calls inside it
+    
     try {
         // Turn off the auto-printing when failure occurs so that we can
         // handle the errors appropriately
         H5::Exception::dontPrint();
 
         // Create a new file using the default property lists.
-	H5::H5File file(FILE_NAME, H5F_ACC_TRUNC);
+	H5::H5File file{filename, H5F_ACC_TRUNC};
 
         // Create the data space for the dataset.
         hsize_t dims[2]; // dataset dimensions
-        dims[0] = NX;
-        dims[1] = NY;
-        H5::DataSpace dataspace(RANK, dims);
+        dims[0] = x;
+        dims[1] = y;
+        H5::DataSpace dataspace{rank, dims};
 
         // Create the dataset.
-        H5::DataSet dataset = file.createDataSet(DATASET_NAME, H5::PredType::STD_I32BE, dataspace);
+        H5::DataSet dataset = file.createDataSet(dataset_name, H5::PredType::STD_I32BE, dataspace);
 
-    } // end of try block
-
-    // catch failure caused by the H5File operations
-    catch (H5::FileIException error) {
+    } catch (const H5::FileIException & error) {
+	// catch failure caused by the H5File operations
         error.printErrorStack();
         return -1;
-    }
-
-    // catch failure caused by the DataSet operations
-    catch (H5::DataSetIException error) {
+    } catch (const H5::DataSetIException & error) {
+	// catch failure caused by the DataSet operations
         error.printErrorStack();
         return -1;
-    }
-
-    // catch failure caused by the DataSpace operations
-    catch (H5::DataSpaceIException error) {
+    } catch (const H5::DataSpaceIException & error) {
+	// catch failure caused by the DataSpace operations
         error.printErrorStack();
         return -1;
     }
