@@ -1,0 +1,3 @@
+#+TITLE: Interface definition for QSL
+
+This folder contains a draft of the QSL interface, as a single qsl.hpp header file. The Makefile checks the syntax of the header file, and compiles (but does not link) a simple main file to check the usability of the interface. Run ~make~ to statically check the header file and compile the test object.
