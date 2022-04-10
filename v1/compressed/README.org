@@ -3,3 +3,8 @@
 QSL should allow the state of each simulator to be saved to and loaded from a binary format. The binary format should be well-supported in C++ and python (an example client language that might use the data), and should also be supported by standard linux utilities (for the purpose of verifying and debugging the library). 
 
 Two candidate formats are HDF5 and NetCDF. This folder contains some tests of the C++ and python libraries for these formats.
+
+* Candidate formats
+** HDF5
+** netCDF4
+** BSON
