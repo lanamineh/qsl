@@ -59,6 +59,13 @@ namespace qsl
 	/// Instantiate a simulator based on the state that is passed in 
 	explicit basic(const std::vector<std::complex<F>> & state);
 
+	/// Convert from any simulator of the same type
+	/// This is not a  copy constructor (because it is templated), so it will not
+	/// cause the move constructors to be implicitly deleted.
+	/// TODO concept for simulator
+	template<template<std::floating_point,bool,typename> typename S, bool D1, typename P1>
+	explicit basic(const S<F,D1,P1> & s);
+	
 	/// Get the number of qubits
 	unsigned size() const;
 	/// Get the dimension of the Hilbert space
@@ -157,6 +164,11 @@ namespace qsl
 	/// Instantiate a simulator based on the state that is passed in 
 	explicit resize(const std::vector<std::complex<F>> & state);
 
+	/// Construct (a copy) from any simulator of the same type
+	/// TODO concept for simulator
+	template<template<std::floating_point,bool,typename> typename S, bool D1, typename P1>
+	explicit resize(const S<F,D1,P1> & s);
+	
 	/// Get the number of qubits
 	unsigned size() const;
 	/// Get the dimension of the Hilbert space
@@ -268,6 +280,10 @@ namespace qsl
 	explicit number(const std::vector<std::complex<F>> & state);
 	/// Instantiate a simulator with a specific number of ones
 	number(unsigned num_qubits, unsigned num_ones);
+
+	/// Convert from any simulator of the same type
+	template<bool D1, typename P1>
+	explicit number(const number<F,D1,P1> & s);
 	
 	/// Get the number of qubits
 	unsigned size() const;
@@ -350,6 +366,7 @@ namespace qsl
     template<typename S>
     std::ostream & operator << (std::ostream & os, const S & s);
 
+    /// Calculate the Fubini-Study metric between two simulators/vectors
     template<std::floating_point F,
 	     template<std::floating_point,bool,typename> typename S1, bool D1, typename P1,
 	     template<std::floating_point,bool,typename> typename S2, bool D2, typename P2>
@@ -362,6 +379,34 @@ namespace qsl
     template<std::floating_point F,
 	     template<std::floating_point,bool,typename> typename S, bool D, typename P>
     F distance(const std::vector<std::complex<F>> & s1, const S<F,D,P> & s2);
+
+    /// Calculate the fidelity between two simulators/vectors
+    template<std::floating_point F,
+	     template<std::floating_point,bool,typename> typename S1, bool D1, typename P1,
+	     template<std::floating_point,bool,typename> typename S2, bool D2, typename P2>
+    F fidelity(const S1<F,D1,P1> & s1, const S2<F,D2,P2> & s2) ;
+
+    template<std::floating_point F,
+	     template<std::floating_point,bool,typename> typename S, bool D, typename P>
+    F fidelity(const S<F,D,P> & s1, const std::vector<std::complex<F>> & s2);
+
+    template<std::floating_point F,
+	     template<std::floating_point,bool,typename> typename S, bool D, typename P>
+    F fidelity(const std::vector<std::complex<F>> & s1, const S<F,D,P> & s2);
+
+    /// Calculate the inner product between two simulators/vectors
+    template<std::floating_point F,
+	     template<std::floating_point,bool,typename> typename S1, bool D1, typename P1,
+	     template<std::floating_point,bool,typename> typename S2, bool D2, typename P2>
+    F inner_prod(const S1<F,D1,P1> & s1, const S2<F,D2,P2> & s2) ;
+
+    template<std::floating_point F,
+	     template<std::floating_point,bool,typename> typename S, bool D, typename P>
+    F inner_prod(const S<F,D,P> & s1, const std::vector<std::complex<F>> & s2);
+
+    template<std::floating_point F,
+	     template<std::floating_point,bool,typename> typename S, bool D, typename P>
+    F inner_prod(const std::vector<std::complex<F>> & s1, const S<F,D,P> & s2);
 
     
 

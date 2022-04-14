@@ -23,6 +23,21 @@ int main()
     std::vector<std::complex<float>> s1{{1,0},{1,0}}; // |+) state
     qsl::basic<float> q4{s1}; // You can initialise explicitly from a std::vector    
 
+    // Convert one simulator to another
+    qsl::basic<double> q5{q3}; // Any simulator type to basic
+    qsl::resize<double> q6{q1}; // Any simulator type to resize
+    qsl::number<double,true,qsl::omp> q7{q3}; // Any number sim to number sim
+    //qsl::basic<float> q8{q3}; // Cannot implicitly change floating point type    
+
+    // Copy-assignment operator
+    q5 = q1;
+
+    // Copy constructor (actually using the coversion constructor)
+    qsl::basic<double> q8{q1};
+
+    // Move semantics
+    qsl::basic<double> q9{qsl::basic<double>{3}};
+    
     // Gates
     for (unsigned n{0}; n < q1.size(); ++n) {
 	q1.h(n); // Apply a Hadamard gate to all qubits in q1
@@ -76,5 +91,28 @@ int main()
     std::cout << qsl::distance(s2, q1) << std::endl;    
     // std::cout << qsl::distance(q1, s1) << std::endl; // This one won't work  
 
+    std::cout << qsl::fidelity(q1, q2) << std::endl;
+    std::cout << qsl::fidelity(q2, q3) << std::endl;
+    std::cout << qsl::fidelity(q1, q3) << std::endl;
+    // std::cout << qsl::fidelity(q2, q4) << std::endl; // This one (correctly)  doesn't work -- double and float conflict
+
+    std::cout << qsl::fidelity(q4, s1) << std::endl;    
+    std::cout << qsl::fidelity(q1, s2) << std::endl;    
+    std::cout << qsl::fidelity(s1, q4) << std::endl;    
+    std::cout << qsl::fidelity(s2, q1) << std::endl;    
+    // std::cout << qsl::fidelity(q1, s1) << std::endl; // This one won't work  
+
+    std::cout << qsl::inner_prod(q1, q2) << std::endl;
+    std::cout << qsl::inner_prod(q2, q3) << std::endl;
+    std::cout << qsl::inner_prod(q1, q3) << std::endl;
+    // std::cout << qsl::inner_prod(q2, q4) << std::endl; // This one (correctly)  doesn't work -- double and float conflict
+
+    std::cout << qsl::inner_prod(q4, s1) << std::endl;    
+    std::cout << qsl::inner_prod(q1, s2) << std::endl;    
+    std::cout << qsl::inner_prod(s1, q4) << std::endl;    
+    std::cout << qsl::inner_prod(s2, q1) << std::endl;    
+    // std::cout << qsl::inner_prod(q1, s1) << std::endl; // This one won't work  
+
+    
     
 }
