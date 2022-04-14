@@ -351,8 +351,19 @@ namespace qsl
     std::ostream & operator << (std::ostream & os, const S & s);
 
     template<std::floating_point F,
-	     template<typename,bool,typename> typename S1, bool D1, typename P1,
-	     template<typename,bool,typename> typename S2, bool D2, typename P2>
+	     template<std::floating_point,bool,typename> typename S1, bool D1, typename P1,
+	     template<std::floating_point,bool,typename> typename S2, bool D2, typename P2>
     F distance(const S1<F,D1,P1> & s1, const S2<F,D2,P2> & s2) ;
+
+    template<std::floating_point F,
+	     template<std::floating_point,bool,typename> typename S, bool D, typename P>
+    F distance(const S<F,D,P> & s1, const std::vector<std::complex<F>> & s2);
+
+    template<std::floating_point F,
+	     template<std::floating_point,bool,typename> typename S, bool D, typename P>
+    F distance(const std::vector<std::complex<F>> & s1, const S<F,D,P> & s2);
+
+    
+
 }
 

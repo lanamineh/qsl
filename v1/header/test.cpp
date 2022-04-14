@@ -65,7 +65,16 @@ int main()
     q2.print(); // Print directly to console output (with a trailing newline)
     q4.print(std::cerr); // Pass a custom output stream
 
+    std::cout << qsl::distance(q1, q2) << std::endl;
+    std::cout << qsl::distance(q2, q3) << std::endl;
     std::cout << qsl::distance(q1, q3) << std::endl;
-    
+    // std::cout << qsl::distance(q2, q4) << std::endl; // This one (correctly)  doesn't work -- double and float conflict
+
+    std::cout << qsl::distance(q4, s1) << std::endl;    
+    std::cout << qsl::distance(q1, s2) << std::endl;    
+    std::cout << qsl::distance(s1, q4) << std::endl;    
+    std::cout << qsl::distance(s2, q1) << std::endl;    
+    // std::cout << qsl::distance(q1, s1) << std::endl; // This one won't work  
+
     
 }
