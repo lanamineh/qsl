@@ -30,7 +30,8 @@ int main()
     q2.cnot(1,2); // Apply a CNOT gate, control = 1, target = 2
     q3.z(1); // Apply a Pauli Z gate to qubit 1
     q1.rx(0, 0.3); // Apply an Rx rotation of 0.3 radians to qubit 0
-
+    // q3.cnot(0,1); // This should not work
+    
     // Basic functions
     [[maybe_unused]] std::size_t d{q1.dim()}; // Get the dimension of the state vector
     [[maybe_unused]] unsigned n1{q2.size()}; // Get the number of qubits
@@ -57,14 +58,14 @@ int main()
     } g2;
     q1.make_random(g2); // Make a random state using a custom generator
     
-    // TODO
-    //std::cout << q1 << std::endl; // Send any simulator to an ostream
-    //std::cout << q2 << std::endl;
-    //std::cerr << q3 << std::endl;
-    //std::cerr << q4 << std::endl;
+    std::cout << q1 << std::endl; // Send any simulator to an ostream
+    std::cout << q2 << std::endl;
+    std::cerr << q3 << std::endl;
+    std::cerr << q4 << std::endl;
     q2.print(); // Print directly to console output (with a trailing newline)
     q4.print(std::cerr); // Pass a custom output stream
 
+    std::cout << qsl::distance(q1, q3) << std::endl;
     
     
 }

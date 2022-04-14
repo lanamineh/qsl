@@ -345,4 +345,14 @@ namespace qsl
 
     };
 
+    /// TODO concept for sim
+    /// TODO double check where this should go -- in or out the namespace
+    template<typename S>
+    std::ostream & operator << (std::ostream & os, const S & s);
+
+    template<std::floating_point F,
+	     template<typename,bool,typename> typename S1, bool D1, typename P1,
+	     template<typename,bool,typename> typename S2, bool D2, typename P2>
+    F distance(const S1<F,D1,P1> & s1, const S2<F,D2,P2> & s2) ;
 }
+
