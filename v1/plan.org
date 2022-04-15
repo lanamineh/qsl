@@ -423,8 +423,12 @@ The debug mode should also optionally enable a trace mode, configurable via a gl
 
 The trace information would comprise a list of everything the qsl library does -- every time a gate is performed, a simulator is constructed, measured, etc. Might be nice to have the move/copy constructors logged too (same as every other constructors), so that you can debug move semantics. Maybe could have a running check of how much memory is allocated to simulators, etc.
 
-Need to figure out how to identify simulators in the log. (Is there any way to access the name of the variable? What to do about anonymous simulators? (rvalues, etc.)).
+Need to figure out how to identify simulators in the log. (Is there any way to access the name of the variable? What to do about anonymous simulators? (rvalues, etc.)). Maybe you could have a member function to label the simulator? If so, should it only be accessible when debug = true?
 
+Potential logging levels:
+- **Quantum operations** The lowest level, just lists quantum-related things like gates, etc. that you would want to know as a user of the library (but not interested in any programming-related things, so no memory, no constructors, no traditional debugging, etc.)
+- **A bit more detail** Maybe print implementation details like memory use, size of state vector, precision, use of omp, etc.
+- **All relevant C++ operations** List things like copy/move operations, constructions, memory operations, etc.
 
 
 ** Interface specification 

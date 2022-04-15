@@ -132,5 +132,6 @@ int main()
 
     // Compare different floating point types
     std::cout << qsl::inner_prod(q1,static_cast<qsl::basic<double,false>>(q10)) << std::endl;
+
     
 }
