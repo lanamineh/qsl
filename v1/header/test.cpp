@@ -47,6 +47,13 @@ int main()
     qsl::basic<float> q11{4};
     //q11 = q1; // Cannot do this because conversion is explicit
     q11 = static_cast<qsl::basic<float>>(q1);
+
+    qsl::resize<long double> q15 = static_cast<qsl::resize<long double>>(q6);
+    //qsl::resize<long double> q16 = q6; // This one does not work
+
+    qsl::number<long double> q17 = static_cast<qsl::number<long double>>(q3);
+    //qsl::resize<long double> q18 = q3; // This one does not work
+
     
     // Gates
     for (unsigned n{0}; n < q1.size(); ++n) {
