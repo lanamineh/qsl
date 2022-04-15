@@ -88,7 +88,7 @@ namespace qsl
 		// In order for this to work, the body of this function must
 		// be in the header file (if the user is allowed to pass custom
 		// gen types)
-		gen(); // Just to surpress unused-variable warning for now
+		g(); // Just to surpress unused-variable warning for now
 	    }
 	
 	/// Print state vector
@@ -195,7 +195,7 @@ namespace qsl
 		// In order for this to work, the body of this function must
 		// be in the header file (if the user is allowed to pass custom
 		// gen types)
-		gen(); // Just to surpress unused-variable warning for now
+		g(); // Just to surpress unused-variable warning for now
 	    }
 
 
@@ -315,7 +315,7 @@ namespace qsl
 		// In order for this to work, the body of this function must
 		// be in the header file (if the user is allowed to pass custom
 		// gen types)
-		gen(); // Just to surpress unused-variable warning for now
+		g(); // Just to surpress unused-variable warning for now
 	    }
 
 

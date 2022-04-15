@@ -40,18 +40,18 @@ int main()
 
     // Conversion between floating point types
     //qsl::basic<float> q10{q1}; // This one is not allowed
-    qsl::basic<float> q10{q1}; // This one seems to use the conversion operator, even though it is explicit
-    qsl::basic<float> q12(q1); // This one also works
+    [[maybe_unused]] qsl::basic<float> q10{q1}; // This one seems to use the conversion operator, even though it is explicit
+    [[maybe_unused]] qsl::basic<float> q12(q1); // This one also works
     //qsl::basic<float> q14 = q1; // This one is not OK for some reason
     // qsl::basic<float> q13{q3}; // Cannot do this -- constructor is explicit
-    qsl::basic<float> q11{4};
+    [[maybe_unused]] qsl::basic<float> q11{4};
     //q11 = q1; // Cannot do this because conversion is explicit
     q11 = static_cast<qsl::basic<float>>(q1);
 
-    qsl::resize<long double> q15 = static_cast<qsl::resize<long double>>(q6);
+    [[maybe_unused]] qsl::resize<long double> q15 = static_cast<qsl::resize<long double>>(q6);
     //qsl::resize<long double> q16 = q6; // This one does not work
 
-    qsl::number<long double> q17 = static_cast<qsl::number<long double>>(q3);
+    [[maybe_unused]] qsl::number<long double> q17 = static_cast<qsl::number<long double>>(q3);
     //qsl::resize<long double> q18 = q3; // This one does not work
 
     
@@ -131,6 +131,6 @@ int main()
     // std::cout << qsl::inner_prod(q1, s1) << std::endl; // This one won't work  
 
     // Compare different floating point types
-    auto a{qsl::inner_prod(q1,static_cast<qsl::basic<double,false>>(q10))};
+    std::cout << qsl::inner_prod(q1,static_cast<qsl::basic<double,false>>(q10)) << std::endl;
     
 }
