@@ -37,6 +37,10 @@ int main()
 
     // Move semantics
     qsl::basic<double> q9{qsl::basic<double>{3}};
+
+    // Conversion between floating point types
+    //qsl::basic<float> q10{q1}; // This one is not allowed
+    qsl::resize<float> q10{q1};
     
     // Gates
     for (unsigned n{0}; n < q1.size(); ++n) {

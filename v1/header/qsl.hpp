@@ -65,6 +65,10 @@ namespace qsl
 	/// TODO concept for simulator
 	template<template<std::floating_point,bool,typename> typename S, bool D1, typename P1>
 	explicit basic(const S<F,D1,P1> & s);
+
+	/// Allow explicit cast between different simulator types
+	template<std::floating_point F1, bool D1, typename P1>
+	explicit operator basic<F1,D1,P1>();
 	
 	/// Get the number of qubits
 	unsigned size() const;
