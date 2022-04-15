@@ -40,7 +40,13 @@ int main()
 
     // Conversion between floating point types
     //qsl::basic<float> q10{q1}; // This one is not allowed
-    qsl::resize<float> q10{q1};
+    qsl::basic<float> q10{q1}; // This one seems to use the conversion operator, even though it is explicit
+    qsl::basic<float> q12(q1); // This one also works
+    //qsl::basic<float> q14 = q1; // This one is not OK for some reason
+    // qsl::basic<float> q13{q3}; // Cannot do this -- constructor is explicit
+    qsl::basic<float> q11{4};
+    //q11 = q1; // Cannot do this because conversion is explicit
+    q11 = static_cast<qsl::basic<float>>(q1);
     
     // Gates
     for (unsigned n{0}; n < q1.size(); ++n) {
@@ -117,6 +123,7 @@ int main()
     std::cout << qsl::inner_prod(s2, q1) << std::endl;    
     // std::cout << qsl::inner_prod(q1, s1) << std::endl; // This one won't work  
 
-    
+    // Compare different floating point types
+    auto a{qsl::inner_prod(q1,static_cast<qsl::basic<double,false>>(q10))};
     
 }

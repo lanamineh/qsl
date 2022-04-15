@@ -83,7 +83,7 @@ namespace qsl
 	/// Access state vector elements (read-only). 
 	const std::complex<F> & operator[](std::size_t index) const;
 	/// Generate random state, need to pass in a generator which will default to our global one.
-	void make_random(std::uniform_random_bit_generator auto & gen = gen)
+	void make_random(std::uniform_random_bit_generator auto & g = gen)
 	    {
 		// In order for this to work, the body of this function must
 		// be in the header file (if the user is allowed to pass custom
@@ -141,17 +141,17 @@ namespace qsl
 	/// Calculate probability of specific outcome of a qubit
 	F prob(unsigned targ, unsigned outcome) const;
 	/// Measure one qubit
-	unsigned measure(unsigned targ, std::uniform_random_bit_generator auto gen = gen);
+	unsigned measure(unsigned targ, std::uniform_random_bit_generator auto g = gen);
 	/// Measure all of the qubits
-	std::size_t measure_all(std::uniform_random_bit_generator auto gen = gen);
+	std::size_t measure_all(std::uniform_random_bit_generator auto g = gen);
 	/// Postselect one qubit on a specific outcome
 	unsigned postselect(unsigned targ, unsigned outcome) const;
 	/// Perform measurement sampling on one qubit
 	std::vector<std::size_t> sample(unsigned targ, std::size_t samples,
-					std::uniform_random_bit_generator auto gen = gen) const;
+					std::uniform_random_bit_generator auto g = gen) const;
 	/// Perform measurement sampling on all the qubits
 	std::map<std::size_t, std::size_t> sample_all(std::size_t samples,
-						      std::uniform_random_bit_generator auto gen = gen) const;
+						      std::uniform_random_bit_generator auto g = gen) const;
 
     };
 
@@ -186,7 +186,7 @@ namespace qsl
 	/// Access state vector elements (read-only). 
 	const std::complex<F> & operator[](std::size_t index) const;
 	/// Generate random state, need to pass in a generator which will default to our global one.
-	void make_random(std::uniform_random_bit_generator auto & gen = gen)
+	void make_random(std::uniform_random_bit_generator auto & g = gen)
 	    {
 		// In order for this to work, the body of this function must
 		// be in the header file (if the user is allowed to pass custom
@@ -252,20 +252,20 @@ namespace qsl
 	/// Calculate probability of specific outcome of a qubit
 	F prob(unsigned targ, unsigned outcome) const;
 	/// Measure one qubit
-	unsigned measure(unsigned targ, std::uniform_random_bit_generator auto gen = gen);
+	unsigned measure(unsigned targ, std::uniform_random_bit_generator auto g = gen);
 	/// Measure all of the qubits
-	std::size_t measure_all(std::uniform_random_bit_generator auto gen = gen);
+	std::size_t measure_all(std::uniform_random_bit_generator auto g = gen);
 	/// Postselect one qubit on a specific outcome
 	unsigned postselect(unsigned targ, unsigned outcome) const;
 	/// Perform measurement sampling on one qubit
 	std::vector<std::size_t> sample(unsigned targ, std::size_t samples,
-					std::uniform_random_bit_generator auto gen = gen) const;
+					std::uniform_random_bit_generator auto g = gen) const;
 	/// Perform measurement sampling on all the qubits
 	std::map<std::size_t, std::size_t> sample_all(std::size_t samples,
-						      std::uniform_random_bit_generator auto gen = gen) const;
+						      std::uniform_random_bit_generator auto g = gen) const;
 
 	/// Measure one qubit and remove from state vector
-	unsigned measure_out(unsigned targ, std::uniform_random_bit_generator auto gen = gen);
+	unsigned measure_out(unsigned targ, std::uniform_random_bit_generator auto g = gen);
 	/// Postselect one qubit on a specific outcome and remove from state vector
 	unsigned postselect_out(unsigned targ, unsigned outcome) const;
     };
@@ -302,7 +302,7 @@ namespace qsl
 	/// Access state vector elements (read-only). 
 	const std::complex<F> & operator[](std::size_t index) const;
 	/// Generate random state, need to pass in a generator which will default to our global one.
-	void make_random(std::uniform_random_bit_generator auto & gen = gen)
+	void make_random(std::uniform_random_bit_generator auto & g = gen)
 	    {
 		// In order for this to work, the body of this function must
 		// be in the header file (if the user is allowed to pass custom
@@ -351,17 +351,17 @@ namespace qsl
 	/// Calculate probability of specific outcome of a qubit
 	F prob(unsigned targ, unsigned outcome) const;
 	/// Measure one qubit
-	unsigned measure(unsigned targ, std::uniform_random_bit_generator auto gen = gen);
+	unsigned measure(unsigned targ, std::uniform_random_bit_generator auto g = gen);
 	/// Measure all of the qubits
-	std::size_t measure_all(std::uniform_random_bit_generator auto gen = gen);
+	std::size_t measure_all(std::uniform_random_bit_generator auto g = gen);
 	/// Postselect one qubit on a specific outcome
 	unsigned postselect(unsigned targ, unsigned outcome) const;
 	/// Perform measurement sampling on one qubit
 	std::vector<std::size_t> sample(unsigned targ, std::size_t samples,
-					std::uniform_random_bit_generator auto gen = gen) const;
+					std::uniform_random_bit_generator auto g = gen) const;
 	/// Perform measurement sampling on all the qubits
 	std::map<std::size_t, std::size_t> sample_all(std::size_t samples,
-						      std::uniform_random_bit_generator auto gen = gen) const;
+						      std::uniform_random_bit_generator auto g = gen) const;
 
     };
 
