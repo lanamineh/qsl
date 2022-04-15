@@ -417,6 +417,16 @@ One possible better method:
 - Don't pass a seed in the constructor, instead do it like uniform_int_distribution and make the user pass a generator object to the functions that use randomness. This allows the user the flexibility to create their own generators when they need to (avoiding performance penalties if they want), and is similar to the C++ standard approach to random distributions. It also allows the user to separate sources of randomness used for different purposes. It can also be generalised if we discover the need for more randomness (just allow a generator argument in those functions). The implementation of the simulators will be much simpler because there is no need to store random elements.
 - However, set a default argument for all the generators to a global qsl generator object. Allow the user to set a global seed for this if they want. That way, anyone not wanting to deal with randomness doesn't have to, and there is still a bit of "easy" reproducibility available from the global seed.
 
+*** Logging and debugging
+
+The debug mode should also optionally enable a trace mode, configurable via a global object. The configuration should allow setting a verbosity level, and specifying an output file name (which could also be stderr or stdout, maybe), to which all trace information would be sent.
+
+The trace information would comprise a list of everything the qsl library does -- every time a gate is performed, a simulator is constructed, measured, etc. Might be nice to have the move/copy constructors logged too (same as every other constructors), so that you can debug move semantics. Maybe could have a running check of how much memory is allocated to simulators, etc.
+
+Need to figure out how to identify simulators in the log. (Is there any way to access the name of the variable? What to do about anonymous simulators? (rvalues, etc.)).
+
+
+
 ** Interface specification 
 
 This section contains the full specification for the interface.
