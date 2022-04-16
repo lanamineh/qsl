@@ -14,8 +14,13 @@
 
 // "Wrong" types for testing the concepts
 template<std::floating_point F, bool D, typename P>
-struct NotASim
+struct NotASim1
 {
+};
+template<std::floating_point F, bool D, typename P>
+struct NotASim2
+{
+    double get_state() const;
 };
 
 
@@ -141,6 +146,8 @@ int main()
     std::cout << qsl::inner_prod(q1,static_cast<qsl::basic<double,false>>(q10)) << std::endl;
 
     // Testing concepts
-    NotASim<double, false, qsl::omp> test;
-    qsl::basic<double> q19{test};
+    NotASim1<double, false, qsl::omp> test1;
+    //qsl::basic<double> q19{test1};
+    NotASim2<double, false, qsl::omp> test2;
+    qsl::basic<double> q19{test2};
 }
