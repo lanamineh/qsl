@@ -12,6 +12,13 @@
 #include <iostream>
 #include <random>
 
+// "Wrong" types for testing the concepts
+template<std::floating_point F, bool D, typename P>
+struct NotASim
+{
+};
+
+
 int main()
 {
     // Constructors
@@ -133,5 +140,7 @@ int main()
     // Compare different floating point types
     std::cout << qsl::inner_prod(q1,static_cast<qsl::basic<double,false>>(q10)) << std::endl;
 
-    
+    // Testing concepts
+    NotASim<double, false, qsl::omp> test;
+    qsl::basic<double> q19{test};
 }
