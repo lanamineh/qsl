@@ -13,8 +13,8 @@
 
 namespace qsl
 {
-    template<typename S, typename F>
-    concept has_state_vector = requires (S s) {
+    template<template<std::floating_point F, bool D, typename P> typename S, typename F, bool D, typename P>
+    concept has_state_vector = requires (S<F,D,P> s) {
     	{s.get_state()} -> std::same_as<std::vector<std::complex<F>>>;
     };
     
@@ -69,7 +69,7 @@ namespace qsl
 	/// cause the move constructors to be implicitly deleted.
 	/// TODO concept for simulator
 	template<template<std::floating_point,bool,typename> typename S, bool D1, typename P1>
-	requires has_state_vector<S<F,D1,P1>, F>
+	requires has_state_vector<S, F, D1, P1>
 	explicit basic(const S<F,D1,P1> & s);
 
 	/// Allow explicit cast between different simulator types

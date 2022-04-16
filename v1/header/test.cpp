@@ -149,5 +149,5 @@ int main()
     NotASim1<double, false, qsl::omp> test1;
     //qsl::basic<double> q19{test1};
     NotASim2<double, false, qsl::omp> test2;
-    qsl::basic<double> q19{test2};
+    //qsl::basic<double> q19{test2};
 }
