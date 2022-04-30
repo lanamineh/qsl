@@ -39,7 +39,7 @@ int main()
     qsl::basic<double> q5{q3}; // Any simulator type to basic
     qsl::resize<double> q6{q1}; // Any simulator type to resize
     qsl::number<double,true,qsl::omp> q7{q3}; // Any number sim to number sim
-    //qsl::basic<float> q8{q3}; // Cannot implicitly change floating point type    
+    //qsl::basic<float> q81{q2}; // Cannot implicitly change floating point type    
 
     // Copy-assignment operator
     q5 = q1;
@@ -112,25 +112,27 @@ int main()
     std::cout << qsl::distance(q1, q2) << std::endl;
     std::cout << qsl::distance(q2, q3) << std::endl;
     std::cout << qsl::distance(q1, q3) << std::endl;
-    // std::cout << qsl::distance(q2, q4) << std::endl; // This one (correctly)  doesn't work -- double and float conflict
+    //std::cout << qsl::distance(q2, q4) << std::endl; // This one (correctly)  doesn't work -- double and float conflict
 
     std::cout << qsl::distance(q4, s1) << std::endl;    
     std::cout << qsl::distance(q1, s2) << std::endl;    
     std::cout << qsl::distance(s1, q4) << std::endl;    
     std::cout << qsl::distance(s2, q1) << std::endl;    
-    // std::cout << qsl::distance(q1, s1) << std::endl; // This one won't work  
-
+    //std::cout << qsl::distance(q1, s1) << std::endl; // This one won't work  
+    //std::cout << qsl::distance(s1, q1) << std::endl; // This one won't work  
+    
     std::cout << qsl::fidelity(q1, q2) << std::endl;
     std::cout << qsl::fidelity(q2, q3) << std::endl;
     std::cout << qsl::fidelity(q1, q3) << std::endl;
-    // std::cout << qsl::fidelity(q2, q4) << std::endl; // This one (correctly)  doesn't work -- double and float conflict
+    //std::cout << qsl::fidelity(q2, q4) << std::endl; // This one (correctly)  doesn't work -- double and float conflict
 
     std::cout << qsl::fidelity(q4, s1) << std::endl;    
     std::cout << qsl::fidelity(q1, s2) << std::endl;    
     std::cout << qsl::fidelity(s1, q4) << std::endl;    
     std::cout << qsl::fidelity(s2, q1) << std::endl;    
-    // std::cout << qsl::fidelity(q1, s1) << std::endl; // This one won't work  
-
+    //std::cout << qsl::fidelity(q1, s1) << std::endl; // This one won't work  
+    //std::cout << qsl::fidelity(s1, q1) << std::endl; // This one won't work  
+    
     std::cout << qsl::inner_prod(q1, q2) << std::endl;
     std::cout << qsl::inner_prod(q2, q3) << std::endl;
     std::cout << qsl::inner_prod(q1, q3) << std::endl;
