@@ -146,7 +146,8 @@ namespace qsl
 	void h(unsigned targ);
 	void x(unsigned targ);
 	void y(unsigned targ);
-	void z(unsigned targ);  
+	void z(unsigned targ);
+	void u1(unsigned targ, const std::vector<F> & matrix);
 	void u1(unsigned targ, const std::vector<std::complex<F>> & matrix);
 
 	// Controlled gates
@@ -157,7 +158,8 @@ namespace qsl
 	void ch(unsigned ctrl, unsigned targ);
 	void cnot(unsigned ctrl, unsigned targ);
 	void cy(unsigned ctrl, unsigned targ);
-	void cz(unsigned ctrl, unsigned targ);  
+	void cz(unsigned ctrl, unsigned targ);
+	void cu1(unsigned ctrl, unsigned targ, const std::vector<F> & matrix);
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<std::complex<F>> & matrix);
 
 	// Rest of the number gates
@@ -168,11 +170,13 @@ namespace qsl
 	void fswap(unsigned targ1, unsigned targ2);
 	void iswap(unsigned targ1, unsigned targ2);
 	void nh(unsigned targ1, unsigned targ2);
+	void nu1(unsigned targ1, unsigned targ2, const std::vector<F> & matrix);
 	void nu1(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & matrix);
 
 	/// Arbitrary two-qubit unitary
+	void u2(unsigned targ1, unsigned targ2, const std::vector<F> & matrix);
 	void u2(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & matrix);
-
+	
 	/// Calculate probability of specific outcome of a qubit
 	F prob(unsigned targ, unsigned outcome) const;
 	/// Measure one qubit
@@ -261,7 +265,8 @@ namespace qsl
 	void h(unsigned targ);
 	void x(unsigned targ);
 	void y(unsigned targ);
-	void z(unsigned targ);  
+	void z(unsigned targ);
+	void u1(unsigned targ, const std::vector<F> & matrix);
 	void u1(unsigned targ, const std::vector<std::complex<F>> & matrix);
 
 	// Controlled gates
@@ -272,7 +277,8 @@ namespace qsl
 	void ch(unsigned ctrl, unsigned targ);
 	void cnot(unsigned ctrl, unsigned targ);
 	void cy(unsigned ctrl, unsigned targ);
-	void cz(unsigned ctrl, unsigned targ);  
+	void cz(unsigned ctrl, unsigned targ);
+	void cu1(unsigned ctrl, unsigned targ, const std::vector<F> & matrix);
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<std::complex<F>> & matrix);
 
 	// Rest of the number gates
@@ -283,9 +289,11 @@ namespace qsl
 	void fswap(unsigned targ1, unsigned targ2);
 	void iswap(unsigned targ1, unsigned targ2);
 	void nh(unsigned targ1, unsigned targ2);
+	void nu1(unsigned targ1, unsigned targ2, const std::vector<F> & matrix);
 	void nu1(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & matrix);
 
 	/// Arbitrary two-qubit unitary
+	void u2(unsigned targ1, unsigned targ2, const std::vector<F> & matrix);
 	void u2(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & matrix);
 
 	/// Calculate probability of specific outcome of a qubit
@@ -389,6 +397,7 @@ namespace qsl
 	void fswap(unsigned targ1, unsigned targ2);
 	void iswap(unsigned targ1, unsigned targ2);
 	void nh(unsigned targ1, unsigned targ2);
+	void nu1(unsigned targ1, unsigned targ2, const std::vector<F> & matrix);
 	void nu1(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & matrix);
 
 	/// Calculate probability of specific outcome of a qubit
@@ -435,7 +444,7 @@ namespace qsl
     template<std::floating_point F, has_state_vector_of_type<F> S>
     F fidelity(const std::vector<std::complex<F>> & s1, const S & s2);
 
-    /// Calculate the inner product between two simulators/vectors
+    /// Calculate the inner product between two simulators/vectors - do not normalise vector?
     template<has_state_vector S1, has_state_vector S2>
     requires have_same_precision<S1, S2> 
     get_precision_t<S1> inner_prod(const S1 & s1, const S2 & s2);
