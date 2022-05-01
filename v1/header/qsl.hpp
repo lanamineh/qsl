@@ -220,17 +220,6 @@ namespace qsl
 	 */ 	
 	explicit basic(const std::vector<std::complex<F>> & state);
 
-<<<<<<< HEAD
-	/// Convert from any simulator of the same type
-	/// This is not a  copy constructor (because it is templated), so it will not
-	/// cause the move constructors to be implicitly deleted.
-	/// TODO concept for simulator
-	template<has_state_vector_of_precision<F> S>
-	explicit basic(const S & s);
-
-	/// Allow explicit cast between different simulator types
-	template<std::floating_point F1, bool D1, parallelisation P1>
-=======
 	/**
 	 * \brief Convert from any simulator using the same floating point type.
 	 *
@@ -239,14 +228,13 @@ namespace qsl
 	 *
 	 * \param s A valid qsl simulator object that uses the same floating point type.
 	 */
-	template<has_state_vector_of_type<F> S>
+	template<has_state_vector_of_precision<F> S>
 	explicit basic(const S & s);
 
 	/**
 	 * \brief Convert between different floating point types for qsl::basic simulators.
 	 */
-	template<std::floating_point F1, bool D1, typename P1>
->>>>>>> 2894e0cd3c468ca97ea35c1d72abbd57c12cbb16
+	template<std::floating_point F1, bool D1, parallelisation P1>
 	explicit operator basic<F1,D1,P1>();
 	
 	/**
@@ -473,15 +461,6 @@ namespace qsl
 	 */ 	
 	explicit resize(const std::vector<std::complex<F>> & state);
 
-<<<<<<< HEAD
-	/// Construct (a copy) from any simulator of the same type
-	/// TODO concept for simulator
-	template<has_state_vector_of_precision<F> S>
-	explicit resize(const S & s);
-
-	/// Allow explicit cast between different simulator types
-	template<std::floating_point F1, bool D1, parallelisation P1>
-=======
 	/**
 	 * \brief Convert from any simulator using the same floating point type.
 	 *
@@ -490,14 +469,13 @@ namespace qsl
 	 *
 	 * \param s A valid qsl simulator object that uses the same floating point type.
 	 */
-	template<has_state_vector_of_type<F> S>
+	template<has_state_vector_of_precision<F> S>
 	explicit resize(const S & s);
 
 	/**
 	 * \brief Convert between different floating point types for qsl::resize simulators.
 	 */
-	template<std::floating_point F1, bool D1, typename P1>
->>>>>>> 2894e0cd3c468ca97ea35c1d72abbd57c12cbb16
+	template<std::floating_point F1, bool D1, parallelisation P1>
 	explicit operator resize<F1,D1,P1>();
 	
 	/**
@@ -767,14 +745,6 @@ namespace qsl
 	 */ 
 	number(unsigned num_qubits, unsigned num_ones);
 
-<<<<<<< HEAD
-	/// Convert from any simulator of the same type
-	template<has_state_vector_of_precision<F> S>
-	explicit number(const S & s);
-
-	/// Allow explicit cast between different simulator types
-	template<std::floating_point F1, bool D1, parallelisation P1>
-=======
 	/**
 	 * \brief Convert from any simulator using the same floating point type.
 	 *
@@ -783,14 +753,13 @@ namespace qsl
 	 *
 	 * \param s A valid qsl simulator object that uses the same floating point type.
 	 */
-	template<has_state_vector_of_type<F> S>
+	template<has_state_vector_of_precision<F> S>
 	explicit number(const S & s);
 
 	/**
 	 * \brief Convert between different floating point types for qsl::number simulators.
 	 */
-	template<std::floating_point F1, bool D1, typename P1>
->>>>>>> 2894e0cd3c468ca97ea35c1d72abbd57c12cbb16
+	template<std::floating_point F1, bool D1, parallelisation P1>
 	explicit operator number<F1,D1,P1>();
 
 	/**
