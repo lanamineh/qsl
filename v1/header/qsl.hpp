@@ -103,7 +103,8 @@ namespace qsl
      *
      */
     template<typename S, typename F>
-    concept state_vector_precision = std::is_same_v<get_precision_t<S>, F>;
+    concept state_vector_precision = std::is_floating_point_v<F>
+	&& std::is_same_v<get_precision_t<S>, F>;
 
     /**
      * \brief Helper to check for a state vector of a particular precision
