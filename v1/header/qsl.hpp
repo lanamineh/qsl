@@ -69,6 +69,15 @@ namespace qsl
     };
 
     /**
+     * \brief Allow get_precision to work with floating point types too
+     */
+    template<std::floating_point F>
+    struct get_precision<F>
+    {
+	using type = F;
+    };
+    
+    /**
      * \brief Helper to get the precision type of a simulator or state directly
      *
      * \tparam T The simulator or state vector whose precision is wanted.
@@ -102,10 +111,30 @@ namespace qsl
      * \tparam F The precision to be compared with the precision of S
      *
      */
-    template<typename S, typename F>
-    concept state_vector_precision = std::is_floating_point_v<F>
-	&& std::is_same_v<get_precision_t<S>, F>;
+    //  template<typename S, typename F>
+    // concept state_vector_precision = std::is_floating_point_v<F>
+    // 	&& std::is_same_v<get_precision_t<S>, F>;
 
+
+    /**
+     * \brief Check if two types have the same precision
+     *
+     * This concept compares the precision of two types, which may be
+     * simulators, state vectors (real or complex), or built-in floating
+     * point types. The concept returns true if the types have the same
+     * floating point type. For a simulator, the floating point type is
+     * the floating point type of its internal complex state vector. For
+     * a real or complex state vector, it is the floating point type
+     * of the underlying vector.
+     *
+     * \tparam T The first type to check
+     * \tparam U Another simulator/state vector/built-in type to compare with T
+     */
+    template<typename T, typename U>
+    concept same_precision = std::is_same_v<get_precision_t<T>,
+					    get_precision_t<U>>;
+    
+    
     /**
      * \brief Helper to check for a state vector of a particular precision
      *
@@ -117,20 +146,9 @@ namespace qsl
      *
      */
     template<typename S, typename F>
-    concept has_state_vector_of_precision = has_state_vector<S> && state_vector_precision<S,F>;
+    concept has_state_vector_of_precision = has_state_vector<S>
+	&& same_precision<S,F>;
 
-    /**
-     * \brief Check if two simulators/state vectors have the same precision
-     *
-     * This concept should only be used if it is known that S1 and S2 are
-     * simulators/state vectors.
-     *
-     * \tparam S1 A simulator/state vector
-     * \tparam S2 Another simulator/state vector to compare with S1
-     */
-    template<typename S1, typename S2>
-    concept same_precision = std::is_same_v<get_precision_t<S1>, get_precision_t<S2>>;
-    
     /**
      * \brief Random generator
      */
