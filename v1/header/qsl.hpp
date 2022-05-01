@@ -13,6 +13,30 @@
 
 namespace qsl
 {
+
+    template<typename T>
+    constexpr bool is_complex_state_vector = false;
+
+    template<std::floating_point F>
+    constexpr bool is_complex_state_vector<std::vector<std::complex<F>>> = true;
+
+    template<typename T>
+    concept complex_state_vector = is_complex_state_vector<T>;
+
+    /*
+    template<typename T>
+    constexpr bool is_real_state_vector = false;
+
+    template<std::floating_point F>
+    constexpr bool is_real_state_vector<std::vector<F>> = true;
+
+    template<typename T>
+    concept real_state_vector = is_real_state_vector<T>;
+
+    template<typename T>
+    concept state_vector = real_state_vector<T> || complex_state_vector<T>;
+    */
+    
     template<typename T>
     struct get_precision {};
     
@@ -22,29 +46,33 @@ namespace qsl
 	using type = F;
     };
 
-    // \todo This might not be necessary if we can find a way around the get_precision_t compile error
     template<std::floating_point F>
     struct get_precision<std::vector<std::complex<F>>>
     {
-	using type = F;
+    	using type = F;
     };
     
     template<typename T>
     using get_precision_t = get_precision<T>::type;
-
     
-    template<typename S, typename F>
-    concept has_state_vector_of_type = requires (S s) {
-    	{s.get_state()} -> std::same_as<std::vector<std::complex<F>>>;
-    };
+    // template<typename S, typename F>
+    // concept has_state_vector_of_type = requires (S s) {
+    // 	{s.get_state()} -> std::same_as<std::vector<std::complex<F>>>;
+    // };
 
     template<typename S>
     concept has_state_vector = requires (S s) {
-    	{s.get_state()};// -> Check that return type is std::vector of std::complex of std::floating_point 
+    	{s.get_state()} -> complex_state_vector;
     };
+
+    template<typename S, typename F>
+    concept state_vector_precision = std::is_floating_point_v<F> && std::is_same_v<get_precision_t<S>, F>;
+
+    template<typename S, typename F>
+    concept has_state_vector_of_precision = has_state_vector<S> && state_vector_precision<S,F>;
     
     template<typename S1, typename S2>
-    concept have_same_precision = std::is_same_v<get_precision_t<S1>, get_precision_t<S2>>;
+    concept same_precision = std::is_same_v<get_precision_t<S1>, get_precision_t<S2>>;
     
     /// \todo Make these all part of a concept
     /// Run functions without parallelisation
@@ -98,7 +126,7 @@ namespace qsl
 	/// This is not a  copy constructor (because it is templated), so it will not
 	/// cause the move constructors to be implicitly deleted.
 	/// TODO concept for simulator
-	template<has_state_vector_of_type<F> S>
+	template<has_state_vector_of_precision<F> S>
 	explicit basic(const S & s);
 
 	/// Allow explicit cast between different simulator types
@@ -209,7 +237,7 @@ namespace qsl
 
 	/// Construct (a copy) from any simulator of the same type
 	/// TODO concept for simulator
-	template<has_state_vector_of_type<F> S>
+	template<has_state_vector_of_precision<F> S>
 	explicit resize(const S & s);
 
 	/// Allow explicit cast between different simulator types
@@ -333,7 +361,7 @@ namespace qsl
 	number(unsigned num_qubits, unsigned num_ones);
 
 	/// Convert from any simulator of the same type
-	template<has_state_vector_of_type<F> S>
+	template<has_state_vector_of_precision<F> S>
 	explicit number(const S & s);
 
 	/// Allow explicit cast between different simulator types
@@ -424,35 +452,35 @@ namespace qsl
     
     /// Calculate the Fubini-Study metric between two simulators/vectors
     template<has_state_vector S1, has_state_vector S2>
-    requires have_same_precision<S1, S2> 
+    requires same_precision<S1, S2> 
     get_precision_t<S1> distance(const S1 & s1, const S2 & s2);
 
-    template<std::floating_point F, has_state_vector_of_type<F> S>
+    template<std::floating_point F, has_state_vector_of_precision<F> S>
     F distance(const S & s1, const std::vector<std::complex<F>> & s2);
 
-    template<std::floating_point F, has_state_vector_of_type<F> S>
+    template<std::floating_point F, has_state_vector_of_precision<F> S>
     F distance(const std::vector<std::complex<F>> & s1, const S & s2);
 
     /// Calculate the fidelity between two simulators/vectors
     template<has_state_vector S1, has_state_vector S2>
-    requires have_same_precision<S1, S2> 
+    requires same_precision<S1, S2> 
     get_precision_t<S1> fidelity(const S1 & s1, const S2 & s2);
 
-    template<std::floating_point F, has_state_vector_of_type<F> S>
+    template<std::floating_point F, has_state_vector_of_precision<F> S>
     F fidelity(const S & s1, const std::vector<std::complex<F>> & s2);
 
-    template<std::floating_point F, has_state_vector_of_type<F> S>
+    template<std::floating_point F, has_state_vector_of_precision<F> S>
     F fidelity(const std::vector<std::complex<F>> & s1, const S & s2);
 
     /// Calculate the inner product between two simulators/vectors - do not normalise vector?
     template<has_state_vector S1, has_state_vector S2>
-    requires have_same_precision<S1, S2> 
+    requires same_precision<S1, S2> 
     get_precision_t<S1> inner_prod(const S1 & s1, const S2 & s2);
 
-    template<std::floating_point F, has_state_vector_of_type<F> S>
+    template<std::floating_point F, has_state_vector_of_precision<F> S>
     F inner_prod(const S & s1, const std::vector<std::complex<F>> & s2);
 
-    template<std::floating_point F, has_state_vector_of_type<F> S>
+    template<std::floating_point F, has_state_vector_of_precision<F> S>
     F inner_prod(const std::vector<std::complex<F>> & s1, const S & s2);
 
     
