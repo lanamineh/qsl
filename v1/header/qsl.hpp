@@ -13,7 +13,21 @@
 
 namespace qsl
 {
+    /// Run functions without parallelisation
+    struct seq;
+    /// Run functions with omp
+    struct omp;
+    /// Automatically turn omp on and off depending on number of qubits
+    struct opt;
 
+    /**
+     * \brief 
+     *
+     */
+    template<typename T>
+    concept parallelisation = std::is_same_v<T,seq> || std::is_same_v<T,omp>
+	|| std::is_same_v<T,opt>;
+    
     template<typename T>
     constexpr bool is_complex_state_vector = false;
 
@@ -23,65 +37,99 @@ namespace qsl
     template<typename T>
     concept complex_state_vector = is_complex_state_vector<T>;
 
-    /*
+    /**
+     * \brief Struct for obtaining the precision of a simulator or state vector
+     */
     template<typename T>
-    constexpr bool is_real_state_vector = false;
+    struct get_precision;
 
-    template<std::floating_point F>
-    constexpr bool is_real_state_vector<std::vector<F>> = true;
-
-    template<typename T>
-    concept real_state_vector = is_real_state_vector<T>;
-
-    template<typename T>
-    concept state_vector = real_state_vector<T> || complex_state_vector<T>;
-    */
-    
-    template<typename T>
-    struct get_precision {};
-    
-    template<template<std::floating_point,bool,typename> typename S, std::floating_point F, bool D, typename P>
+    /**
+     * \brief Obtain the precision of a simulator object
+     *
+     * The resulting precision is stored in the type member.
+     */
+    template<template<typename,bool,typename> typename S,
+	     std::floating_point F,
+	     bool D,
+	     parallelisation P>
     struct get_precision<S<F, D, P>>
     {
 	using type = F;
     };
 
+    /**
+     * \brief Obtain the precision for a state vector (standard vector)
+     * 
+     * Precision is stored in the type member.
+     */
     template<std::floating_point F>
     struct get_precision<std::vector<std::complex<F>>>
     {
     	using type = F;
     };
-    
-    template<typename T>
-    using get_precision_t = get_precision<T>::type;
-    
-    // template<typename S, typename F>
-    // concept has_state_vector_of_type = requires (S s) {
-    // 	{s.get_state()} -> std::same_as<std::vector<std::complex<F>>>;
-    // };
 
+    /**
+     * \brief Helper to get the precision type of a simulator or state directly
+     *
+     * \tparam T The simulator or state vector whose precision is wanted.
+     */
+    template<typename T>
+    using get_precision_t = typename get_precision<T>::type;
+    
+    /**
+     * \brief Concept for having a state vector
+     *
+     * A class having a state vector means having a member function
+     * get_state() which returns a std::vector<std::complex<F>>, where
+     * F is a floating point type.
+     *
+     * \tparam S The type to check for having a state vector
+     */
     template<typename S>
     concept has_state_vector = requires (S s) {
     	{s.get_state()} -> complex_state_vector;
     };
 
+    /**
+     * \brief Compare the precision of a simulator/state vector with a fixed type
+     *
+     * Use this concept to check if a simulator or state vector has a 
+     * particular given precision. This concept will only work if 
+     * you know that S is actually a simulator or state vector. The concept 
+     * evaluates to true if S has precision F.
+     *
+     * \tparam S The simulator or state vector
+     * \tparam F The precision to be compared with the precision of S
+     *
+     */
     template<typename S, typename F>
-    concept state_vector_precision = std::is_floating_point_v<F> && std::is_same_v<get_precision_t<S>, F>;
+    concept state_vector_precision = std::is_same_v<get_precision_t<S>, F>;
 
+    /**
+     * \brief Helper to check for a state vector of a particular precision
+     *
+     * This concept is the same as checking first whether a type has a state
+     * vector, and then comparing its precision with a known type.
+     *
+     * \tparam S The type to check for a state vector.
+     * \tparam F The precision to compare with S, if S has a state vector
+     *
+     */
     template<typename S, typename F>
     concept has_state_vector_of_precision = has_state_vector<S> && state_vector_precision<S,F>;
-    
+
+    /**
+     * \brief Check if two simulators/state vectors have the same precision
+     *
+     * This concept should only be used if it is known that S1 and S2 are
+     * simulators/state vectors.
+     *
+     * \tparam S1 A simulator/state vector
+     * \tparam S2 Another simulator/state vector to compare with S1
+     */
     template<typename S1, typename S2>
     concept same_precision = std::is_same_v<get_precision_t<S1>, get_precision_t<S2>>;
     
-    /// \todo Make these all part of a concept
-    /// Run functions without parallelisation
-    struct seq {};
-    /// Run functions with omp
-    struct omp {};
-    /// Automatically turn omp on and off depending on number of qubits
-    struct opt {};
-
     /**
      * \brief Random generator
      */
@@ -111,7 +159,7 @@ namespace qsl
     /**
      * \brief General purpose quantum simulator.
      */
-    template<std::floating_point F, bool D = false, typename P = opt>
+    template<std::floating_point F, bool D = false, parallelisation P = opt>
     class basic
     {
     public:
@@ -130,7 +178,7 @@ namespace qsl
 	explicit basic(const S & s);
 
 	/// Allow explicit cast between different simulator types
-	template<std::floating_point F1, bool D1, typename P1>
+	template<std::floating_point F1, bool D1, parallelisation P1>
 	explicit operator basic<F1,D1,P1>();
 	
 	/// Get the number of qubits
@@ -226,7 +274,7 @@ namespace qsl
     /**
      * \brief Resizeable quantum simulator
      */
-    template<std::floating_point F, bool D = false, typename P = opt>
+    template<std::floating_point F, bool D = false, parallelisation P = opt>
     class resize
     {
     public:
@@ -241,7 +289,7 @@ namespace qsl
 	explicit resize(const S & s);
 
 	/// Allow explicit cast between different simulator types
-	template<std::floating_point F1, bool D1, typename P1>
+	template<std::floating_point F1, bool D1, parallelisation P1>
 	explicit operator resize<F1,D1,P1>();
 	
 	/// Get the number of qubits
@@ -349,7 +397,7 @@ namespace qsl
     /**
      * \brief Fixed number quantum simulator.
      */
-    template<std::floating_point F, bool D = false, typename P = opt>
+    template<std::floating_point F, bool D = false, parallelisation P = opt>
     class number
     {
     public:
@@ -365,7 +413,7 @@ namespace qsl
 	explicit number(const S & s);
 
 	/// Allow explicit cast between different simulator types
-	template<std::floating_point F1, bool D1, typename P1>
+	template<std::floating_point F1, bool D1, parallelisation P1>
 	explicit operator number<F1,D1,P1>();
 
 	/// Get the number of qubits

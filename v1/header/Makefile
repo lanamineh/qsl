@@ -1,4 +1,6 @@
 CC=g++-10
+#CC=g++-11
+#CC=clang++-10
 
 test.o: check
 	${CC} -c -std=c++20 -Wall -Wextra test.cpp -o test.o
