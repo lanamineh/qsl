@@ -69,7 +69,7 @@ namespace qsl
     };
 
     /**
-     * \brief Allow get_precision to work with floating point types too
+     * \brief Allow get_precision to work with built-in floating-point types too
      */
     template<std::floating_point F>
     struct get_precision<F>
@@ -98,23 +98,6 @@ namespace qsl
     concept has_state_vector = requires (S s) {
     	{s.get_state()} -> complex_state_vector;
     };
-
-    /**
-     * \brief Compare the precision of a simulator/state vector with a fixed type
-     *
-     * Use this concept to check if a simulator or state vector has a 
-     * particular given precision. This concept will only work if 
-     * you know that S is actually a simulator or state vector. The concept 
-     * evaluates to true if S has precision F.
-     *
-     * \tparam S The simulator or state vector
-     * \tparam F The precision to be compared with the precision of S
-     *
-     */
-    //  template<typename S, typename F>
-    // concept state_vector_precision = std::is_floating_point_v<F>
-    // 	&& std::is_same_v<get_precision_t<S>, F>;
-
 
     /**
      * \brief Check if two types have the same precision
@@ -181,7 +164,7 @@ namespace qsl
      * \tparam F The floating point precision.
      * \tparam D Set debugging to be on (true) or off (false). Defaults to off
      *           to prioritise speed. 
-     * \tparam P Set paralellisation level. Available options are off (qsl::seq), 
+     * \tparam P Set parallelisation level. Available options are off (qsl::seq), 
      *           on (qsl::omp), or an automatic optimal selection (qsl::opt).
      */
     template<std::floating_point F, bool D = false, parallelisation P = opt>
