@@ -5,3 +5,6 @@ test.o: check
 
 check:
 	cppcheck --enable=all --suppress=missingIncludeSystem qsl.hpp test.cpp
+
+docs:
+	doxygen

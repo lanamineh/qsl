@@ -22,6 +22,7 @@ build/
 docs/doxy
 docs/html
 docs/doctrees
+v1/header/html
 
 # C++ module files
 gcm.cache

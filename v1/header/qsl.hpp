@@ -87,8 +87,6 @@ namespace qsl
     class basic
     {
     public:
-	//using precision_t = F;
-	
 	/// Instantiate a simulator with num_qubits qubits in the all zero state
 	explicit basic(unsigned num_qubits);
 	/// Instantiate a simulator based on the state that is passed in 
