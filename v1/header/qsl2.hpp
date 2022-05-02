@@ -121,14 +121,14 @@ namespace qsl
 	 *
 	 * \return Number of qubits.
 	 */
-	unsigned size() const;
+	unsigned qubits() const;
 
 	/**
 	 * \brief Get the dimension of the Hilbert space = 2 ^ num_qubits.
 	 *
 	 * \return Dimension of Hilbert space.
 	 */
-	unsigned dim() const;
+	unsigned size() const;
 
 	/**
 	 * \brief Return the current state of the qubits.
@@ -362,14 +362,14 @@ namespace qsl
 	 *
 	 * \return Number of qubits.
 	 */
-	unsigned size() const;
+	unsigned qubits() const;
 	
 	/**
 	 * \brief Get the current dimension of the Hilbert space = 2 ^ num_qubits.
 	 *
 	 * \return Dimension of Hilbert space.
 	 */
-	unsigned dim() const;
+	unsigned size() const;
 	
 	/**
 	 * \brief Return the current state of the qubits.
@@ -646,14 +646,14 @@ namespace qsl
 	 *
 	 * \return Number of qubits.
 	 */
-	unsigned size() const;
+	unsigned qubits() const;
 
 	/**
 	 * \brief Get the dimension of the Hilbert space = 2 ^ num_qubits.
 	 *
 	 * \return Dimension of Hilbert space.
 	 */	
-	unsigned dim() const;
+	unsigned size() const;
 
 	/**
 	 * \brief Return the current state of the qubits.
@@ -702,6 +702,17 @@ namespace qsl
 	void reset(unsigned num_qubits);
 
 	/**
+	 * \brief Change number of qubits number of ones.
+	 *
+	 * The state vector is set to the lowest computational basis
+	 * state with the specified number of ones.
+	 *
+	 * \param num_qubits The number of qubits to simulate.
+	 * \param num_qubits The number of ones to set.
+	 */
+	void reset(unsigned num_qubits, unsigned num_ones);
+	    
+	/**
 	 * \brief Access state vector elements (read-only).
 	 *
 	 * This is read-only to avoid accidental tampering with the state vector
@@ -733,17 +744,8 @@ namespace qsl
 	 *
 	 * \return Number of ones.
 	 */
-	unsigned get_ones() const;
+	unsigned ones() const;
 
-	/**
-	 * \brief Set the number of ones and reset the state vector for this number of ones.
-	 *
-	 * The state vector is set to the lowest indexed computational basis state for the given num_ones.
-	 *
-	 * \param num_ones Number of ones.
-	 */
-	void set_ones(unsigned num_ones);
-	
 	/**
 	 * \brief Pretty print the state vector to an output stream.
 	 *
