@@ -745,7 +745,8 @@ namespace qsl
 	 *
 	 * \param state A (real) vector containing the new state for the object.
 	 */ 		
-	void set_state(const std::vector<F> & state);
+	//void set_state(const std::vector<F> & state);
+	resize & operator= (const std::vector<F> & state);
 
 	/**
 	 * \brief Change the simulator state to the state that is passed in. 
@@ -756,7 +757,8 @@ namespace qsl
 	 *
 	 * \param state A vector containing the new state for the object.
 	 */ 		
-	void set_state(const std::vector<std::complex<F>> & state);
+	//void set_state(const std::vector<std::complex<F>> & state);
+	resize & operator= (const std::vector<std::complex<F>> & state);
 
 	/**
 	 * \brief Reset to the all-zero computational basis state.
@@ -1266,7 +1268,8 @@ namespace qsl
 	 *
 	 * \param state A (real) vector containing the new state for the object.
 	 */ 		
-	void set_state(const std::vector<F> & state);
+	//void set_state(const std::vector<F> & state);
+	number & operator= (const std::vector<F> & state);
 
 	/**
 	 * \brief Change the simulator state to the state that is passed in. 
@@ -1278,7 +1281,8 @@ namespace qsl
 	 *
 	 * \param state A vector containing the new state for the object.
 	 */ 		
-	void set_state(const std::vector<std::complex<F>> & state);
+	//void set_state(const std::vector<std::complex<F>> & state);
+	number & operator= (const std::vector<std::complex<F>> & state);
 
 	/**
 	 * \brief Reset to the lowest indexed computational basis state for the given num_ones.

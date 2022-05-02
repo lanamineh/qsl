@@ -87,7 +87,7 @@ int main()
     [[maybe_unused]] unsigned n2{q3.ones()}; // Get the number of ones in a fixed-number simulator
     
     std::vector<std::complex<double>> s2{{1,0},{0,0},{0,0},{1,0}};
-    q2.set_state(s2); // You can set the state to an arbitrary number of qubits
+    q2 = s2; // You can set the state to an arbitrary number of qubits
     // q4.set_state(s2); // You cannot implicitly change the floating point type
 
     // TODO
