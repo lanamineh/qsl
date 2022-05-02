@@ -60,7 +60,6 @@ namespace qsl
 	// Operator[] must be valid and return a real or complex number
 	// TODO Fix this.
 	//{t[0]} -> real_or_complex;
-
 	
 	// Must return its size like std::vector
 	{t.size()} -> std::same_as<std::size_t>; 
