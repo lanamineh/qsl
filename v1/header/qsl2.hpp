@@ -235,28 +235,264 @@ namespace qsl
 	 */
 	void load_json(const std::filesystem::path & path);
 
-	// One-qubit gates
+	/**
+	 * \brief Rotate around the x-axis of the Bloch sphere 
+	 * \f$ e^{-i\theta X/2} \f$:
+	 * 
+	 * \f[ 
+	 * R_x = \begin{pmatrix}
+	 *       \cos(\theta/2) & -i\sin(\theta/2) \\
+	 *       -i\sin(\theta/2) & \cos(\theta/2) \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void rx(unsigned targ, F angle);
+
+	/**
+	 * \brief Rotate around the y-axis of the Bloch sphere 
+	 * \f$ e^{-i\theta Y/2} \f$:
+	 * 
+	 * \f[ 
+	 * R_y = \begin{pmatrix}
+	 *       \cos(\theta/2) & -\sin(\theta/2) \\
+	 *       \sin(\theta/2) & \cos(\theta/2) \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void ry(unsigned targ, F angle);
+
+	/**
+	 * \brief Rotate around the z-axis of the Bloch sphere 
+	 * \f$ e^{-i\theta Z/2} \f$:
+	 * 
+	 * \f[ 
+	 * R_z = \begin{pmatrix}
+	 *       e^{-i\theta/2} & 0 \\
+	 *       0 & e^{i\theta/2} \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void rz(unsigned targ, F angle);  
+
+	/**
+	 * \brief Apply a phase shift to qubit targ:
+	 *
+	 * \f[
+	 * \text{phase}(\theta) = \begin{pmatrix}
+	 *       1 & 0 \\
+	 *       0 & e^{i\theta} \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * Also equivalent to \f$ e^{i\theta/2} R_z(\theta) \f$.
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */	
 	void phase(unsigned targ, F angle); 
+
+	/**
+	 * \brief Apply the Hadamard gate to qubit targ:
+	 *
+	 * \f[ 
+	 * H = \frac{1}{\sqrt{2}}\begin{pmatrix}
+	 *     1 & 1 \\
+	 *     1 & -1 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 */
 	void h(unsigned targ);
+
+	/**
+	 * \brief Apply the Pauli-X gate to qubit targ:
+	 *
+	 * \f[ 
+	 * X = \begin{pmatrix}
+	 *     0 & 1 \\
+	 *     1 & 0 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * Also equivalent to \f$ iR_x(\pi) \f$.
+	 *
+	 * \param targ The target qubit.
+	 */
 	void x(unsigned targ);
+
+	/**
+	 * \brief Apply the Pauli-Y gate to qubit targ:
+	 *
+	 * \f[ 
+	 * Y = \begin{pmatrix}
+	 *     0 & -i \\
+	 *     i & 0 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * Also equivalent to \f$ iR_y(\pi) \f$.
+	 *
+	 * \param targ The target qubit.
+	 */
 	void y(unsigned targ);
+
+	/**
+	 * \brief Apply the Pauli-Z gate to qubit targ:
+	 *
+	 * \f[ 
+	 * Z = \begin{pmatrix}
+	 *     1 & 0 \\
+	 *     0 & -1 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * Also equivalent to \f$ iR_z(\pi) \f$ or \f$ \text{phase}(\pi) \f$
+	 *
+	 * \param targ The target qubit.
+	 */
 	void z(unsigned targ);
+
+	/**
+	 * \brief Apply an arbitrary one-qubit (real) unitary to targ.
+	 *
+	 * The matrix must have orthonormal columns, the columns will be
+	 * normalised in this function.
+	 *
+	 * \todo Figure out row- or column-majored for matrix.
+	 *
+	 * \param targ The target qubit.
+	 * \param matrix The unitary matrix to apply.
+	 */
 	void u1(unsigned targ, const std::vector<F> & matrix);
+
+	/**
+	 * \brief Apply an arbitrary one-qubit unitary to targ.
+	 *
+	 * The matrix must have orthonormal columns, the columns will be
+	 * normalised in this function.
+	 *
+	 * \todo Figure out row- or column-majored for matrix.
+	 *
+	 * \param targ The target qubit.
+	 * \param matrix The unitary matrix to apply.
+	 */
 	void u1(unsigned targ, const std::vector<std::complex<F>> & matrix);
 
-	// Controlled gates
+	/**
+	 * \brief Perform a controlled X-rotation on two qubits. 
+	 *
+	 * \param ctrl The control qubit, \f$ R_x \f$ is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void crx(unsigned ctrl, unsigned targ, F angle);
+
+	/**
+	 * \brief Perform a controlled Y-rotation on two qubits. 
+	 *
+	 * \param ctrl The control qubit, \f$ R_y \f$ is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void cry(unsigned ctrl, unsigned targ, F angle);
+
+	/**
+	 * \brief Perform a controlled Z-rotation on two qubits. 
+	 *
+	 * \param ctrl The control qubit, \f$ R_z \f$ is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void crz(unsigned ctrl, unsigned targ, F angle);  
+
+	/**
+	 * \brief Perform a controlled phase gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, a phase shift is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void cphase(unsigned ctrl, unsigned targ, F angle); 
+
+	/**
+	 * \brief Perform a controlled Hadamard gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, H is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
 	void ch(unsigned ctrl, unsigned targ);
+
+	/**
+	 * \brief Perform a controlled Pauli-X (often referred to as a controlled-Not) 
+	 *        gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, X is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
 	void cnot(unsigned ctrl, unsigned targ);
+
+	/**
+	 * \brief Perform a controlled Pauli-Y gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, Y is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
 	void cy(unsigned ctrl, unsigned targ);
+
+	/**
+	 * \brief Perform a controlled Pauli-Z gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, Z is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
 	void cz(unsigned ctrl, unsigned targ);
+
+	/**
+	 * \brief Apply a controlled arbitrary one-qubit (real) unitary.
+	 *
+	 * The matrix must have orthonormal columns, the columns will be
+	 * normalised in this function.
+	 *
+	 * \todo Figure out row- or column-majored for matrix.
+	 *
+	 * \param ctrl The control qubit, U is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param matrix The unitary matrix to apply.
+	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<F> & matrix);
+
+	/**
+	 * \brief Apply a controlled arbitrary one-qubit unitary.
+	 *
+	 * The matrix must have orthonormal columns, the columns will be
+	 * normalised in this function.
+	 *
+	 * \todo Figure out row- or column-majored for matrix.
+	 *
+	 * \param ctrl The control qubit, U is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param matrix The unitary matrix to apply.
+	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<std::complex<F>> & matrix);
 
 	// Rest of the number gates
@@ -500,28 +736,264 @@ namespace qsl
 	 */
 	void load_json(const std::filesystem::path & path);
 	
-	// One-qubit gates
+	/**
+	 * \brief Rotate around the x-axis of the Bloch sphere 
+	 * \f$ e^{-i\theta X/2} \f$:
+	 * 
+	 * \f[ 
+	 * R_x = \begin{pmatrix}
+	 *       \cos(\theta/2) & -i\sin(\theta/2) \\
+	 *       -i\sin(\theta/2) & \cos(\theta/2) \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void rx(unsigned targ, F angle);
+
+	/**
+	 * \brief Rotate around the y-axis of the Bloch sphere 
+	 * \f$ e^{-i\theta Y/2} \f$:
+	 * 
+	 * \f[ 
+	 * R_y = \begin{pmatrix}
+	 *       \cos(\theta/2) & -\sin(\theta/2) \\
+	 *       \sin(\theta/2) & \cos(\theta/2) \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void ry(unsigned targ, F angle);
+
+	/**
+	 * \brief Rotate around the z-axis of the Bloch sphere 
+	 * \f$ e^{-i\theta Z/2} \f$:
+	 * 
+	 * \f[ 
+	 * R_z = \begin{pmatrix}
+	 *       e^{-i\theta/2} & 0 \\
+	 *       0 & e^{i\theta/2} \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void rz(unsigned targ, F angle);  
-	void phase(unsigned targ, F angle); 
+
+	/**
+	 * \brief Apply a phase shift to qubit targ:
+	 *
+	 * \f[
+	 * \text{phase}(\theta) = \begin{pmatrix}
+	 *       1 & 0 \\
+	 *       0 & e^{i\theta} \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * Also equivalent to \f$ e^{i\theta/2} R_z(\theta) \f$.
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */	
+	void phase(unsigned targ, F angle);
+
+	/**
+	 * \brief Apply the Hadamard gate to qubit targ:
+	 *
+	 * \f[ 
+	 * H = \frac{1}{\sqrt{2}}\begin{pmatrix}
+	 *     1 & 1 \\
+	 *     1 & -1 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 */
 	void h(unsigned targ);
+
+	/**
+	 * \brief Apply the Pauli-X gate to qubit targ:
+	 *
+	 * \f[ 
+	 * X = \begin{pmatrix}
+	 *     0 & 1 \\
+	 *     1 & 0 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * Also equivalent to \f$ iR_x(\pi) \f$.
+	 *
+	 * \param targ The target qubit.
+	 */
 	void x(unsigned targ);
+
+	/**
+	 * \brief Apply the Pauli-Y gate to qubit targ:
+	 *
+	 * \f[ 
+	 * Y = \begin{pmatrix}
+	 *     0 & -i \\
+	 *     i & 0 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * Also equivalent to \f$ iR_y(\pi) \f$.
+	 *
+	 * \param targ The target qubit.
+	 */
 	void y(unsigned targ);
+
+	/**
+	 * \brief Apply the Pauli-Z gate to qubit targ:
+	 *
+	 * \f[ 
+	 * Z = \begin{pmatrix}
+	 *     1 & 0 \\
+	 *     0 & -1 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * Also equivalent to \f$ iR_z(\pi) \f$ or \f$ \text{phase}(\pi) \f$
+	 *
+	 * \param targ The target qubit.
+	 */
 	void z(unsigned targ);
+
+	/**
+	 * \brief Apply an arbitrary one-qubit (real) unitary to targ.
+	 *
+	 * The matrix must have orthonormal columns, the columns will be
+	 * normalised in this function.
+	 *
+	 * \todo Figure out row- or column-majored for matrix.
+	 *
+	 * \param targ The target qubit.
+	 * \param matrix The unitary matrix to apply.
+	 */
 	void u1(unsigned targ, const std::vector<F> & matrix);
+
+	/**
+	 * \brief Apply an arbitrary one-qubit unitary to targ.
+	 *
+	 * The matrix must have orthonormal columns, the columns will be
+	 * normalised in this function.
+	 *
+	 * \todo Figure out row- or column-majored for matrix.
+	 *
+	 * \param targ The target qubit.
+	 * \param matrix The unitary matrix to apply.
+	 */
 	void u1(unsigned targ, const std::vector<std::complex<F>> & matrix);
 
-	// Controlled gates
+	/**
+	 * \brief Perform a controlled X-rotation on two qubits. 
+	 *
+	 * \param ctrl The control qubit, \f$ R_x \f$ is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */	
 	void crx(unsigned ctrl, unsigned targ, F angle);
+
+	/**
+	 * \brief Perform a controlled Y-rotation on two qubits. 
+	 *
+	 * \param ctrl The control qubit, \f$ R_y \f$ is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void cry(unsigned ctrl, unsigned targ, F angle);
-	void crz(unsigned ctrl, unsigned targ, F angle);  
-	void cphase(unsigned ctrl, unsigned targ, F angle); 
+
+	/**
+	 * \brief Perform a controlled Z-rotation on two qubits. 
+	 *
+	 * \param ctrl The control qubit, \f$ R_z \f$ is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
+	void crz(unsigned ctrl, unsigned targ, F angle);
+
+	/**
+	 * \brief Perform a controlled phase gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, a phase shift is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
+	void cphase(unsigned ctrl, unsigned targ, F angle);
+
+	/**
+	 * \brief Perform a controlled Hadamard gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, H is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
 	void ch(unsigned ctrl, unsigned targ);
+
+	/**
+	 * \brief Perform a controlled Pauli-X (often referred to as a controlled-Not) 
+	 *        gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, X is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
 	void cnot(unsigned ctrl, unsigned targ);
+
+	/**
+	 * \brief Perform a controlled Pauli-Y gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, Y is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
 	void cy(unsigned ctrl, unsigned targ);
+
+	/**
+	 * \brief Perform a controlled Pauli-Z gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, Z is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
 	void cz(unsigned ctrl, unsigned targ);
+
+	/**
+	 * \brief Apply a controlled arbitrary one-qubit (real) unitary.
+	 *
+	 * The matrix must have orthonormal columns, the columns will be
+	 * normalised in this function.
+	 *
+	 * \todo Figure out row- or column-majored for matrix.
+	 *
+	 * \param ctrl The control qubit, U is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param matrix The unitary matrix to apply.
+	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<F> & matrix);
+
+	/**
+	 * \brief Apply a controlled arbitrary one-qubit unitary.
+	 *
+	 * The matrix must have orthonormal columns, the columns will be
+	 * normalised in this function.
+	 *
+	 * \todo Figure out row- or column-majored for matrix.
+	 *
+	 * \param ctrl The control qubit, U is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param matrix The unitary matrix to apply.
+	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<std::complex<F>> & matrix);
 
 	// Rest of the number gates
@@ -708,7 +1180,7 @@ namespace qsl
 	 * state with the specified number of ones.
 	 *
 	 * \param num_qubits The number of qubits to simulate.
-	 * \param num_qubits The number of ones to set.
+	 * \param num_ones The number of ones to set.
 	 */
 	void reset(unsigned num_qubits, unsigned num_ones);
 	    
@@ -780,14 +1252,82 @@ namespace qsl
 	 */
 	void load_json(const std::filesystem::path & path);
 	
-	// One-qubit gates
-	void rz(unsigned targ, F angle);  
-	void phase(unsigned targ, F angle); 
+	/**
+	 * \brief Rotate around the z-axis of the Bloch sphere 
+	 * \f$ e^{-i\theta Z/2} \f$:
+	 * 
+	 * \f[ 
+	 * R_z = \begin{pmatrix}
+	 *       e^{-i\theta/2} & 0 \\
+	 *       0 & e^{i\theta/2} \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
+	void rz(unsigned targ, F angle);
+
+	/**
+	 * \brief Apply a phase shift to qubit targ:
+	 *
+	 * \f[
+	 * \text{phase}(\theta) = \begin{pmatrix}
+	 *       1 & 0 \\
+	 *       0 & e^{i\theta} \\
+	 *       \end{pmatrix} 
+	 * \f]
+	 *
+	 * Also equivalent to \f$ e^{i\theta/2} R_z(\theta) \f$.
+	 *
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */	
+	void phase(unsigned targ, F angle);
+
+	/**
+	 * \brief Apply the Pauli-Z gate to qubit targ:
+	 *
+	 * \f[ 
+	 * Z = \begin{pmatrix}
+	 *     1 & 0 \\
+	 *     0 & -1 \\
+	 *     \end{pmatrix} 
+	 * \f]
+	 *
+	 * Also equivalent to \f$ iR_z(\pi) \f$ or \f$ \text{phase}(\pi) \f$
+	 *
+	 * \param targ The target qubit.
+	 */
 	void z(unsigned targ);  
 
-	// Controlled gates
+	/**
+	 * \brief Perform a controlled Z-rotation on two qubits. 
+	 *
+	 * \param ctrl The control qubit, \f$ R_z \f$ is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */	
 	void crz(unsigned ctrl, unsigned targ, F angle);  
+
+	/**
+	 * \brief Perform a controlled phase gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, a phase shift is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 * \param angle The angle to rotate the qubit by (in radians).
+	 */
 	void cphase(unsigned ctrl, unsigned targ, F angle); 
+
+	/**
+	 * \brief Perform a controlled Pauli-Z gate on two qubits. 
+	 *
+	 * \param ctrl The control qubit, Z is applied on the target qubit
+	 *             if this qubit is \f$ |1\rangle \f$.
+	 * \param targ The target qubit.
+	 */
 	void cz(unsigned ctrl, unsigned targ);  
 
 	// Rest of the number gates
