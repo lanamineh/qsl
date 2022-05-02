@@ -87,7 +87,7 @@ namespace qsl
     };
 
     /**
-     * \brief Obtain the precision for a state vector (standard vector)
+     * \brief Obtain the precision for a complex state vector
      * 
      * Precision is stored in the type member.
      */
@@ -97,6 +97,18 @@ namespace qsl
     	using type = F;
     };
 
+    /**
+     * \brief Obtain the precision for a real state vector
+     * 
+     * Precision is stored in the type member.
+     */
+    template<std::floating_point F>
+    struct get_precision<std::vector<F>>
+    {
+    	using type = F;
+    };
+
+    
     /**
      * \brief Allow get_precision to work with built-in floating-point types too
      */
@@ -255,6 +267,8 @@ namespace qsl
 	 */ 		
 	void set_state(const std::vector<F> & state);
 
+	basic & operator= (const std::vector<F> & state);
+	
 	/**
 	 * \brief Change the simulator state to the state that is passed in. 
 	 *

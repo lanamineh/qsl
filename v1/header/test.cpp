@@ -66,6 +66,9 @@ int main()
     [[maybe_unused]] qsl::number<long double> q17 = static_cast<qsl::number<long double>>(q3);
     //qsl::resize<long double> q18 = q3; // This one does not work
 
+    // Initialise from an initialiser list using operator=
+    q1 = {1,2,3,2};
+    
     
     // Gates
     for (unsigned n{0}; n < q1.size(); ++n) {
@@ -112,6 +115,7 @@ int main()
     std::cout << qsl::distance(q1, q2) << std::endl;
     std::cout << qsl::distance(q2, q3) << std::endl;
     std::cout << qsl::distance(q1, q3) << std::endl;
+    std::cout << qsl::distance(q1, std::vector<double>{1,2,3,4}) << std::endl;
     //std::cout << qsl::distance(q2, q4) << std::endl; // This one (correctly)  doesn't work -- double and float conflict
 
     std::cout << qsl::distance(q4, s1) << std::endl;    
