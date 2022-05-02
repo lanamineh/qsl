@@ -264,16 +264,10 @@ namespace qsl
 	 * allows for a change in the number of qubits.
 	 *
 	 * \param state A (real) vector containing the new state for the object.
-	 */ 		
-	void set_state(const std::vector<F> & state);
-
-	//basic & operator= (const state_vector auto & state); // not working
-	//basic & operator= (const std::vector<F> & state); // works, but not as good because need two versions (one for real and the other for complex).
-
-	// This covers both real and complex std::vector initialiser lists, but not passing a real state vector type.
-	basic & operator= (const std::vector<std::complex<F>> & state);
-	//basic & operator= (const std::vector<F> & state);
-
+	 */
+	//void set_state(const std::vector<F> & state);
+	basic & operator= (const std::vector<F> & state);
+ 
 	// Probably the best thing to do is disallow setting from a std::vector of reals. Then the function won't be ambiguous, but you can still pass an initialiser list of reals.
 	
 	/**
@@ -286,7 +280,8 @@ namespace qsl
 	 *
 	 * \param state A vector containing the new state for the object.
 	 */ 		
-	void set_state(const std::vector<std::complex<F>> & state);
+	//void set_state(const std::vector<std::complex<F>> & state);
+	basic & operator= (const std::vector<std::complex<F>> & state);
 
 	/**
 	 * \brief Reset to the all-zero computational basis state.

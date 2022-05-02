@@ -67,8 +67,8 @@ int main()
     //qsl::resize<long double> q18 = q3; // This one does not work
 
     // Initialise from an initialiser list using operator=
-    q1 = {1,2,3,2};
-    q1 = {{1,0},{2,2},{3,2},{2,3}};
+    q1 = std::vector<double>{1,2,3,2};
+    q12 = std::vector<std::complex<float>>{{1,0},{2,2},{3,2},{2,3}};
 
     //    q1 = std::vector<double>{1,2,3,4};
     
