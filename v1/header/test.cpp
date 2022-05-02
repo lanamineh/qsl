@@ -77,9 +77,9 @@ int main()
     // q3.cnot(0,1); // This should not work
     
     // Basic functions
-    [[maybe_unused]] std::size_t d{q1.dim()}; // Get the dimension of the state vector
+    [[maybe_unused]] std::size_t d{q1.size()}; // Get the sizeension of the state vector
     [[maybe_unused]] unsigned n1{q2.size()}; // Get the number of qubits
-    [[maybe_unused]] unsigned n2{q3.get_ones()}; // Get the number of ones in a fixed-number simulator
+    [[maybe_unused]] unsigned n2{q3.ones()}; // Get the number of ones in a fixed-number simulator
     
     std::vector<std::complex<double>> s2{{1,0},{0,0},{0,0},{1,0}};
     q2.set_state(s2); // You can set the state to an arbitrary number of qubits

@@ -21,12 +21,117 @@ namespace qsl
     struct opt;
 
     /**
-     * \brief 
+     * \brief Restricted to the types that specify a parallelisation level
+     *
+     * This concept restricts a template parameter to the types that are
+     * valid parallelisation levels.
      *
      */
     template<typename T>
     concept parallelisation = std::is_same_v<T,seq> || std::is_same_v<T,omp>
 	|| std::is_same_v<T,opt>;
+
+    /// A general type is not real or complex
+    template<typename T>
+    struct real_or_complex_t : std::false_type {};
+
+    /// Specialisation for real floating point
+    template<std::floating_point F>
+    struct real_or_complex_t<F&> : std::true_type {};
+
+    /// Specialisation for complex floating point
+    template<std::floating_point F>
+    struct real_or_complex_t<std::complex<F>&> : std::true_type {};
+
+    /**
+     * \brief Concept to check whether a type is a real or complex number
+     *
+     * This concept is true for a type which is either a reference to a 
+     * built-in floating point type (a real number), or a reference to a 
+     * std::complex of a floating point type (a complex number). 
+     * Otherwise it is false. 
+     */ 
+    template<typename T>
+    concept real_or_complex = real_or_complex_t<T>::value;
+
+    template<typename T>
+    concept state_vector = requires (T t) {
+
+	// Operator[] must be valid and return a real or complex number
+	// TODO Fix this.
+	//{t[0]} -> real_or_complex;
+
+	
+	// Must return its size like std::vector
+	{t.size()} -> std::same_as<std::size_t>; 
+    };
+    
+    /**
+     * \brief Struct for obtaining the precision of a simulator or state vector
+     */
+    template<typename T>
+    struct get_precision;
+
+    /**
+     * \brief Obtain the precision of a simulator object
+     *
+     * The resulting precision is stored in the type member.
+     */
+    template<template<typename,bool,typename> typename S,
+	     std::floating_point F,
+	     bool D,
+	     parallelisation P>
+    struct get_precision<S<F, D, P>>
+    {
+	using type = F;
+    };
+
+    /**
+     * \brief Obtain the precision for a state vector (standard vector)
+     * 
+     * Precision is stored in the type member.
+     */
+    template<std::floating_point F>
+    struct get_precision<std::vector<std::complex<F>>>
+    {
+    	using type = F;
+    };
+
+    /**
+     * \brief Allow get_precision to work with built-in floating-point types too
+     */
+    template<std::floating_point F>
+    struct get_precision<F>
+    {
+	using type = F;
+    };
+    
+    /**
+     * \brief Helper to get the precision type of a simulator or state directly
+     *
+     * \tparam T The simulator or state vector whose precision is wanted.
+     */
+    template<typename T>
+    using get_precision_t = typename get_precision<T>::type;
+
+    /**
+     * \brief Check if two types have the same precision
+     *
+     * This concept compares the precision of two types, which may be
+     * simulators, state vectors (real or complex), or built-in floating
+     * point types. The concept returns true if the types have the same
+     * floating point type. For a simulator, the floating point type is
+     * the floating point type of its internal complex state vector. For
+     * a real or complex state vector, it is the floating point type
+     * of the underlying vector.
+     *
+     * \tparam T The first type to check
+     * \tparam U Another simulator/state vector/built-in type to compare with T
+     */
+    template<typename T, typename U>
+    concept same_precision = std::is_same_v<get_precision_t<T>,
+					    get_precision_t<U>>;
+
     
     /**
      * \brief Random generator
@@ -107,7 +212,7 @@ namespace qsl
 	 *
 	 * \param s A valid qsl simulator object that uses the same floating point type.
 	 */
-	template<has_state_vector_of_precision<F> S>
+	template<state_vector S>
 	explicit basic(const S & s);
 
 	/**
@@ -128,7 +233,7 @@ namespace qsl
 	 *
 	 * \return Dimension of Hilbert space.
 	 */
-	unsigned size() const;
+	std::size_t size() const;
 
 	/**
 	 * \brief Return the current state of the qubits.
@@ -348,7 +453,7 @@ namespace qsl
 	 *
 	 * \param s A valid qsl simulator object that uses the same floating point type.
 	 */
-	template<has_state_vector_of_precision<F> S>
+	template<state_vector S>
 	explicit resize(const S & s);
 
 	/**
@@ -369,7 +474,7 @@ namespace qsl
 	 *
 	 * \return Dimension of Hilbert space.
 	 */
-	unsigned size() const;
+	std::size_t size() const;
 	
 	/**
 	 * \brief Return the current state of the qubits.
@@ -632,7 +737,7 @@ namespace qsl
 	 *
 	 * \param s A valid qsl simulator object that uses the same floating point type.
 	 */
-	template<has_state_vector_of_precision<F> S>
+	template<state_vector S>
 	explicit number(const S & s);
 
 	/**
@@ -653,7 +758,7 @@ namespace qsl
 	 *
 	 * \return Dimension of Hilbert space.
 	 */	
-	unsigned size() const;
+	std::size_t size() const;
 
 	/**
 	 * \brief Return the current state of the qubits.
@@ -824,39 +929,20 @@ namespace qsl
     std::ostream & operator << (std::ostream & os, const S & s);
     
     /// Calculate the Fubini-Study metric between two simulators/vectors
-    template<has_state_vector S1, has_state_vector S2>
+    template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> 
     get_precision_t<S1> distance(const S1 & s1, const S2 & s2);
 
-    template<std::floating_point F, has_state_vector_of_precision<F> S>
-    F distance(const S & s1, const std::vector<std::complex<F>> & s2);
-
-    template<std::floating_point F, has_state_vector_of_precision<F> S>
-    F distance(const std::vector<std::complex<F>> & s1, const S & s2);
-
     /// Calculate the fidelity between two simulators/vectors
-    template<has_state_vector S1, has_state_vector S2>
+    template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> 
     get_precision_t<S1> fidelity(const S1 & s1, const S2 & s2);
 
-    template<std::floating_point F, has_state_vector_of_precision<F> S>
-    F fidelity(const S & s1, const std::vector<std::complex<F>> & s2);
-
-    template<std::floating_point F, has_state_vector_of_precision<F> S>
-    F fidelity(const std::vector<std::complex<F>> & s1, const S & s2);
-
-    /// Calculate the inner product between two simulators/vectors - do not normalise vector?
-    template<has_state_vector S1, has_state_vector S2>
+    /// Calculate the inner product between two simulators/vectors
+    ///- do not normalise vector?
+    template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> 
-    get_precision_t<S1> inner_prod(const S1 & s1, const S2 & s2);
-
-    template<std::floating_point F, has_state_vector_of_precision<F> S>
-    F inner_prod(const S & s1, const std::vector<std::complex<F>> & s2);
-
-    template<std::floating_point F, has_state_vector_of_precision<F> S>
-    F inner_prod(const std::vector<std::complex<F>> & s1, const S & s2);
-
-    
+    get_precision_t<S1> inner_prod(const S1 & s1, const S2 & s2);    
 
 }
 
