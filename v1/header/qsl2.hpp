@@ -267,7 +267,14 @@ namespace qsl
 	 */ 		
 	void set_state(const std::vector<F> & state);
 
-	basic & operator= (const std::vector<F> & state);
+	//basic & operator= (const state_vector auto & state); // not working
+	//basic & operator= (const std::vector<F> & state); // works, but not as good because need two versions (one for real and the other for complex).
+
+	// This covers both real and complex std::vector initialiser lists, but not passing a real state vector type.
+	basic & operator= (const std::vector<std::complex<F>> & state);
+	//basic & operator= (const std::vector<F> & state);
+
+	// Probably the best thing to do is disallow setting from a std::vector of reals. Then the function won't be ambiguous, but you can still pass an initialiser list of reals.
 	
 	/**
 	 * \brief Change the simulator state to the state that is passed in. 

@@ -68,7 +68,9 @@ int main()
 
     // Initialise from an initialiser list using operator=
     q1 = {1,2,3,2};
-    
+    q1 = {{1,0},{2,2},{3,2},{2,3}};
+
+    //    q1 = std::vector<double>{1,2,3,4};
     
     // Gates
     for (unsigned n{0}; n < q1.size(); ++n) {
