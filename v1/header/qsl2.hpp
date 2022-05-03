@@ -31,40 +31,29 @@ namespace qsl
     concept parallelisation = std::is_same_v<T,seq> || std::is_same_v<T,omp>
 	|| std::is_same_v<T,opt>;
 
-    /// A general type is not real or complex
-    template<typename T>
-    struct real_or_complex_t : std::false_type {};
+    // /// A general type is not real or complex
+    // template<typename T>
+    // struct real_or_complex_t : std::false_type {};
 
-    /// Specialisation for real floating point
-    template<std::floating_point F>
-    struct real_or_complex_t<F&> : std::true_type {};
+    // /// Specialisation for real floating point
+    // template<std::floating_point F>
+    // struct real_or_complex_t<F> : std::true_type {};
 
-    /// Specialisation for complex floating point
-    template<std::floating_point F>
-    struct real_or_complex_t<std::complex<F>&> : std::true_type {};
+    // /// Specialisation for complex floating point
+    // template<std::floating_point F>
+    // struct real_or_complex_t<std::complex<F>> : std::true_type {};
 
-    /**
-     * \brief Concept to check whether a type is a real or complex number
-     *
-     * This concept is true for a type which is either a reference to a 
-     * built-in floating point type (a real number), or a reference to a 
-     * std::complex of a floating point type (a complex number). 
-     * Otherwise it is false. 
-     */ 
-    template<typename T>
-    concept real_or_complex = real_or_complex_t<T>::value;
+    // /**
+    //  * \brief Concept to check whether a type is a real or complex number
+    //  *
+    //  * This concept is true for a type which is either a reference to a 
+    //  * built-in floating point type (a real number), or a reference to a 
+    //  * std::complex of a floating point type (a complex number). 
+    //  * Otherwise it is false. 
+    //  */ 
+    // template<typename T>
+    // concept real_or_complex = std::floating;
 
-    template<typename T>
-    concept state_vector = requires (T t) {
-
-	// Operator[] must be valid and return a real or complex number
-	// TODO Fix this.
-	//{t[0]} -> real_or_complex;
-	
-	// Must return its size like std::vector
-	{t.size()} -> std::same_as<std::size_t>; 
-    };
-    
     /**
      * \brief Struct for obtaining the precision of a simulator or state vector
      */
@@ -143,7 +132,39 @@ namespace qsl
     concept same_precision = std::is_same_v<get_precision_t<T>,
 					    get_precision_t<U>>;
 
+
+    /// By default, nothing is a complex type
+    template<typename T>
+    struct is_complex : std::false_type {};
+
+    /// Only a std::complex<T> for floating-point T is complex 
+    template<std::floating_point F>
+    struct is_complex<std::complex<F>> : std::true_type {};
+
+    /**
+     * \brief Concept to check if a type is real or complex
+     *
+     * This concept is true for floating-point real or complex types. A real type is
+     * a built-in floating-point type. A complex type is a std::complex<F> where F is
+     * a real type. The concept is also true for any reference or const reference to
+     * a real or complex type.
+     */
+    template<typename T>
+    concept real_or_complex = std::floating_point<std::remove_cvref_t<T>>
+	|| is_complex<std::remove_cvref_t<T>>::value;
     
+    template<typename T>
+    concept state_vector = requires (T t) {
+	
+	// Operator[] must be valid and return a real or complex number
+	{t[0]} -> real_or_complex;
+	
+	
+	// Must return its size like std::vector
+	{t.size()} -> std::same_as<std::size_t>; 
+    };
+   
+	
     /**
      * \brief Random generator
      */
