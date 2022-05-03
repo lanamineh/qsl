@@ -31,29 +31,6 @@ namespace qsl
     concept parallelisation = std::is_same_v<T,seq> || std::is_same_v<T,omp>
 	|| std::is_same_v<T,opt>;
 
-    // /// A general type is not real or complex
-    // template<typename T>
-    // struct real_or_complex_t : std::false_type {};
-
-    // /// Specialisation for real floating point
-    // template<std::floating_point F>
-    // struct real_or_complex_t<F> : std::true_type {};
-
-    // /// Specialisation for complex floating point
-    // template<std::floating_point F>
-    // struct real_or_complex_t<std::complex<F>> : std::true_type {};
-
-    // /**
-    //  * \brief Concept to check whether a type is a real or complex number
-    //  *
-    //  * This concept is true for a type which is either a reference to a 
-    //  * built-in floating point type (a real number), or a reference to a 
-    //  * std::complex of a floating point type (a complex number). 
-    //  * Otherwise it is false. 
-    //  */ 
-    // template<typename T>
-    // concept real_or_complex = std::floating;
-
     /**
      * \brief Struct for obtaining the precision of a simulator or state vector
      */
@@ -158,7 +135,6 @@ namespace qsl
 	
 	// Operator[] must be valid and return a real or complex number
 	{t[0]} -> real_or_complex;
-	
 	
 	// Must return its size like std::vector
 	{t.size()} -> std::same_as<std::size_t>; 
