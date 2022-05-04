@@ -200,6 +200,9 @@ namespace qsl
 	 * power of two. It does not need to be normalised as this function will carry
 	 * out a normalisation step.
 	 *
+	 * In debug mode, if the input state is not a power of two or is all zeros,
+	 * a std::invalid_argument is thrown.
+	 *
 	 * This is not a copy constructor (because it is templated), so it will not
 	 * cause the move constructors to be implicitly deleted.
 	 *
@@ -245,6 +248,9 @@ namespace qsl
 	 * this function will carry out a normalisation step. Note that this function
 	 * allows for a change in the number of qubits.
 	 *
+	 * In debug mode, if the input state is not a power of two or is all zeros,
+	 * a std::invalid_argument is thrown.
+	 *
 	 * \param state A vector or qsl simulator containing the new state for the object.
 	 */ 		
 	template<state_vector S>
@@ -259,6 +265,9 @@ namespace qsl
 	/**
 	 * \brief Change number of qubits and reset to the all-zero computational basis state.
 	 *
+	 * In debug mode, if the number of qubits is too large to simulate, a
+	 * std::runtime_error is thrown.
+	 *
 	 * \param num_qubits The number of qubits to simulate.
 	 */
 	void reset(unsigned num_qubits);
@@ -268,6 +277,8 @@ namespace qsl
 	 *
 	 * This is read-only to avoid accidental tampering with the state vector
 	 * that might render the state invalid (for example, setting every element to zero).  
+	 *
+	 * A std::out_of_range error is thrown if index is bigger than size()-1.
 	 *
 	 * \param index The state vector index to access.
 	 * \return The complex amplitude at index.
@@ -306,9 +317,12 @@ namespace qsl
 	 * Capped at 20 qubits (16MB at double precision to store the state vector).
 	 * \todo Specify which metadata are stored.
 	 *
-	 * \param path Filename to save to.
+	 * In debug mode, a std::runtime_error is thrown if too many qubits are to be stored
+	 * or if the file cannot be created. 
+	 *
+	 * \param file Filename to save to.
 	 */
-	void save_json(const std::filesystem::path & path) const;
+	void save_json(const std::filesystem::path & file) const;
 
 	/**
 	 * \brief Load in a state vector from a json file.
@@ -320,9 +334,14 @@ namespace qsl
 	 * \todo Figure out how we will serialise std::vector<std::complex> so the input
 	 *       can be specified here.
 	 *
-	 * \param path The filename to read from. 
+	 * In debug mode, a std::runtime_error is thrown if the file doesn't exist or cannot be
+	 * read. A std::invalid_argument is thrown if it does not contain a valid json object,
+	 * if it reads a json object that does not contain a 'state' field, or if the state that
+	 * is read is invalid. 
+	 *
+	 * \param file The filename to read from. 
 	 */
-	void load_json(const std::filesystem::path & path);
+	void load_json(const std::filesystem::path & file);
 
 	/**
 	 * \brief Rotate around the x-axis of the Bloch sphere 
@@ -334,6 +353,8 @@ namespace qsl
 	 *       -i\sin(\theta/2) & \cos(\theta/2) \\
 	 *       \end{pmatrix} 
 	 * \f]
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -351,6 +372,8 @@ namespace qsl
 	 *       \end{pmatrix} 
 	 * \f]
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
 	 */
@@ -366,6 +389,8 @@ namespace qsl
 	 *       0 & e^{i\theta/2} \\
 	 *       \end{pmatrix} 
 	 * \f]
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -384,6 +409,8 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ e^{i\theta/2} R_z(\theta) \f$.
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
 	 */	
@@ -398,6 +425,8 @@ namespace qsl
 	 *     1 & -1 \\
 	 *     \end{pmatrix} 
 	 * \f]
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 */
@@ -415,6 +444,8 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_x(\pi) \f$.
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 *
 	 * \param targ The target qubit.
 	 */
 	void x(unsigned targ);
@@ -430,6 +461,8 @@ namespace qsl
 	 * \f]
 	 *
 	 * Also equivalent to \f$ iR_y(\pi) \f$.
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 */
@@ -447,6 +480,8 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_z(\pi) \f$ or \f$ \text{phase}(\pi) \f$
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 *
 	 * \param targ The target qubit.
 	 */
 	void z(unsigned targ);
@@ -457,10 +492,10 @@ namespace qsl
 	 * The matrix must have orthonormal columns, the columns will be
 	 * normalised in this function.
 	 *
-	 * \todo Figure out row- or column-majored for matrix.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
-	 * \param matrix The unitary matrix to apply.
+	 * \param matrix The unitary matrix to apply, in row-major form.
 	 */
 	void u1(unsigned targ, const std::vector<F> & matrix);
 
@@ -470,15 +505,18 @@ namespace qsl
 	 * The matrix must have orthonormal columns, the columns will be
 	 * normalised in this function.
 	 *
-	 * \todo Figure out row- or column-majored for matrix.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
-	 * \param matrix The unitary matrix to apply.
+	 * \param matrix The unitary matrix to apply in row-major form.
 	 */
 	void u1(unsigned targ, const std::vector<std::complex<F>> & matrix);
 
 	/**
 	 * \brief Perform a controlled X-rotation on two qubits. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, \f$ R_x \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -490,6 +528,9 @@ namespace qsl
 	/**
 	 * \brief Perform a controlled Y-rotation on two qubits. 
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 *
 	 * \param ctrl The control qubit, \f$ R_y \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
@@ -499,6 +540,9 @@ namespace qsl
 
 	/**
 	 * \brief Perform a controlled Z-rotation on two qubits. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, \f$ R_z \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -510,6 +554,9 @@ namespace qsl
 	/**
 	 * \brief Perform a controlled phase gate on two qubits. 
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 *
 	 * \param ctrl The control qubit, a phase shift is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
@@ -519,6 +566,9 @@ namespace qsl
 
 	/**
 	 * \brief Perform a controlled Hadamard gate on two qubits. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, H is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -530,6 +580,9 @@ namespace qsl
 	 * \brief Perform a controlled Pauli-X (often referred to as a controlled-Not) 
 	 *        gate on two qubits. 
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 *
 	 * \param ctrl The control qubit, X is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
@@ -539,6 +592,9 @@ namespace qsl
 	/**
 	 * \brief Perform a controlled Pauli-Y gate on two qubits. 
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 *
 	 * \param ctrl The control qubit, Y is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
@@ -547,6 +603,9 @@ namespace qsl
 
 	/**
 	 * \brief Perform a controlled Pauli-Z gate on two qubits. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, Z is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -560,12 +619,13 @@ namespace qsl
 	 * The matrix must have orthonormal columns, the columns will be
 	 * normalised in this function.
 	 *
-	 * \todo Figure out row- or column-majored for matrix.
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, U is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
-	 * \param matrix The unitary matrix to apply.
+	 * \param matrix The unitary matrix to apply, in row-major form.
 	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<F> & matrix);
 
@@ -575,12 +635,13 @@ namespace qsl
 	 * The matrix must have orthonormal columns, the columns will be
 	 * normalised in this function.
 	 *
-	 * \todo Figure out row- or column-majored for matrix.
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, U is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
-	 * \param matrix The unitary matrix to apply.
+	 * \param matrix The unitary matrix to apply, in row-major form.
 	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<std::complex<F>> & matrix);
 
@@ -638,6 +699,9 @@ namespace qsl
 	 *
 	 * The simulator is initialised in the all-zero state.
 	 *
+	 * In debug mode, if the number of qubits is too large to simulate, a
+	 * std::runtime_error is thrown.
+	 *
 	 * \param num_qubits The number of qubits to simulate.
 	 */ 
 	explicit resize(unsigned num_qubits);
@@ -649,6 +713,9 @@ namespace qsl
 	 * If inputting a std::vector, it must be non-zero and have a length which is a 
 	 * power of two. It does not need to be normalised as this function will carry
 	 * out a normalisation step.
+	 *
+	 * In debug mode, if the input state is not a power of two or is all zeros,
+	 * a std::invalid_argument is thrown.
 	 *
 	 * This is not a copy constructor (because it is templated), so it will not
 	 * cause the move constructors to be implicitly deleted.
@@ -695,6 +762,9 @@ namespace qsl
 	 * this function will carry out a normalisation step. Note that this function
 	 * allows for a change in the number of qubits.
 	 *
+	 * In debug mode, if the input state is not a power of two or is all zeros,
+	 * a std::invalid_argument is thrown.
+	 *
 	 * \param state A vector or qsl simulator containing the new state for the object.
 	 */ 		
 	template<state_vector S>
@@ -709,6 +779,9 @@ namespace qsl
 	/**
 	 * \brief Change number of qubits and reset to the all-zero computational basis state.
 	 *
+	 * In debug mode, if the number of qubits is too large to simulate, a
+	 * std::runtime_error is thrown.
+	 *
 	 * \param num_qubits The number of qubits to simulate.
 	 */
 	void reset(unsigned num_qubits);
@@ -718,6 +791,8 @@ namespace qsl
 	 *
 	 * This is read-only to avoid accidental tampering with the state vector
 	 * that might render the state invalid (for example, setting every element to zero).  
+	 *
+	 * A std::out_of_range error is thrown if index is bigger than size()-1.
 	 *
 	 * \param index The state vector index to access.
 	 * \return The complex amplitude at index.
@@ -751,10 +826,12 @@ namespace qsl
 	 * Qubits that were in positions above targ will be shifted along i.e. the previous 
 	 * qubit that was at position targ will now be indexed as targ+1.
 	 *
+	 * A std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 *
 	 * \param targ The value the inserted qubit will be indexed as.
 	 */
 	void add_qubit(unsigned targ);
-	/// Trims the state vector to the current qubit size
+
 	/**
 	 * \brief Trims the internal state vector to the current qubit size.
 	 *
@@ -782,9 +859,12 @@ namespace qsl
 	 * Capped at 20 qubits (16MB at double precision to store the state vector).
 	 * \todo Specify which metadata are stored.
 	 *
-	 * \param path Filename to save to.
+	 * In debug mode, a std::runtime_error is thrown if too many qubits are to be stored
+	 * or if the file cannot be created. 
+	 *
+	 * \param file Filename to save to.
 	 */
-	void save_json(const std::filesystem::path & path) const;
+	void save_json(const std::filesystem::path & file) const;
 
 	/**
 	 * \brief Load in a state vector from a json file.
@@ -796,10 +876,15 @@ namespace qsl
 	 * \todo Figure out how we will serialise std::vector<std::complex> so the input
 	 *       can be specified here.
 	 *
-	 * \param path The filename to read from. 
+    	 * In debug mode, a std::runtime_error is thrown if the file doesn't exist or cannot be
+	 * read. A std::invalid_argument is thrown if it does not contain a valid json object,
+	 * if it reads a json object that does not contain a 'state' field, or if the state that
+	 * is read is invalid. 
+	 *
+	 * \param file The filename to read from. 
 	 */
-	void load_json(const std::filesystem::path & path);
-	
+	void load_json(const std::filesystem::path & file);
+
 	/**
 	 * \brief Rotate around the x-axis of the Bloch sphere 
 	 * \f$ e^{-i\theta X/2} \f$:
@@ -810,6 +895,8 @@ namespace qsl
 	 *       -i\sin(\theta/2) & \cos(\theta/2) \\
 	 *       \end{pmatrix} 
 	 * \f]
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -827,6 +914,8 @@ namespace qsl
 	 *       \end{pmatrix} 
 	 * \f]
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
 	 */
@@ -842,6 +931,8 @@ namespace qsl
 	 *       0 & e^{i\theta/2} \\
 	 *       \end{pmatrix} 
 	 * \f]
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -860,10 +951,12 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ e^{i\theta/2} R_z(\theta) \f$.
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
 	 */	
-	void phase(unsigned targ, F angle);
+	void phase(unsigned targ, F angle); 
 
 	/**
 	 * \brief Apply the Hadamard gate to qubit targ:
@@ -874,6 +967,8 @@ namespace qsl
 	 *     1 & -1 \\
 	 *     \end{pmatrix} 
 	 * \f]
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 */
@@ -891,6 +986,8 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_x(\pi) \f$.
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 *
 	 * \param targ The target qubit.
 	 */
 	void x(unsigned targ);
@@ -906,6 +1003,8 @@ namespace qsl
 	 * \f]
 	 *
 	 * Also equivalent to \f$ iR_y(\pi) \f$.
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 */
@@ -923,6 +1022,8 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_z(\pi) \f$ or \f$ \text{phase}(\pi) \f$
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 *
 	 * \param targ The target qubit.
 	 */
 	void z(unsigned targ);
@@ -933,10 +1034,10 @@ namespace qsl
 	 * The matrix must have orthonormal columns, the columns will be
 	 * normalised in this function.
 	 *
-	 * \todo Figure out row- or column-majored for matrix.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
-	 * \param matrix The unitary matrix to apply.
+	 * \param matrix The unitary matrix to apply, in row-major form.
 	 */
 	void u1(unsigned targ, const std::vector<F> & matrix);
 
@@ -946,25 +1047,31 @@ namespace qsl
 	 * The matrix must have orthonormal columns, the columns will be
 	 * normalised in this function.
 	 *
-	 * \todo Figure out row- or column-majored for matrix.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
-	 * \param matrix The unitary matrix to apply.
+	 * \param matrix The unitary matrix to apply in row-major form.
 	 */
 	void u1(unsigned targ, const std::vector<std::complex<F>> & matrix);
 
 	/**
 	 * \brief Perform a controlled X-rotation on two qubits. 
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 *
 	 * \param ctrl The control qubit, \f$ R_x \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
-	 */	
+	 */
 	void crx(unsigned ctrl, unsigned targ, F angle);
 
 	/**
 	 * \brief Perform a controlled Y-rotation on two qubits. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, \f$ R_y \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -976,25 +1083,34 @@ namespace qsl
 	/**
 	 * \brief Perform a controlled Z-rotation on two qubits. 
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 *
 	 * \param ctrl The control qubit, \f$ R_z \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
 	 */
-	void crz(unsigned ctrl, unsigned targ, F angle);
+	void crz(unsigned ctrl, unsigned targ, F angle);  
 
 	/**
 	 * \brief Perform a controlled phase gate on two qubits. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, a phase shift is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
 	 */
-	void cphase(unsigned ctrl, unsigned targ, F angle);
+	void cphase(unsigned ctrl, unsigned targ, F angle); 
 
 	/**
 	 * \brief Perform a controlled Hadamard gate on two qubits. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, H is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1006,6 +1122,9 @@ namespace qsl
 	 * \brief Perform a controlled Pauli-X (often referred to as a controlled-Not) 
 	 *        gate on two qubits. 
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 *
 	 * \param ctrl The control qubit, X is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
@@ -1015,6 +1134,9 @@ namespace qsl
 	/**
 	 * \brief Perform a controlled Pauli-Y gate on two qubits. 
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 *
 	 * \param ctrl The control qubit, Y is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
@@ -1023,6 +1145,9 @@ namespace qsl
 
 	/**
 	 * \brief Perform a controlled Pauli-Z gate on two qubits. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, Z is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1036,12 +1161,13 @@ namespace qsl
 	 * The matrix must have orthonormal columns, the columns will be
 	 * normalised in this function.
 	 *
-	 * \todo Figure out row- or column-majored for matrix.
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, U is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
-	 * \param matrix The unitary matrix to apply.
+	 * \param matrix The unitary matrix to apply, in row-major form.
 	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<F> & matrix);
 
@@ -1051,12 +1177,13 @@ namespace qsl
 	 * The matrix must have orthonormal columns, the columns will be
 	 * normalised in this function.
 	 *
-	 * \todo Figure out row- or column-majored for matrix.
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, U is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
-	 * \param matrix The unitary matrix to apply.
+	 * \param matrix The unitary matrix to apply, in row-major form.
 	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<std::complex<F>> & matrix);
 
@@ -1120,6 +1247,9 @@ namespace qsl
 	 * The simulator is initialised in the all-zero state, and the number of ones
 	 * is set to zero.
 	 *
+	 * In debug mode, if the number of qubits is too large to simulate, a
+	 * std::runtime_error is thrown.
+	 *
 	 * \param num_qubits The number of qubits to simulate.
 	 */ 
 	explicit number(unsigned num_qubits);
@@ -1131,6 +1261,9 @@ namespace qsl
 	 * If inputting a std::vector, it must be non-zero and have a length which is a 
 	 * power of two. It does not need to be normalised as this function will carry
 	 * out a normalisation step.
+	 *
+	 * In debug mode, if the input state is not a power of two or is all zeros,
+	 * a std::invalid_argument is thrown.
 	 *
 	 * This is not a copy constructor (because it is templated), so it will not
 	 * cause the move constructors to be implicitly deleted.
@@ -1147,6 +1280,10 @@ namespace qsl
 	 *
 	 * The simulator is initialised in the lowest indexed computational basis state
 	 * with num_ones ones.
+	 *
+	 * In debug mode, if the number of qubits is too large to simulate, a
+	 * std::runtime_error is thrown. If num_ones is bigger than num_qubits, 
+	 * std::invalid_argument is thrown.
 	 *
 	 * \param num_qubits The number of qubits to simulate.
 	 * \param num_ones The number of ones in the fixed number simulator.
@@ -1188,6 +1325,9 @@ namespace qsl
 	 * this function will carry out a normalisation step. Note that this function
 	 * allows for a change in the number of qubits.
 	 *
+	 * In debug mode, if the input state is not a power of two or is all zeros,
+	 * a std::invalid_argument is thrown.
+	 *
 	 * \param state A vector or qsl simulator containing the new state for the object.
 	 */ 		
 	template<state_vector S>
@@ -1204,6 +1344,9 @@ namespace qsl
 	 *
 	 * The number of ones is also reset to zero.
 	 *
+	 * In debug mode, if the number of qubits is too large to simulate, a
+	 * std::runtime_error is thrown.
+	 *
 	 * \param num_qubits The number of qubits to simulate.
 	 */
 	void reset(unsigned num_qubits);
@@ -1213,6 +1356,10 @@ namespace qsl
 	 *
 	 * The state vector is set to the lowest computational basis
 	 * state with the specified number of ones.
+	 *
+	 * In debug mode, if the number of qubits is too large to simulate, a
+	 * std::runtime_error is thrown. If num_ones is bigger than num_qubits, 
+	 * std::invalid_argument is thrown.
 	 *
 	 * \param num_qubits The number of qubits to simulate.
 	 * \param num_ones The number of ones to set.
@@ -1224,6 +1371,8 @@ namespace qsl
 	 *
 	 * This is read-only to avoid accidental tampering with the state vector
 	 * that might render the state invalid (for example, setting every element to zero).  
+	 *
+	 * A std::out_of_range error is thrown if index is bigger than size()-1.
 	 *
 	 * \param index The state vector index to access.
 	 * \return The complex amplitude at index.
@@ -1269,9 +1418,12 @@ namespace qsl
 	 * Capped at 20 qubits (16MB at double precision to store the state vector).
 	 * \todo Specify which metadata are stored.
 	 *
-	 * \param path Filename to save to.
+	 * In debug mode, a std::runtime_error is thrown if too many qubits are to be stored
+	 * or if the file cannot be created. 
+	 *
+	 * \param file Filename to save to.
 	 */	
-	void save_json(const std::filesystem::path & path) const;
+	void save_json(const std::filesystem::path & file) const;
 
 	/**
 	 * \brief Load in a state vector from a json file.
@@ -1283,9 +1435,14 @@ namespace qsl
 	 * \todo Figure out how we will serialise std::vector<std::complex> so the input
 	 *       can be specified here.
 	 *
-	 * \param path The filename to read from. 
+	 * In debug mode, a std::runtime_error is thrown if the file doesn't exist or cannot be
+	 * read. A std::invalid_argument is thrown if it does not contain a valid json object,
+	 * if it reads a json object that does not contain a 'state' field, or if the state that
+	 * is read is invalid. 
+	 *
+	 * \param file The filename to read from. 
 	 */
-	void load_json(const std::filesystem::path & path);
+	void load_json(const std::filesystem::path & file);
 	
 	/**
 	 * \brief Rotate around the z-axis of the Bloch sphere 
@@ -1297,6 +1454,8 @@ namespace qsl
 	 *       0 & e^{i\theta/2} \\
 	 *       \end{pmatrix} 
 	 * \f]
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -1315,6 +1474,8 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ e^{i\theta/2} R_z(\theta) \f$.
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
 	 */	
@@ -1332,12 +1493,17 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_z(\pi) \f$ or \f$ \text{phase}(\pi) \f$
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 *
 	 * \param targ The target qubit.
 	 */
 	void z(unsigned targ);  
 
 	/**
 	 * \brief Perform a controlled Z-rotation on two qubits. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, \f$ R_z \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1349,6 +1515,9 @@ namespace qsl
 	/**
 	 * \brief Perform a controlled phase gate on two qubits. 
 	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 *
 	 * \param ctrl The control qubit, a phase shift is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
@@ -1358,6 +1527,9 @@ namespace qsl
 
 	/**
 	 * \brief Perform a controlled Pauli-Z gate on two qubits. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, Z is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
