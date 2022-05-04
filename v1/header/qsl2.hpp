@@ -803,7 +803,7 @@ namespace qsl
 	 * \param targ The value the inserted qubit will be indexed as.
 	 */
 	void add_qubit(unsigned targ);
-	/// Trims the state vector to the current qubit size
+
 	/**
 	 * \brief Trims the internal state vector to the current qubit size.
 	 *
@@ -1109,26 +1109,277 @@ namespace qsl
 	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<std::complex<F>> & matrix);
 
-	// Rest of the number gates
+	/**
+	 * \brief Perform an X rotation on the \f$ \{|01\rangle,|10\rangle\}\f$
+	 * subspace. 
+	 *
+	 * \f[ 
+	 *  nR_x(\theta) = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & \cos(\theta/2) & -i\sin(\theta/2) & 0 \\
+	 *             0 & -i\sin(\theta/2) & \cos(\theta/2) & 0 \\
+	 *             0 & 0 & 0 & 1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * This is equivalent to applying \f$ e^{-i\theta (XX+YY)/2} \f$. 
+	 *
+	 * \param q1 The first qubit.
+	 * \param q2 The second qubit.
+	 * \param angle The angle to rotate by (in radians)
+	 */
 	void nrx(unsigned targ1, unsigned targ2, F angle);
-	void nry(unsigned targ1, unsigned targ2, F angle);
-	void nrz(unsigned targ1, unsigned targ2, F angle);
-	void swap(unsigned targ1, unsigned targ2);
-	void fswap(unsigned targ1, unsigned targ2);
-	void iswap(unsigned targ1, unsigned targ2);
-	void nh(unsigned targ1, unsigned targ2);
-	void nu1(unsigned targ1, unsigned targ2, const std::vector<F> & matrix);
-	void nu1(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & matrix);
 
-	/// Arbitrary two-qubit unitary
+	/**
+	 * \brief Perform an Y rotation on the \f$ \{|01\rangle,|10\rangle\}\f$
+	 * subspace. This is equivalent to applying 
+	 * \f$ e^{-i\theta (YX-XY)/2} \f$. 
+	 *
+	 * \ingroup qubits_gates
+
+	 * \f[ 
+	 *  nR_y(\theta) = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & \cos(\theta/2) & -\sin(\theta/2) & 0 \\
+	 *             0 & \sin(\theta/2) & \cos(\theta/2) & 0 \\
+	 *             0 & 0 & 0 & 1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param q1 The first qubit.
+	 * \param q2 The second qubit.
+	 * \param angle Angle to rotate by.
+	 */
+	void nry(unsigned targ1, unsigned targ2, F angle);
+
+	/**
+	 * \brief Perform an Z rotation on the \f$ \{|01\rangle,|10\rangle\}\f$
+	 * subspace. 
+	 *
+	 * \f[ 
+	 *  nR_y(\theta) = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & e^{-i\theta/2} & 0 & 0 \\
+	 *             0 & 0 & e^{i\theta/2} & 0 \\
+	 *             0 & 0 & 0 & 1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * This is equivalent to applying TODO fix this -> \f$ e^{-i\theta (YX-XY)/2} \f$.
+	 * 
+	 * \param q1 The first qubit.
+	 * \param q2 The second qubit.
+	 * \param angle Angle to rotate by.
+	 */	
+	void nrz(unsigned targ1, unsigned targ2, F angle);
+
+	/**
+	 * \brief Perform a swap gate on two qubits. 
+	 *
+	 * \f[ 
+	 * SWAP = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 0 & 1 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & 0 & 1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param q1 The first qubit to swap.
+	 * \param q2 The second qubit to swap.
+	 */
+	void swap(unsigned targ1, unsigned targ2);
+
+	/**
+	 * \brief Perform a fermionic-swap gate on two qubits. 
+	 *
+	 * \f[ 
+	 * FSWAP = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 0 & 1 & 0 \\
+	 *             0 & 1 & 0 & 0 \\
+	 *             0 & 0 & 0 & -1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param q1 The first qubit to fswap.
+	 * \param q2 The second qubit to fswap.
+	 */
+	void fswap(unsigned targ1, unsigned targ2);
+
+	/**
+	 * \brief Perform an imaginary-swap gate on two qubits. 
+	 *
+	 * \f[ 
+	 * ISWAP = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 0 & i & 0 \\
+	 *             0 & i & 0 & 0 \\
+	 *             0 & 0 & 0 & -1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * This corresponds to the fixed-number \f[R_x(-\pi/2)\f].
+	 *
+	 * \param q1 The first qubit to iswap.
+	 * \param q2 The second qubit to iswap.
+	 */
+	void iswap(unsigned targ1, unsigned targ2);
+
+	/**
+	 * \brief Perform a Hadamard gate on the \f$ \{|01\rangle,|10\rangle\}\f$
+	 * subspace.  
+	 *
+	 * \f[ 
+	 *  nH = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & 1/\sqrt{2} & 1/\sqrt{2} & 0 \\
+	 *             0 & 1/\sqrt{2} & -1/\sqrt{2} & 0 \\
+	 *             0 & 0 & 0 & 1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * \param q1 The first qubit.
+	 * \param q2 The second qubit.
+	 */
+	void nh(unsigned targ1, unsigned targ2);
+
+	/**
+	 * \brief Perform an arbitrary fixed-number gate, real matrix coefficients   
+	 *
+	 * \f[ 
+	 *  nU = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & a_0 & a_1 & 0 \\
+	 *             0 & a_2 & a_3 & 0 \\
+	 *             0 & 0 & 0 & 1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * Use this function when all the coefficients of the unitary matrix 
+	 * \f$a_i\f$ above are real.
+	 *
+	 * \param q1 The first qubit.
+	 * \param q2 The second qubit.
+	 * \param a The four coefficients of the matrix, stored in 
+	 * row-major order in a vector (in the order they are indexed above). 
+	 */
+	void nu1(unsigned targ1, unsigned targ2, const std::vector<F> & a);
+
+	/**
+	 * \brief Perform an arbitrary fixed-number gate, complex matrix coefficients   
+	 *
+	 * \f[ 
+	 *  nU = \begin{pmatrix}
+	 *             1 & 0 & 0 & 0 \\
+	 *             0 & u_0 & u_1 & 0 \\
+	 *             0 & u_2 & u_3 & 0 \\
+	 *             0 & 0 & 0 & 1
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * Use this function when all the coefficients of the unitary matrix 
+	 * \f$u_i\f$ above are complex. If all the coefficients are real, use the
+	 * real version of nu1 for improved performance.
+	 *
+	 * \param q1 The first qubit.
+	 * \param q2 The second qubit.
+	 * \param u The four complex coefficients of the matrix, stored in 
+	 * row-major order in a vector (in the order they are indexed above).
+	 */	
+	void nu1(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & u);
+
+	/**
+	 * \brief Perform an arbitrary two-qubit gate, real coefficients
+	 *
+	 * \f[ 
+	 *  U = \begin{pmatrix}
+	 *             a_0 & a_1 & a_2 & a_3 \\
+	 *             a_4 & a_5 & a_6 & a_7 \\
+	 *             a_8 & a_9 & a_{10} & a_{11} \\
+	 *             a_{12} & a_{13} & a_{14} & a_{15}
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * Use this function when all the coefficients of the unitary matrix 
+	 * \f$a_i\f$ above are real.
+	 *
+	 * \param q1 The first qubit.
+	 * \param q2 The second qubit.
+	 * \param a The 16 real coefficients of the matrix, stored in row-major 
+	 * order in a vector (in the order they are indexed above). 
+	 */		
 	void u2(unsigned targ1, unsigned targ2, const std::vector<F> & matrix);
+
+	/**
+	 * \brief Perform an arbitrary two-qubit gate
+	 *
+	 * \f[ 
+	 *  U = \begin{pmatrix}
+	 *             u_0 & u_1 & u_2 & u_3 \\
+	 *             u_4 & u_5 & u_6 & u_7 \\
+	 *             u_8 & u_9 & u_{10} & u_{11} \\
+	 *             u_{12} & u_{13} & u_{14} & u_{15}
+	 *             \end{pmatrix} 
+	 * \f]
+	 *
+	 * Use this function when all the coefficients of the unitary matrix 
+	 * \f$u_i\f$ above are complex. If all the coefficients are real, use the
+	 * real version of u2 for improved performance.
+	 *
+	 * \param q1 The first qubit.
+	 * \param q2 The second qubit.
+	 * \param u The 16 complex coefficients of the matrix, stored in row-major 
+	 * order in a vector (in the order they are indexed above).
+	 */		
 	void u2(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & matrix);
 
-	/// Calculate probability of specific outcome of a qubit
+	/** 
+	 * \brief Calculate probability of specific outcome of a qubit
+	 * 
+	 * Calculate the probability that a specific outcome will result from the
+	 * measurement of qubit, without measuring the qubit. The state vector
+	 * is not affected by this function.
+	 *
+	 * \param targ The qubit under consideration
+	 * \param outcome The outcome whose probability is desired.
+	 * \return The probability of the specifed outcome.
+	 */
 	F prob(unsigned targ, unsigned outcome) const;
-	/// Measure one qubit
+
+	/** 
+	 * \brief Measure one qubit
+	 *
+	 * Measure a particular qubit and return the outcome. The function chooses
+	 * the outcome at random, depending on the probability defined by the amplitudes
+	 * in the state vector.
+	 *
+	 * The source of randomness is a generator object, which provides a means to 
+	 * obtain repeatable results, or otherwise control the source of randomness for the
+	 * function. By default, qsl::gen is used as the source of randomness. 
+	 * 
+	 * \param targ The qubit to measure
+	 * \param g A generator used as the source of randomness
+	 * \return The measured outcome (either 0 or 1)
+	 */
 	unsigned measure(unsigned targ, std::uniform_random_bit_generator auto g = gen);
-	/// Measure all of the qubits
+
+	/** 
+	 * \brief Measure all the qubits 
+	 *
+	 * Measure all the qubit and return the resulting computational basis state as
+	 * an integer, whose bits represent measured outcomes. The least significant bits
+	 * in the returned integer represent the lowest-index measurement outcomes. The 
+	 * outcome for the qubit measurements are chosen randomly, with probabilities 
+	 * depending on the amplitudes in the state vector.
+	 *
+	 * The source of randomness is a generator object, which provides a means to 
+	 * obtain repeatable results, or otherwise control the source of randomness for the
+	 * function. By default, qsl::gen is used as the source of randomness. 
+	 * 
+	 * \param g A generator used as the source of randomness
+	 * \return The measurement outcomes (packed little-endian into an integer)
+	 */
 	std::size_t measure_all(std::uniform_random_bit_generator auto g = gen);
 	/// Postselect one qubit on a specific outcome
 	unsigned postselect(unsigned targ, unsigned outcome) const;
