@@ -185,42 +185,29 @@ namespace qsl
 	 *
 	 * The simulator is initialised in the all-zero state.
 	 *
+	 * In debug mode, if the number of qubits is too large to simulate, a
+	 * std::runtime_error is thrown.
+	 *
 	 * \param num_qubits The number of qubits to simulate.
 	 */ 
 	explicit basic(unsigned num_qubits);
 
 	/**
-	 * \brief Instantiate a simulator based on a real state that is passed in. 
-         *        The imaginary part of the state vector will be assumed to be all-zero.
+	 * \brief Instantiate a simulator based on a std::vector or another simulator
+         *        that has the same floating point precision.
 	 *
-	 * The input state vector must be non-zero and have a length which
-	 * is a power of two. It does not need to be normalised as
-	 * this function will carry out a normalisation step. 
-	 *
-	 * \param state A (real) vector containing the initial state for the object.
-	 */ 	
-	explicit basic(const std::vector<F> & state);
-
-	/**
-	 * \brief Instantiate a simulator based on the state that is passed in. 
-	 *
-	 * The input state vector must be non-zero and have a length which
-	 * is a power of two. It does not need to be normalised as
-	 * this function will carry out a normalisation step.
-	 *
-	 * \param state A complex vector containing the initial state for the object.
-	 */ 	
-	explicit basic(const std::vector<std::complex<F>> & state);
-
-	/**
-	 * \brief Convert from any simulator using the same floating point type.
+	 * If inputting a std::vector, it must be non-zero and have a length which is a 
+	 * power of two. It does not need to be normalised as this function will carry
+	 * out a normalisation step.
 	 *
 	 * This is not a copy constructor (because it is templated), so it will not
 	 * cause the move constructors to be implicitly deleted.
 	 *
-	 * \param s A valid qsl simulator object that uses the same floating point type.
+	 * \param s A valid qsl simulator object with the same floating point precision,
+         *          or std::vector<std::complex<F>> or std::vector<F>.
 	 */
 	template<state_vector S>
+	requires same_precision<F, S>
 	explicit basic(const S & s);
 
 	/**
@@ -251,29 +238,18 @@ namespace qsl
 	std::vector<std::complex<F>> state() const;
 
 	/**
-	 * \brief Change the simulator state to the real state that is passed in. 
-         *        The imaginary part of the state vector will be assumed to be all-zero.
-	 *
-	 * The input state vector must be non-zero and have a length which
-	 * is a power of two. It does not need to be normalised as
-	 * this function will carry out a normalisation step. Note that this function
-	 * allows for a change in the number of qubits.
-	 *
-	 * \param state A (real) vector containing the new state for the object.
-	 */
-	basic & operator= (const std::vector<F> & state);
- 
-	/**
 	 * \brief Change the simulator state to the state that is passed in. 
 	 *
-	 * The input state vector must be non-zero and have a length which
+	 * If a stad::vector, the input state vector must be non-zero and have a length which
 	 * is a power of two. It does not need to be normalised as
 	 * this function will carry out a normalisation step. Note that this function
 	 * allows for a change in the number of qubits.
 	 *
-	 * \param state A vector containing the new state for the object.
+	 * \param state A vector or qsl simulator containing the new state for the object.
 	 */ 		
-	basic & operator= (const std::vector<std::complex<F>> & state);
+	template<state_vector S>
+	requires same_precision<F, S>
+	basic & operator= (const S & state);
 
 	/**
 	 * \brief Reset to the all-zero computational basis state.
@@ -667,37 +643,21 @@ namespace qsl
 	explicit resize(unsigned num_qubits);
 
 	/**
-	 * \brief Instantiate a simulator based on a real state that is passed in. 
-         *        The imaginary part of the state vector will be assumed to be all-zero.
+	 * \brief Instantiate a simulator based on a std::vector or another simulator
+         *        that has the same floating point precision.
 	 *
-	 * The input state vector must be non-zero and have a length which
-	 * is a power of two. It does not need to be normalised as
-	 * this function will carry out a normalisation step. 
-	 *
-	 * \param state A (real) vector containing the initial state for the object.
-	 */ 	
-	explicit resize(const std::vector<F> & state);
-
-	/**
-	 * \brief Instantiate a simulator based on the state that is passed in. 
-	 *
-	 * The input state vector must be non-zero and have a length which
-	 * is a power of two. It does not need to be normalised as
-	 * this function will carry out a normalisation step.
-	 *
-	 * \param state A complex vector containing the initial state for the object.
-	 */ 	
-	explicit resize(const std::vector<std::complex<F>> & state);
-
-	/**
-	 * \brief Convert from any simulator using the same floating point type.
+	 * If inputting a std::vector, it must be non-zero and have a length which is a 
+	 * power of two. It does not need to be normalised as this function will carry
+	 * out a normalisation step.
 	 *
 	 * This is not a copy constructor (because it is templated), so it will not
 	 * cause the move constructors to be implicitly deleted.
 	 *
-	 * \param s A valid qsl simulator object that uses the same floating point type.
+	 * \param s A valid qsl simulator object with the same floating point precision,
+         *          or std::vector<std::complex<F>> or std::vector<F>.
 	 */
 	template<state_vector S>
+	requires same_precision<F, S>
 	explicit resize(const S & s);
 
 	/**
@@ -728,27 +688,18 @@ namespace qsl
 	std::vector<std::complex<F>> state() const;
 
 	/**
-	 * \brief Change the simulator state to the real state that is passed in. 
-         *        The imaginary part of the state vector will be assumed to be all-zero.
-	 *
-	 * The input state vector must be non-zero and have a length which
-	 * is a power of two. It does not need to be normalised as
-	 * this function will carry out a normalisation step. 
-	 *
-	 * \param state A (real) vector containing the new state for the object.
-	 */ 		
-	resize & operator= (const std::vector<F> & state);
-
-	/**
 	 * \brief Change the simulator state to the state that is passed in. 
 	 *
-	 * The input state vector must be non-zero and have a length which
+	 * If a stad::vector, the input state vector must be non-zero and have a length which
 	 * is a power of two. It does not need to be normalised as
-	 * this function will carry out a normalisation step. 
+	 * this function will carry out a normalisation step. Note that this function
+	 * allows for a change in the number of qubits.
 	 *
-	 * \param state A vector containing the new state for the object.
+	 * \param state A vector or qsl simulator containing the new state for the object.
 	 */ 		
-	resize & operator= (const std::vector<std::complex<F>> & state);
+	template<state_vector S>
+	requires same_precision<F, S>
+	resize & operator= (const S & state);
 
 	/**
 	 * \brief Reset to the all-zero computational basis state.
@@ -1174,30 +1125,23 @@ namespace qsl
 	explicit number(unsigned num_qubits);
 
 	/**
-	 * \brief Instantiate a simulator based on a real state that is passed in. 
-         *        The imaginary part of the state vector will be assumed to be all-zero.
+	 * \brief Instantiate a simulator based on a std::vector or another simulator
+         *        that has the same floating point precision.
 	 *
-	 * The input state vector must be non-zero and have a length which
-	 * is a power of two. It does not need to be normalised as
-	 * this function will carry out a normalisation step. The input vector must
-	 * be of fixed number.
+	 * If inputting a std::vector, it must be non-zero and have a length which is a 
+	 * power of two. It does not need to be normalised as this function will carry
+	 * out a normalisation step.
 	 *
-	 * \param state A (real) vector containing the initial state for the object.
-	 */ 	
-	explicit number(const std::vector<F> & state);
-
-	/**
-	 * \brief Instantiate a simulator based on the state that is passed in. 
+	 * This is not a copy constructor (because it is templated), so it will not
+	 * cause the move constructors to be implicitly deleted.
 	 *
-	 * The input state vector must be non-zero and have a length which
-	 * is a power of two. It does not need to be normalised as
-	 * this function will carry out a normalisation step. The input vector must
-	 * be of fixed number.
-	 *
-	 * \param state A complex vector containing the initial state for the object.
-	 */ 	
-	explicit number(const std::vector<std::complex<F>> & state);
-
+	 * \param s A valid qsl simulator object with the same floating point precision,
+         *          or std::vector<std::complex<F>> or std::vector<F>.
+	 */
+	template<state_vector S>
+	requires same_precision<F, S>
+	explicit number(const S & s);
+	
 	/**
 	 * \brief Initialise the class with a specified number of qubits and number of ones.
 	 *
@@ -1208,17 +1152,6 @@ namespace qsl
 	 * \param num_ones The number of ones in the fixed number simulator.
 	 */ 
 	number(unsigned num_qubits, unsigned num_ones);
-
-	/**
-	 * \brief Convert from any simulator using the same floating point type.
-	 *
-	 * This is not a copy constructor (because it is templated), so it will not
-	 * cause the move constructors to be implicitly deleted.
-	 *
-	 * \param s A valid qsl simulator object that uses the same floating point type.
-	 */
-	template<state_vector S>
-	explicit number(const S & s);
 
 	/**
 	 * \brief Convert between different floating point types for qsl::number simulators.
@@ -1248,29 +1181,18 @@ namespace qsl
 	std::vector<std::complex<F>> state() const;
 
 	/**
-	 * \brief Change the simulator state to the real state that is passed in. 
-         *        The imaginary part of the state vector will be assumed to be all-zero.
-	 *
-	 * The input state vector must be non-zero, fixed number and have a length which
-	 * is a power of two. It does not need to be normalised as
-	 * this function will carry out a normalisation step. Note that this function
-	 * allows for a change in the number of qubits.
-	 *
-	 * \param state A (real) vector containing the new state for the object.
-	 */ 		
-	number & operator= (const std::vector<F> & state);
-
-	/**
 	 * \brief Change the simulator state to the state that is passed in. 
 	 *
-	 * The input state vector must be non-zero, fixed number and have a length which
+	 * If a stad::vector, the input state vector must be non-zero and have a length which
 	 * is a power of two. It does not need to be normalised as
 	 * this function will carry out a normalisation step. Note that this function
 	 * allows for a change in the number of qubits.
 	 *
-	 * \param state A vector containing the new state for the object.
+	 * \param state A vector or qsl simulator containing the new state for the object.
 	 */ 		
-	number & operator= (const std::vector<std::complex<F>> & state);
+	template<state_vector S>
+	requires same_precision<F, S>
+	number & operator= (const S & state);
 
 	/**
 	 * \brief Reset to the lowest indexed computational basis state for the given num_ones.

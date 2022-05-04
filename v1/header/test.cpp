@@ -51,7 +51,7 @@ int main()
     qsl::basic<double> q9{qsl::basic<double>{3}};
 
     // Conversion between floating point types
-    //qsl::basic<float> q10{q1}; // This one is not allowed
+    //qsl::basic<float> q100{q1}; // This one is not allowed
     [[maybe_unused]] qsl::basic<float> q10{q1}; // This one seems to use the conversion operator, even though it is explicit
     [[maybe_unused]] qsl::basic<float> q12(q1); // This one also works
     //qsl::basic<float> q14 = q1; // This one is not OK for some reason
