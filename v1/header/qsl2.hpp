@@ -1445,7 +1445,7 @@ namespace qsl
 	/** 
 	 * \brief Measure all the qubits 
 	 *
-	 * Measure all the qubit and return the resulting computational basis state as
+	 * Measure all the qubits and return the resulting computational basis state as
 	 * an integer, whose bits represent measured outcomes. The least significant bits
 	 * in the returned integer represent the lowest-index measurement outcomes. The 
 	 * outcome for the qubit measurements are chosen randomly, with probabilities 
