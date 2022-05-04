@@ -248,7 +248,7 @@ namespace qsl
 	 *
 	 * \return The state of the qubits as a std::vector.
 	 */
-	std::vector<std::complex<F>> get_state() const;
+	std::vector<std::complex<F>> state() const;
 
 	/**
 	 * \brief Change the simulator state to the real state that is passed in. 
@@ -261,11 +261,8 @@ namespace qsl
 	 *
 	 * \param state A (real) vector containing the new state for the object.
 	 */
-	//void set_state(const std::vector<F> & state);
 	basic & operator= (const std::vector<F> & state);
  
-	// Probably the best thing to do is disallow setting from a std::vector of reals. Then the function won't be ambiguous, but you can still pass an initialiser list of reals.
-	
 	/**
 	 * \brief Change the simulator state to the state that is passed in. 
 	 *
@@ -276,7 +273,6 @@ namespace qsl
 	 *
 	 * \param state A vector containing the new state for the object.
 	 */ 		
-	//void set_state(const std::vector<std::complex<F>> & state);
 	basic & operator= (const std::vector<std::complex<F>> & state);
 
 	/**
@@ -729,7 +725,7 @@ namespace qsl
 	 *
 	 * \return The state of the qubits as a std::vector.
 	 */
-	std::vector<std::complex<F>> get_state() const;
+	std::vector<std::complex<F>> state() const;
 
 	/**
 	 * \brief Change the simulator state to the real state that is passed in. 
@@ -741,7 +737,6 @@ namespace qsl
 	 *
 	 * \param state A (real) vector containing the new state for the object.
 	 */ 		
-	//void set_state(const std::vector<F> & state);
 	resize & operator= (const std::vector<F> & state);
 
 	/**
@@ -753,7 +748,6 @@ namespace qsl
 	 *
 	 * \param state A vector containing the new state for the object.
 	 */ 		
-	//void set_state(const std::vector<std::complex<F>> & state);
 	resize & operator= (const std::vector<std::complex<F>> & state);
 
 	/**
@@ -1251,7 +1245,7 @@ namespace qsl
 	 *
 	 * \return The state of the qubits as a std::vector.
 	 */
-	std::vector<std::complex<F>> get_state() const;
+	std::vector<std::complex<F>> state() const;
 
 	/**
 	 * \brief Change the simulator state to the real state that is passed in. 
@@ -1264,7 +1258,6 @@ namespace qsl
 	 *
 	 * \param state A (real) vector containing the new state for the object.
 	 */ 		
-	//void set_state(const std::vector<F> & state);
 	number & operator= (const std::vector<F> & state);
 
 	/**
@@ -1277,7 +1270,6 @@ namespace qsl
 	 *
 	 * \param state A vector containing the new state for the object.
 	 */ 		
-	//void set_state(const std::vector<std::complex<F>> & state);
 	number & operator= (const std::vector<std::complex<F>> & state);
 
 	/**
