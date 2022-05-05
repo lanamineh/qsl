@@ -1202,14 +1202,17 @@ namespace qsl
 	 *
 	 * This is equivalent to applying \f$ e^{-i\theta (XX+YY)/2} \f$. 
 	 *
-	 * \param q1 The first qubit.
-	 * \param q2 The second qubit.
+	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 *
+	 * \param targ1 The first qubit.
+	 * \param targ2 The second qubit.
 	 * \param angle The angle to rotate by (in radians)
 	 */
 	void nrx(unsigned targ1, unsigned targ2, F angle);
 
 	/**
-	 * \brief Perform an Y rotation on the \f$ \{|01\rangle,|10\rangle\}\f$
+	 * \brief Perform a Y rotation on the \f$ \{|01\rangle,|10\rangle\}\f$
 	 * subspace. This is equivalent to applying 
 	 * \f$ e^{-i\theta (YX-XY)/2} \f$. 
 	 *
@@ -1224,14 +1227,17 @@ namespace qsl
 	 *             \end{pmatrix} 
 	 * \f]
 	 *
-	 * \param q1 The first qubit.
-	 * \param q2 The second qubit.
-	 * \param angle Angle to rotate by.
+	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 *
+	 * \param targ1 The first qubit.
+	 * \param targ2 The second qubit.
+	 * \param angle Angle to rotate by (in radians).
 	 */
 	void nry(unsigned targ1, unsigned targ2, F angle);
 
 	/**
-	 * \brief Perform an Z rotation on the \f$ \{|01\rangle,|10\rangle\}\f$
+	 * \brief Perform a Z rotation on the \f$ \{|01\rangle,|10\rangle\}\f$
 	 * subspace. 
 	 *
 	 * \f[ 
@@ -1244,10 +1250,13 @@ namespace qsl
 	 * \f]
 	 *
 	 * This is equivalent to applying TODO fix this -> \f$ e^{-i\theta (YX-XY)/2} \f$.
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 * 
-	 * \param q1 The first qubit.
-	 * \param q2 The second qubit.
-	 * \param angle Angle to rotate by.
+	 * \param targ1 The first qubit.
+	 * \param targ2 The second qubit.
+	 * \param angle Angle to rotate by (in radians).
 	 */	
 	void nrz(unsigned targ1, unsigned targ2, F angle);
 
@@ -1263,8 +1272,11 @@ namespace qsl
 	 *             \end{pmatrix} 
 	 * \f]
 	 *
-	 * \param q1 The first qubit to swap.
-	 * \param q2 The second qubit to swap.
+	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 *
+	 * \param targ1 The first qubit to swap.
+	 * \param targ2 The second qubit to swap.
 	 */
 	void swap(unsigned targ1, unsigned targ2);
 
@@ -1280,8 +1292,13 @@ namespace qsl
 	 *             \end{pmatrix} 
 	 * \f]
 	 *
-	 * \param q1 The first qubit to fswap.
-	 * \param q2 The second qubit to fswap.
+	 * This corresponds to a swap gate followed by a CZ gate.
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 *
+	 * \param targ1 The first qubit to fswap.
+	 * \param targ2 The second qubit to fswap.
 	 */
 	void fswap(unsigned targ1, unsigned targ2);
 
@@ -1293,14 +1310,17 @@ namespace qsl
 	 *             1 & 0 & 0 & 0 \\
 	 *             0 & 0 & i & 0 \\
 	 *             0 & i & 0 & 0 \\
-	 *             0 & 0 & 0 & -1
+	 *             0 & 0 & 0 & 1
 	 *             \end{pmatrix} 
 	 * \f]
 	 *
 	 * This corresponds to the fixed-number \f[R_x(-\pi/2)\f].
 	 *
-	 * \param q1 The first qubit to iswap.
-	 * \param q2 The second qubit to iswap.
+	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 *
+	 * \param targ1 The first qubit to iswap.
+	 * \param targ2 The second qubit to iswap.
 	 */
 	void iswap(unsigned targ1, unsigned targ2);
 
@@ -1317,8 +1337,11 @@ namespace qsl
 	 *             \end{pmatrix} 
 	 * \f]
 	 *
-	 * \param q1 The first qubit.
-	 * \param q2 The second qubit.
+	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 *
+	 * \param targ1 The first qubit.
+	 * \param targ2 The second qubit.
 	 */
 	void nh(unsigned targ1, unsigned targ2);
 
@@ -1337,10 +1360,13 @@ namespace qsl
 	 * Use this function when all the coefficients of the unitary matrix 
 	 * \f$a_i\f$ above are real.
 	 *
-	 * \param q1 The first qubit.
-	 * \param q2 The second qubit.
+	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 *
+	 * \param targ1 The first qubit.
+	 * \param targ2 The second qubit.
 	 * \param a The four coefficients of the matrix, stored in 
-	 * row-major order in a vector (in the order they are indexed above). 
+	 *          row-major order in a vector (in the order they are indexed above). 
 	 */
 	void nu1(unsigned targ1, unsigned targ2, const std::vector<F> & a);
 
@@ -1360,10 +1386,13 @@ namespace qsl
 	 * \f$u_i\f$ above are complex. If all the coefficients are real, use the
 	 * real version of nu1 for improved performance.
 	 *
-	 * \param q1 The first qubit.
-	 * \param q2 The second qubit.
+	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 *
+	 * \param targ1 The first qubit.
+	 * \param targ2 The second qubit.
 	 * \param u The four complex coefficients of the matrix, stored in 
-	 * row-major order in a vector (in the order they are indexed above).
+	 *          row-major order in a vector (in the order they are indexed above).
 	 */	
 	void nu1(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & u);
 
@@ -1382,12 +1411,15 @@ namespace qsl
 	 * Use this function when all the coefficients of the unitary matrix 
 	 * \f$a_i\f$ above are real.
 	 *
-	 * \param q1 The first qubit.
-	 * \param q2 The second qubit.
+	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 *
+	 * \param targ1 The first qubit.
+	 * \param targ2 The second qubit.
 	 * \param a The 16 real coefficients of the matrix, stored in row-major 
-	 * order in a vector (in the order they are indexed above). 
+	 *          order in a vector (in the order they are indexed above). 
 	 */		
-	void u2(unsigned targ1, unsigned targ2, const std::vector<F> & matrix);
+	void u2(unsigned targ1, unsigned targ2, const std::vector<F> & a);
 
 	/**
 	 * \brief Perform an arbitrary two-qubit gate
@@ -1405,12 +1437,15 @@ namespace qsl
 	 * \f$u_i\f$ above are complex. If all the coefficients are real, use the
 	 * real version of u2 for improved performance.
 	 *
-	 * \param q1 The first qubit.
-	 * \param q2 The second qubit.
+	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
+	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 *
+	 * \param targ1 The first qubit.
+	 * \param targ2 The second qubit.
 	 * \param u The 16 complex coefficients of the matrix, stored in row-major 
-	 * order in a vector (in the order they are indexed above).
+	 *          order in a vector (in the order they are indexed above).
 	 */		
-	void u2(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & matrix);
+	void u2(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & u);
 
 	/** 
 	 * \brief Calculate probability of specific outcome of a qubit
@@ -1418,6 +1453,9 @@ namespace qsl
 	 * Calculate the probability that a specific outcome will result from the
 	 * measurement of qubit, without measuring the qubit. The state vector
 	 * is not affected by this function.
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
+	 * num_qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
 	 *
 	 * \param targ The qubit under consideration
 	 * \param outcome The outcome whose probability is desired.
@@ -1435,6 +1473,9 @@ namespace qsl
 	 * The source of randomness is a generator object, which provides a means to 
 	 * obtain repeatable results, or otherwise control the source of randomness for the
 	 * function. By default, qsl::gen is used as the source of randomness. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
+	 * num_qubits-1.
 	 * 
 	 * \param targ The qubit to measure
 	 * \param g A generator used as the source of randomness
@@ -1459,19 +1500,100 @@ namespace qsl
 	 * \return The measurement outcomes (packed little-endian into an integer)
 	 */
 	std::size_t measure_all(std::uniform_random_bit_generator auto g = gen);
-	/// Postselect one qubit on a specific outcome
-	unsigned postselect(unsigned targ, unsigned outcome) const;
-	/// Perform measurement sampling on one qubit
+
+	/** 
+	 * \brief Collapse one qubit to a specific outcome
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
+	 * num_qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
+	 * 
+	 * \param targ The qubit to measure
+	 * \param outcome The desired outcome of targ
+	 * \return The measured outcome (either 0 or 1), this is the same as outcome
+	 *         but is returned for consistency with the measure function.
+	 */
+	unsigned postselect(unsigned targ, unsigned outcome);
+	
+	/** 
+	 * \brief Sample the measurement outcome of one qubit repeatedly
+	 *
+	 * If only a measurement outcome is required from a measurement operation (e.g.
+	 * the state will not be used afterwards), it is more efficient to not collapse 
+	 * the state vector. This function samples from the probability distribution of the
+	 * qubit many times and is equivalent to preparing the same circuit and measuring
+	 * qubit targ samples times. The state vector is not modified.
+	 *
+	 * The source of randomness is a generator object, which provides a means to 
+	 * obtain repeatable results, or otherwise control the source of randomness for the
+	 * function. By default, qsl::gen is used as the source of randomness. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
+	 * num_qubits-1.
+	 * 
+	 * \param targ The qubit to sample
+	 * \param samples Number of samples to take
+	 * \param g A generator used as the source of randomness
+	 * \return A length-two vector where element 0 is the number of times 0 was
+	 *         sampled, and element 1 the number of times 1 was sampled.
+	 */
 	std::vector<std::size_t> sample(unsigned targ, std::size_t samples,
 					std::uniform_random_bit_generator auto g = gen) const;
-	/// Perform measurement sampling on all the qubits
+
+	/** 
+	 * \brief Sample the measurement outcome of all the qubits repeatedly
+	 *
+	 * This function is useful if at the end of a circuit all the qubits need to be
+	 * measured (resulting in a computational basis state as an outcome), 
+	 * and the process repeated many times. This function generates measurement samples 
+	 * from the probability distribution of all the qubits, and does not modify the
+	 * state vector.  
+	 *
+	 * The source of randomness is a generator object, which provides a means to 
+	 * obtain repeatable results, or otherwise control the source of randomness for the
+	 * function. By default, qsl::gen is used as the source of randomness. 
+	 * 
+	 * \param samples Number of samples to take
+	 * \param g A generator used as the source of randomness
+	 * \return A map of the measurement outcomes where the keys are the computational
+	 *         basis state outcomes (encoded as a bitstring) and the associated values
+	 *         are the number of times that outcome was measured.
+	 */
 	std::map<std::size_t, std::size_t> sample_all(std::size_t samples,
 						      std::uniform_random_bit_generator auto g = gen) const;
 
-	/// Measure one qubit and remove from state vector
+	/** 
+	 * \brief Measure one qubit and remove from the state vector.
+	 *
+	 * Measure a particular qubit and return the outcome. Remove the measured 
+	 * qubit from the state vector, reducing the number of qubits by one. The function chooses
+	 * the outcome at random, depending on the probability defined by the amplitudes
+	 * in the state vector.
+	 *
+	 * The source of randomness is a generator object, which provides a means to 
+	 * obtain repeatable results, or otherwise control the source of randomness for the
+	 * function. By default, qsl::gen is used as the source of randomness. 
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
+	 * num_qubits-1.
+	 * 
+	 * \param targ The qubit to measure
+	 * \param g A generator used as the source of randomness
+	 * \return The measured outcome (either 0 or 1)
+	 */
 	unsigned measure_out(unsigned targ, std::uniform_random_bit_generator auto g = gen);
-	/// Postselect one qubit on a specific outcome and remove from state vector
-	unsigned postselect_out(unsigned targ, unsigned outcome) const;
+
+	/** 
+	 * \brief Collapse one qubit to a specific outcome, and remove from the state vector.
+	 *
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
+	 * num_qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
+	 * 
+	 * \param targ The qubit to measure
+	 * \param outcome The desired outcome of targ
+	 * \return The measured outcome (either 0 or 1), this is the same as outcome
+	 *         but is returned for consistency with the measure function.
+	 */
+	unsigned postselect_out(unsigned targ, unsigned outcome);
     };
 
 
