@@ -2475,57 +2475,6 @@ namespace qsl
 	 */	
 	void nu1(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & u);
 
-	/**
-	 * \brief Perform an arbitrary two-qubit gate, real coefficients
-	 *
-	 * \f[ 
-	 *  U = \begin{pmatrix}
-	 *             a_0 & a_1 & a_2 & a_3 \\
-	 *             a_4 & a_5 & a_6 & a_7 \\
-	 *             a_8 & a_9 & a_{10} & a_{11} \\
-	 *             a_{12} & a_{13} & a_{14} & a_{15}
-	 *             \end{pmatrix} 
-	 * \f]
-	 *
-	 * Use this function when all the coefficients of the unitary matrix 
-	 * \f$a_i\f$ above are real.
-	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
-	 *
-	 * \param targ1 The first qubit.
-	 * \param targ2 The second qubit.
-	 * \param a The 16 real coefficients of the matrix, stored in row-major 
-	 *          order in a vector (in the order they are indexed above). 
-	 */		
-	void u2(unsigned targ1, unsigned targ2, const std::vector<F> & a);
-
-	/**
-	 * \brief Perform an arbitrary two-qubit gate
-	 *
-	 * \f[ 
-	 *  U = \begin{pmatrix}
-	 *             u_0 & u_1 & u_2 & u_3 \\
-	 *             u_4 & u_5 & u_6 & u_7 \\
-	 *             u_8 & u_9 & u_{10} & u_{11} \\
-	 *             u_{12} & u_{13} & u_{14} & u_{15}
-	 *             \end{pmatrix} 
-	 * \f]
-	 *
-	 * Use this function when all the coefficients of the unitary matrix 
-	 * \f$u_i\f$ above are complex. If all the coefficients are real, use the
-	 * real version of u2 for improved performance.
-	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
-	 *
-	 * \param targ1 The first qubit.
-	 * \param targ2 The second qubit.
-	 * \param u The 16 complex coefficients of the matrix, stored in row-major 
-	 *          order in a vector (in the order they are indexed above).
-	 */		
-	void u2(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & u);
-
 	/** 
 	 * \brief Calculate probability of specific outcome of a qubit
 	 * 
