@@ -169,6 +169,18 @@ namespace qsl
     extern gen_t gen;
 
     /**
+     * \brief Turn logging of debugging information on/off 
+     *
+     * When a simulator is created that has debug on (D = true), this function
+     * sets whether a logger which prints debugging information is activated or not.
+     * Note that this function switches logging on/off globally. 
+     *
+     * \param activate Switch logging on (true) or off (false).
+     * \param os Stream to output the logging data to, defaults to std::cout.
+     */
+    void log(bool activate, std::ostream & os = std::cout);
+    
+    /**
      * \brief General purpose quantum simulator.
      *
      * \tparam F The floating point precision.
