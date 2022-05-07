@@ -11,6 +11,7 @@
 #include <random>
 #include <map>
 
+/// The namespace for all items in QSL
 namespace qsl
 {
     /// Run functions without parallelisation
@@ -2628,26 +2629,126 @@ namespace qsl
 						      std::uniform_random_bit_generator auto g = gen) const;
     };
 
-    /// TODO concept for sim
-    /// TODO double check where this should go -- in or out the namespace
+
+    /**
+     * \brief Print the full state vector of a simulator object
+     *
+     * Print the state vector to an output stream, with no trailing newline.
+     * Each amplitude is printed on a separate line.
+     *
+     * This function behaves differently to s.print(), in that it prints the
+     * whole state vector (does not truncate the middle), and also does not 
+     * print other information about the simulator.
+     *
+     * \param os The output stream to print the vector to
+     * \param s The simulator whose state is to be printed.
+     *
+     */
     template<typename S>
     std::ostream & operator << (std::ostream & os, const S & s);
     
-    /// Calculate the Fubini-Study metric between two simulators/vectors
+    /**
+     * \brief Calculate the Fubini-Study metric between two simulators/state vectors
+     *
+     * The Fubini-Study metric is a distance between rays in complex projective
+     * space which can be interpreted as the angle between rays. This is an 
+     * appropriate distance to use for physical states because it compares them 
+     * up to a global scale factor (e.g. ignoring any global phases).
+     *
+     * The definition of the Fubini-Study distance is
+     *
+     * \f[
+     * \gamma (u ,v) = \arccos {\sqrt{\frac{\langle u \vert v \rangle \;
+     * \langle v \vert u \rangle }{\langle u \vert u \rangle \;\langle 
+     * v \vert v \rangle }}}
+     * = \arccos\left[{\frac{|\langle u|v \rangle|}{\lVert u\rVert\lVert 
+     * v\rVert}}\right]
+     * \f]
+     *
+     * For more information, see 
+     * <a href="https://en.wikipedia.org/wiki/Fubini%E2%80%93Study_metric">
+     * the wikipedia page
+     * </a>
+     *
+     * You can use this function between any types that satisfy the 
+     * state_vector concept (meaning they have .size() and operator[] return
+     * a real or complex number). If the two state vector arguments have
+     * different lengths, then std::invalid_argument is thrown. If either 
+     * state vector is equal to zero (i.e. not normalisable), then
+     * std::invalid_argument is thrown.
+     *
+     * \param u The first state vector to compare
+     * \param v The second state vector to compare
+     * \return The (real) Fubini-Study distance between u and v
+     */
     template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> 
-    get_precision_t<S1> distance(const S1 & s1, const S2 & s2);
+    get_precision_t<S1> distance(const S1 & u, const S2 & v);
 
-    /// Calculate the fidelity between two simulators/vectors
+    /**
+     * \brief Calculate the fidelity between two simulators/state vectors
+     *
+     * The fidelity is a common way to measure the distance between two quantum
+     * states. It is not a distance, but relates more closely to the ability to
+     * distinguish the two states by measuring them. A fidelity of 1 indicates that
+     * the states are equal (corresponds to distance(u,v) = 0), whereas a fidelity
+     * 0 indicates that the states are orthogonal.
+     *
+     * The fidelity between two (normalised) state vectors is defined as 
+     *
+     * \f[
+     * F(u, v) = \lvert \langle u|  v \rangle \rvert^2
+     * \f]
+     *
+     * For more information, see 
+     * <a href="https://en.wikipedia.org/wiki/Fidelity_of_quantum_states"> the
+     * wikipedia page </a>.
+     *
+     * You can use this function between any types that satisfy the 
+     * state_vector concept (meaning they have .size() and operator[] return
+     * a real or complex number). If the two state vector arguments have
+     * different lengths, then std::invalid_argument is thrown. If either 
+     * state vector is equal to zero (i.e. not normalisable), then
+     * std::invalid_argument is thrown. This function also normalises the
+     * states you pass in, so that the fidelity calculation is valid.
+     *
+     * \param u The first state vector to compare
+     * \param v The second state vector to compare
+     * \return The (real) fidelity between u and v. 
+     */
     template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> 
-    get_precision_t<S1> fidelity(const S1 & s1, const S2 & s2);
+    get_precision_t<S1> fidelity(const S1 & u, const S2 & v);
 
-    /// Calculate the inner product between two simulators/vectors
-    ///- do not normalise vector?
+    /**
+     * \brief Compute the inner product between two simulators/state vectors
+     *
+     * The standard inner product between two state vectors \f$u\f$ 
+     * and \f$v\f$ is given by
+     *
+     * \f[
+     * \langle u | v \rangle = \sum_{n=0}^N u_i^* v_i
+     * \f]
+     *
+     * This is the natural inner product on \f$ \mathbb{C}^N\f$,
+     * analogous to the Euclidean scalar product on 
+     * \f$ \mathbb{R}^N \f$. The state vectors are not normalised in
+     * the calculation of this function, which distinguishes it from
+     * qsl::fidelity (which normalises the input state vectors) and
+     * qsl::distance (for which normalisation does not matter).
+     *
+     * You can use this function between any types that satisfy the 
+     * state_vector concept (meaning they have .size() and operator[] return
+     * a real or complex number). The zero vector is allowed.
+     *
+     * \param u The first state vector to compare
+     * \param v The second state vector to compare
+     * \return The (complex) inner product between u and v. 
+     *
+     */
     template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> 
-    get_precision_t<S1> inner_prod(const S1 & s1, const S2 & s2);    
+    std::complex<get_precision_t<S1>> inner_prod(const S1 & u, const S2 & v);    
 
 }
 

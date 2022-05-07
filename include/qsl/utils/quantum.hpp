@@ -92,8 +92,6 @@ namespace qsl {
 	return std::sqrt(norm);
     }
 
-
-
     /**
      * \brief Compute the Fubini-Study metric between two state vectors
      *
