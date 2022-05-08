@@ -93,7 +93,7 @@ namespace qsl
     template<state_vector S>
     struct get_precision<S>
     {
-	using type = get_precision<std::remove_cvref_t<decltype(std::declval<S>()[0])>>::type;
+	    using type = get_precision<typename S::value_type>::type;
     };
 
     

@@ -137,7 +137,7 @@ int main()
     std::cout << qsl::distance(s1, q4) << std::endl;    
     std::cout << qsl::distance(s2, q1) << std::endl;    
     std::cout << qsl::distance(v1, q1) << std::endl;    
-    std::cout << qsl::distance(n0, q1) << std::endl;    
+    //std::cout << qsl::distance(n0, q1) << std::endl;    
     //std::cout << qsl::distance(q1, s1) << std::endl; // This one won't work  
     //std::cout << qsl::distance(s1, q1) << std::endl; // This one won't work  
     
