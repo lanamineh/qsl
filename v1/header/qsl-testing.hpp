@@ -211,6 +211,11 @@ namespace qsl
 	 * std::runtime_error is thrown.
 	 *
 	 * \param num_qubits The number of qubits to simulate.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown. E.g. try inputting a large number,
+	 *   negative numbers etc.
+	 * - Check state vector is in the all-zero state and the correct size.
 	 */ 
 	explicit basic(unsigned num_qubits);
 
@@ -230,6 +235,14 @@ namespace qsl
 	 *
 	 * \param s A valid qsl simulator object with the same floating point precision,
          *          or std::vector<std::complex<F>> or std::vector<F>.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown. E.g. input wrong length state vector,
+	 *   or one of correct length and all zeros.
+	 * - Input un-normalised state and check it becomes normalised.
+	 * - Input normalised state and check it stays the same.
+	 * - Try all possible input types (std::vectors and simulators) and check state is correct.
+	 * - Check number of qubits is correctly calculated.
 	 */
 	template<state_vector S>
 	requires same_precision<F, S>
@@ -237,6 +250,10 @@ namespace qsl
 
 	/**
 	 * \brief Convert between different floating point types for qsl::basic simulators.
+	 *
+	 * Testing:
+	 * - Check state vector is correct and normalised (this function could introduce small
+	 *   floating point errors). 
 	 */
 	template<std::floating_point F1, bool D1, parallelisation P1>
 	explicit operator basic<F1,D1,P1>();
@@ -245,6 +262,10 @@ namespace qsl
 	 * \brief Get the number of qubits.
 	 *
 	 * \return Number of qubits.
+	 *
+	 * Testing:
+	 * - Instantiate a simulator with a number of qubits and check this function 
+	 *   returns the correct number.
 	 */
 	unsigned qubits() const;
 
@@ -252,6 +273,10 @@ namespace qsl
 	 * \brief Get the dimension of the Hilbert space = 2 ^ num_qubits.
 	 *
 	 * \return Dimension of Hilbert space.
+	 *
+	 * Testing:
+	 * - Instantiate a simulator with a number of qubits and check this function 
+	 *   returns the correct state vector size.
 	 */
 	std::size_t size() const;
 
@@ -259,6 +284,10 @@ namespace qsl
 	 * \brief Return the current state of the qubits.
 	 *
 	 * \return The state of the qubits as a std::vector.
+	 *
+	 * Testing:
+	 * - Instantiate a simulator with a specific state and check this function 
+	 *   returns the same state (normalised).
 	 */
 	std::vector<std::complex<F>> state() const;
 
@@ -274,6 +303,14 @@ namespace qsl
 	 * a std::invalid_argument is thrown.
 	 *
 	 * \param state A vector or qsl simulator containing the new state for the object.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown. E.g. input wrong length state vector,
+	 *   or one of correct length and all zeros.
+	 * - Input un-normalised state and check it becomes normalised.
+	 * - Input normalised state and check it stays the same.
+	 * - Try all possible input types (std::vectors and simulators) and check state is correct.
+	 * - Check number of qubits is correctly calculated.
 	 */ 		
 	template<state_vector S>
 	requires same_precision<F, S>
@@ -281,6 +318,9 @@ namespace qsl
 
 	/**
 	 * \brief Reset to the all-zero computational basis state.
+	 *
+	 * Testing:
+	 * - Check state after this function is called is the all-zero state.
 	 */
 	void reset();
 
@@ -291,6 +331,11 @@ namespace qsl
 	 * std::runtime_error is thrown.
 	 *
 	 * \param num_qubits The number of qubits to simulate.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown. E.g. try inputting a large number,
+	 *   negative numbers etc.
+	 * - Check state vector is in the all-zero state and the correct size.
 	 */
 	void reset(unsigned num_qubits);
 	
@@ -304,6 +349,10 @@ namespace qsl
 	 *
 	 * \param index The state vector index to access.
 	 * \return The complex amplitude at index.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown. E.g. try accessing out of bound elements
+	 * - Check output of operator[] in a loop against the .state() method.
 	 */ 
 	const std::complex<F> & operator[](std::size_t index) const;
 	
