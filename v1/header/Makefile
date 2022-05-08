@@ -1,5 +1,5 @@
-CC=g++-10
-#CC=g++-11
+#CC=g++-10
+ CC=g++-11
 #CC=clang++-10
 
 test.o: check
