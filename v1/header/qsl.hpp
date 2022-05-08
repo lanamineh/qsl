@@ -222,7 +222,7 @@ namespace qsl
     class basic
     {
     public:
-	using value_type = F;
+	using value_type = std::complex<F>;
 	constexpr static bool debug() { return D; };
 	
 	/**
@@ -1082,7 +1082,7 @@ namespace qsl
     class resize
     {
     public:
-	using value_type = F;
+	using value_type = std::complex<F>;
 	constexpr static bool debug() { return D; };
 	
 	/**
@@ -2005,7 +2005,7 @@ namespace qsl
     class number
     {
     public:
-	using value_type = F;
+	using value_type = std::complex<F>;
 	constexpr static bool debug() { return D; };
 	
 	/**
@@ -2719,7 +2719,7 @@ namespace qsl
      * \return The (real) fidelity between u and v. 
      */
     template<state_vector S1, state_vector S2>
-    requires same_precision<S1, S2> 
+    requires same_precision<S1, S2> && (debug_state_vector<S1> || debug_state_vector<S2>)
     get_precision_t<S1> fidelity(const S1 & u, const S2 & v);
 
     /**
@@ -2752,7 +2752,7 @@ namespace qsl
      *
      */
     template<state_vector S1, state_vector S2>
-    requires same_precision<S1, S2> 
+    requires same_precision<S1, S2> && (debug_state_vector<S1> || debug_state_vector<S2>)
     std::complex<get_precision_t<S1>> inner_prod(const S1 & u, const S2 & v);    
 
 }
