@@ -12,6 +12,8 @@
 #include <iostream>
 #include <random>
 
+#include <armadillo>
+
 // "Wrong" types for testing the concepts
 template<std::floating_point F, bool D, typename P>
 struct NotASim1
@@ -23,6 +25,11 @@ struct NotASim2
     double get_state() const;
 };
 
+struct NotAStateVector
+{
+    double operator[] (std::size_t);
+    double size() const; // Wrong
+};
 
 int main()
 {
@@ -119,12 +126,18 @@ int main()
     std::cout << qsl::distance(q1, q3) << std::endl;
     std::cout << qsl::distance(q1, std::vector<double>{1,2,3,4}) << std::endl;
     //std::cout << qsl::distance(q2, q4) << std::endl; // This one (correctly)  doesn't work -- double and float conflict
-    std::cout << qsl::distance(std::vector<double>{1,2,3,4}, std::vector<double>{1,2,3,4}) << std::endl;
+    //std::cout << qsl::distance(std::vector<double>{1,2,3,4}, std::vector<double>{1,2,3,4}) << std::endl;
 
+    arma::vec v1{0,1,2,3};
+    arma::cx_vec v2{0,1,2,3};
+    NotAStateVector n0;
+    
     std::cout << qsl::distance(q4, s1) << std::endl;    
     std::cout << qsl::distance(q1, s2) << std::endl;    
     std::cout << qsl::distance(s1, q4) << std::endl;    
     std::cout << qsl::distance(s2, q1) << std::endl;    
+    std::cout << qsl::distance(v1, q1) << std::endl;    
+    std::cout << qsl::distance(n0, q1) << std::endl;    
     //std::cout << qsl::distance(q1, s1) << std::endl; // This one won't work  
     //std::cout << qsl::distance(s1, q1) << std::endl; // This one won't work  
     

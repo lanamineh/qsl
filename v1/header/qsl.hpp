@@ -39,57 +39,41 @@ namespace qsl
     template<typename T>
     struct get_precision;
 
+    /// Get precision of real
     template<std::floating_point F>
     struct get_precision<F>
     {
 	using type = F;
     };
 
+    /// Get precision of complex
     template<std::floating_point F>
     struct get_precision<std::complex<F>>
     {
 	using type = F;
     };
-	
-    /**
-     * \brief Obtain the precision of a simulator object
-     *
-     * The resulting precision is stored in the type member.
-     */
-	
-    /*
-      template<template<typename,bool,typename> typename S,
-      std::floating_point F,
-      bool D,
-      parallelisation P>
-      struct get_precision<S<F, D, P>>
-    {
-	using type = F;
-    };
-    */
-    
 
-    /**
-     * \brief Obtain the precision for a complex state vector
-     * 
-     * Precision is stored in the type member.
-     */
-    template<std::floating_point F>
-    struct get_precision<std::vector<std::complex<F>>>
-    {
-    	using type = F;
-    };
+    // /**
+    //  * \brief Obtain the precision for a complex state vector
+    //  * 
+    //  * Precision is stored in the type member.
+    //  */
+    // template<state_vector F>
+    // struct get_precision<std::vector<std::complex<F>>>
+    // {
+    // 	using type = F;
+    // };
 
-    /**
-     * \brief Obtain the precision for a real state vector
-     * 
-     * Precision is stored in the type member.
-     */
-    template<std::floating_point F>
-    struct get_precision<std::vector<F>>
-    {
-    	using type = F;
-    };
+    // /**
+    //  * \brief Obtain the precision for a real state vector
+    //  * 
+    //  * Precision is stored in the type member.
+    //  */
+    // template<std::floating_point F>
+    // struct get_precision<std::vector<F>>
+    // {
+    // 	using type = F;
+    // };
 
     
     /**
@@ -100,6 +84,50 @@ namespace qsl
     // {
     // 	using type = F;
     // };
+
+    /// By default, nothing is a complex type
+    template<typename T>
+    struct is_complex : std::false_type {};
+
+    /// Only a std::complex<T> for floating-point T is complex 
+    template<std::floating_point F>
+    struct is_complex<std::complex<F>> : std::true_type {};
+
+    /**
+     * \brief Concept to check if a type is real or complex
+     *
+     * This concept is true for floating-point real or complex types. A real type is
+     * a built-in floating-point type. A complex type is a std::complex<F> where F is
+     * a real type. The concept is also true for any reference or const reference to
+     * a real or complex type.
+     */
+    template<typename T>
+    concept real_or_complex = std::floating_point<std::remove_cvref_t<T>>
+	|| is_complex<std::remove_cvref_t<T>>::value;
+    
+    template<typename T>
+    concept state_vector = requires (T t) {
+
+	///\todo Check whether the input type to operator[] should be restricted
+	// Operator[] must be valid and return a real or complex number
+	{t[0]} -> real_or_complex;
+
+	///\todo Check whether using convertible_to is appropriate
+	// Must return its size like std::vector
+	{t.size()} -> std::unsigned_integral; 
+    };
+
+    template<typename S>
+    concept debug_state_vector = state_vector<S> && requires (S s) {
+	{s.debug()} -> std::same_as<bool>;
+    };
+    
+    template<state_vector S>
+    struct get_precision<S>
+    {
+	using type = get_precision<std::remove_cvref_t<decltype(std::declval<S>()[0])>>::type;
+    };
+
     
     /**
      * \brief Helper to get the precision type of a simulator or state directly
@@ -128,48 +156,8 @@ namespace qsl
 					    get_precision_t<U>>;
 
 
-    /// By default, nothing is a complex type
-    template<typename T>
-    struct is_complex : std::false_type {};
-
-    /// Only a std::complex<T> for floating-point T is complex 
-    template<std::floating_point F>
-    struct is_complex<std::complex<F>> : std::true_type {};
-
+    
     /**
-     * \brief Concept to check if a type is real or complex
-     *
-     * This concept is true for floating-point real or complex types. A real type is
-     * a built-in floating-point type. A complex type is a std::complex<F> where F is
-     * a real type. The concept is also true for any reference or const reference to
-     * a real or complex type.
-     */
-    template<typename T>
-    concept real_or_complex = std::floating_point<std::remove_cvref_t<T>>
-	|| is_complex<std::remove_cvref_t<T>>::value;
-    
-    template<typename T>
-    concept state_vector = requires (T t) {
-	
-	// Operator[] must be valid and return a real or complex number
-	{t[0]} -> real_or_complex;
-	
-	// Must return its size like std::vector
-	{t.size()} -> std::same_as<std::size_t>; 
-    };
-
-    template<typename S>
-    concept debug_state_vector = state_vector<S> && requires (S s) {
-	{s.debug()} -> std::same_as<bool>;
-    };
-    
-    template<state_vector S>
-    struct get_precision<S>
-    {
-	using type = get_precision_t<std::remove_cvref_t<decltype(std::declval<S>()[0])>>;
-    };
-	
-   /**
      * \brief Random number generator complying with std::uniform_random_bit_generator.
      *
      * This is a wrapper around std::mt19937_64.
