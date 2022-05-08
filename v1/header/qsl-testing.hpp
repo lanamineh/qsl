@@ -142,10 +142,17 @@ namespace qsl
     };
    
 	
-   /**
+    /**
      * \brief Random number generator complying with std::uniform_random_bit_generator.
      *
      * This is a wrapper around std::mt19937_64.
+     *
+     * Testing:
+     * - Set a seed, read the seed, check they match (both setting with constructor and seed function).
+     * - Check operator() by generating some random values and checking they are between min() and max()
+     * - Check operator() is uniform, for example, generate lots of random numbers, check 
+     *   in python whether they are uniform, then check if the same numbers are regenerated with the seed.
+     * - Check seeding works
      */
     class gen_t
     {
@@ -155,7 +162,7 @@ namespace qsl
 	static result_type min();
 	/// Return maximum possible value
 	static result_type max();
-	/// Obtain the next3 sample from the generator
+	/// Obtain the next sample from the generator
 	result_type operator() ();
 
 	/// Instantiate generator with a random seed
