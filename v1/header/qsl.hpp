@@ -2633,12 +2633,13 @@ namespace qsl
      * the wikipedia page
      * </a>
      *
-     * You can use this function between any types that satisfy the 
-     * state_vector concept (meaning they have .size() and operator[] return
-     * a real or complex number). If the two state vector arguments have
-     * different lengths, then std::invalid_argument is thrown. If either 
-     * state vector is equal to zero (i.e. not normalisable), then
-     * std::invalid_argument is thrown.
+     * You can use this function between two simulator objects, or a simulator
+     * object and a state_vector (meaning it has .size() and operator[] that 
+     * returns a real or complex number). If the simulator argument has debugging
+     * enabled, then std::invalid_argument is thrown in the following two 
+     * scenarios: firstly, if the two arguments are different length state vectors;
+     * secondly, if either argument is the zero vector (i.e. not normalisable).
+     * If debugging is disabled, then the behaviour in these cases is unspecified.
      *
      * \param u The first state vector to compare
      * \param v The second state vector to compare
@@ -2667,13 +2668,15 @@ namespace qsl
      * <a href="https://en.wikipedia.org/wiki/Fidelity_of_quantum_states"> the
      * wikipedia page </a>.
      *
-     * You can use this function between any types that satisfy the 
-     * state_vector concept (meaning they have .size() and operator[] return
-     * a real or complex number). If the two state vector arguments have
-     * different lengths, then std::invalid_argument is thrown. If either 
-     * state vector is equal to zero (i.e. not normalisable), then
-     * std::invalid_argument is thrown. This function also normalises the
-     * states you pass in, so that the fidelity calculation is valid.
+     * You can use this function between two simulator objects, or a simulator
+     * object and a state_vector (meaning it has .size() and operator[] that 
+     * returns a real or complex number). If the simulator argument has debugging
+     * enabled, then std::invalid_argument if the two arguments are different 
+     * length state vectors. If debugging is disabled, then the behaviour in this 
+     * case is unspecified.
+     *
+     * This function also normalises the states you pass in, so that the fidelity 
+     * calculation is valid.
      *
      * \param u The first state vector to compare
      * \param v The second state vector to compare
@@ -2700,9 +2703,12 @@ namespace qsl
      * qsl::fidelity (which normalises the input state vectors) and
      * qsl::distance (for which normalisation does not matter).
      *
-     * You can use this function between any types that satisfy the 
-     * state_vector concept (meaning they have .size() and operator[] return
-     * a real or complex number). The zero vector is allowed.
+     * You can use this function between two simulator objects, or a simulator
+     * object and a state_vector (meaning it has .size() and operator[] that 
+     * returns a real or complex number). If the simulator argument has debugging
+     * enabled, then std::invalid_argument if the two arguments are different 
+     * length state vectors. If debugging is disabled, then the behaviour in this 
+     * case is unspecified.
      *
      * \param u The first state vector to compare
      * \param v The second state vector to compare

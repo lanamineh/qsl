@@ -184,8 +184,21 @@ namespace qsl
      * sets whether a logger which prints debugging information is activated or not.
      * Note that this function switches logging on/off globally. 
      *
+     * QSL simulators will only record logging information if debugging is enabled
+     * (template parameter D = true in the simulator). If D = false, the state of
+     * this global logger is ignored.
+     *
      * \param activate Switch logging on (true) or off (false).
      * \param os Stream to output the logging data to, defaults to std::cout.
+     *
+     * Testing:
+     * - Enable logging using a dummy stream (such as a string stream), and then
+     *   execute one of each kind of operation that should print to the log. This
+     *   will test all the simulator logging functions. Compare the string stream
+     *   with correct messages.
+     * - Disable logging (in the same context as above, with a stream stream), and
+     *   check that operations do not write to the stream.
+     * 
      */
     void log(bool activate, std::ostream & os = std::cout);
     
@@ -2613,8 +2626,19 @@ namespace qsl
      * \param os The output stream to print the vector to
      * \param s The simulator whose state is to be printed.
      *
+     * Testing:
+     * - Check that the function prints the correct state vector to a string
+     *   stream, for a number of example simulators (and vectors? see below).
+     *   Need to think of a way to check the format properly.
+     * 
+     * Todo:
+     * - This function will match std::vector too probably -- can the user still
+     *   override it with their own implmentation if they want? (In the global
+     *   namespace?) What happens if their one is in a namespace? Might be better
+     *   to restrict this to only simulators, since QSL is not really supposed
+     *   to tamper with std::vector.
      */
-    template<typename S>
+    template<state_vector S>
     std::ostream & operator << (std::ostream & os, const S & s);
     
     /**
@@ -2650,6 +2674,10 @@ namespace qsl
      * \param u The first state vector to compare
      * \param v The second state vector to compare
      * \return The (real) Fubini-Study distance between u and v
+     *
+     * Testing:
+     * - 
+     * 
      */
     template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> 
