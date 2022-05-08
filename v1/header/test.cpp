@@ -119,6 +119,7 @@ int main()
     std::cout << qsl::distance(q1, q3) << std::endl;
     std::cout << qsl::distance(q1, std::vector<double>{1,2,3,4}) << std::endl;
     //std::cout << qsl::distance(q2, q4) << std::endl; // This one (correctly)  doesn't work -- double and float conflict
+    std::cout << qsl::distance(std::vector<double>{1,2,3,4}, std::vector<double>{1,2,3,4}) << std::endl;
 
     std::cout << qsl::distance(q4, s1) << std::endl;    
     std::cout << qsl::distance(q1, s2) << std::endl;    

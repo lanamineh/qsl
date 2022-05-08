@@ -14,6 +14,7 @@
 /// The namespace for all items in QSL
 namespace qsl
 {
+	
     /// Run functions without parallelisation
     struct seq;
     /// Run functions with omp
@@ -38,19 +39,35 @@ namespace qsl
     template<typename T>
     struct get_precision;
 
+    template<std::floating_point F>
+    struct get_precision<F>
+    {
+	using type = F;
+    };
+
+    template<std::floating_point F>
+    struct get_precision<std::complex<F>>
+    {
+	using type = F;
+    };
+	
     /**
      * \brief Obtain the precision of a simulator object
      *
      * The resulting precision is stored in the type member.
      */
-    template<template<typename,bool,typename> typename S,
-	     std::floating_point F,
-	     bool D,
-	     parallelisation P>
-    struct get_precision<S<F, D, P>>
+	
+    /*
+      template<template<typename,bool,typename> typename S,
+      std::floating_point F,
+      bool D,
+      parallelisation P>
+      struct get_precision<S<F, D, P>>
     {
 	using type = F;
     };
+    */
+    
 
     /**
      * \brief Obtain the precision for a complex state vector
@@ -77,12 +94,12 @@ namespace qsl
     
     /**
      * \brief Allow get_precision to work with built-in floating-point types too
-     */
-    template<std::floating_point F>
-    struct get_precision<F>
-    {
-	using type = F;
-    };
+    //  */
+    // template<std::floating_point F>
+    // struct get_precision<F>
+    // {
+    // 	using type = F;
+    // };
     
     /**
      * \brief Helper to get the precision type of a simulator or state directly
@@ -140,7 +157,17 @@ namespace qsl
 	// Must return its size like std::vector
 	{t.size()} -> std::same_as<std::size_t>; 
     };
-   
+
+    template<typename S>
+    concept debug_state_vector = state_vector<S> && requires (S s) {
+	{s.debug()} -> std::same_as<bool>;
+    };
+    
+    template<state_vector S>
+    struct get_precision<S>
+    {
+	using type = get_precision_t<std::remove_cvref_t<decltype(std::declval<S>()[0])>>;
+    };
 	
    /**
      * \brief Random number generator complying with std::uniform_random_bit_generator.
@@ -180,7 +207,7 @@ namespace qsl
      * \param activate Switch logging on (true) or off (false).
      * \param os Stream to output the logging data to, defaults to std::cout.
      */
-    void log(bool activate, std::ostream & os = std::cout);
+    void log(bool activate, std::ostream & os = std::cout);	 
     
     /**
      * \brief General purpose quantum simulator.
@@ -195,6 +222,9 @@ namespace qsl
     class basic
     {
     public:
+	using value_type = F;
+	constexpr static bool debug() { return D; };
+	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
 	 *
@@ -1052,6 +1082,9 @@ namespace qsl
     class resize
     {
     public:
+	using value_type = F;
+	constexpr static bool debug() { return D; };
+	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
 	 *
@@ -1972,6 +2005,9 @@ namespace qsl
     class number
     {
     public:
+	using value_type = F;
+	constexpr static bool debug() { return D; };
+	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
 	 *
@@ -2646,7 +2682,7 @@ namespace qsl
      * \return The (real) Fubini-Study distance between u and v
      */
     template<state_vector S1, state_vector S2>
-    requires same_precision<S1, S2> 
+    requires same_precision<S1, S2> && (debug_state_vector<S1> || debug_state_vector<S2>)
     get_precision_t<S1> distance(const S1 & u, const S2 & v);
 
     /**
