@@ -53,38 +53,6 @@ namespace qsl
 	using type = F;
     };
 
-    // /**
-    //  * \brief Obtain the precision for a complex state vector
-    //  * 
-    //  * Precision is stored in the type member.
-    //  */
-    // template<state_vector F>
-    // struct get_precision<std::vector<std::complex<F>>>
-    // {
-    // 	using type = F;
-    // };
-
-    // /**
-    //  * \brief Obtain the precision for a real state vector
-    //  * 
-    //  * Precision is stored in the type member.
-    //  */
-    // template<std::floating_point F>
-    // struct get_precision<std::vector<F>>
-    // {
-    // 	using type = F;
-    // };
-
-    
-    /**
-     * \brief Allow get_precision to work with built-in floating-point types too
-    //  */
-    // template<std::floating_point F>
-    // struct get_precision<F>
-    // {
-    // 	using type = F;
-    // };
-
     /// By default, nothing is a complex type
     template<typename T>
     struct is_complex : std::false_type {};
