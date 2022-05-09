@@ -429,6 +429,12 @@ namespace qsl
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown e.g. input invalid targ.
+	 * - Apply gate to random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 
+	 *   to make sure edge cases have been checked. Pick random values for angle.
 	 */
 	void rx(unsigned targ, F angle);
 
@@ -447,6 +453,8 @@ namespace qsl
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
+	 *
+	 * Testing: same as rx gate.
 	 */
 	void ry(unsigned targ, F angle);
 
@@ -465,6 +473,8 @@ namespace qsl
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
+	 *
+	 * Testing: same as rx gate.
 	 */
 	void rz(unsigned targ, F angle);  
 
@@ -484,6 +494,8 @@ namespace qsl
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
+	 *
+	 * Testing: same as rx gate.
 	 */	
 	void phase(unsigned targ, F angle); 
 
@@ -500,6 +512,12 @@ namespace qsl
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
+	 *
+	 * Testing: 
+	 * - In debug mode, check exceptions thrown e.g. input invalid targ.
+	 * - Apply gate to random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 
+	 *   to make sure edge cases have been checked. 
 	 */
 	void h(unsigned targ);
 
@@ -518,6 +536,8 @@ namespace qsl
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
+	 *
+	 * Testing: same as h gate.
 	 */
 	void x(unsigned targ);
 
@@ -536,6 +556,8 @@ namespace qsl
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
+	 *
+	 * Testing: same as h gate.
 	 */
 	void y(unsigned targ);
 
@@ -554,6 +576,8 @@ namespace qsl
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
 	 *
 	 * \param targ The target qubit.
+	 *
+	 * Testing: same as h gate.
 	 */
 	void z(unsigned targ);
 
@@ -564,9 +588,18 @@ namespace qsl
 	 * normalised in this function.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * A std::invalid_argument is thrown if matrix does not have orthonormal columns
+	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
 	 * \param targ The target qubit.
-	 * \param matrix The unitary matrix to apply, in row-major form.
+	 * \param matrix The unitary matrix to apply, in row-major form
+	 *
+	 * Testing: 
+	 * - In debug mode, check exceptions thrown e.g. input invalid targ, put in 
+	 *   an invalid matrix such as matrix with det = 0, non-orthogonal columns.
+	 * - Apply gate to random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 
+	 *   to make sure edge cases have been checked. Input a few random unitary matrices.
 	 */
 	void u1(unsigned targ, const std::vector<F> & matrix);
 
@@ -574,12 +607,17 @@ namespace qsl
 	 * \brief Apply an arbitrary one-qubit unitary to targ.
 	 *
 	 * The matrix must have orthonormal columns, the columns will be
-	 * normalised in this function.
+	 * normalised in this function. If all the coefficients are real, use the
+	 * real version of u1 for improved performance.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * A std::invalid_argument is thrown if matrix does not have orthonormal columns
+	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
 	 * \param targ The target qubit.
 	 * \param matrix The unitary matrix to apply in row-major form.
+	 *
+	 * Testing: same as real version of u1.
 	 */
 	void u1(unsigned targ, const std::vector<std::complex<F>> & matrix);
 
@@ -593,6 +631,13 @@ namespace qsl
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
+	 *
+	 * Testing: 
+	 * - In debug mode, check exceptions thrown e.g. input invalid targ and ctrl, set
+	 *   targ = ctrl.
+	 * - Apply gate to random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo. Do this with targ and ctrl  = 0 up to num_qubits-1 
+	 *   to make sure edge cases have been checked. Pick random values for angle.
 	 */
 	void crx(unsigned ctrl, unsigned targ, F angle);
 
@@ -606,6 +651,8 @@ namespace qsl
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
+	 *
+	 * Testing: same as crx
 	 */
 	void cry(unsigned ctrl, unsigned targ, F angle);
 
@@ -619,6 +666,8 @@ namespace qsl
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
+	 *
+	 * Testing: same as crx
 	 */
 	void crz(unsigned ctrl, unsigned targ, F angle);  
 
@@ -632,6 +681,8 @@ namespace qsl
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
+	 *
+	 * Testing: same as crx
 	 */
 	void cphase(unsigned ctrl, unsigned targ, F angle); 
 
@@ -644,6 +695,13 @@ namespace qsl
 	 * \param ctrl The control qubit, H is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
+	 *
+	 * Testing: 
+	 * - In debug mode, check exceptions thrown e.g. input invalid targ and ctrl, set
+	 *   targ = ctrl.
+	 * - Apply gate to random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo. Do this with targ and ctrl  = 0 up to num_qubits-1 
+	 *   to make sure edge cases have been checked. 
 	 */
 	void ch(unsigned ctrl, unsigned targ);
 
@@ -657,6 +715,8 @@ namespace qsl
 	 * \param ctrl The control qubit, X is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
+	 *
+	 * Testing: same as ch
 	 */
 	void cnot(unsigned ctrl, unsigned targ);
 
@@ -669,6 +729,8 @@ namespace qsl
 	 * \param ctrl The control qubit, Y is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
+	 *
+	 * Testing: same as ch
 	 */
 	void cy(unsigned ctrl, unsigned targ);
 
@@ -681,6 +743,8 @@ namespace qsl
 	 * \param ctrl The control qubit, Z is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
+	 *
+	 * Testing: same as ch
 	 */
 	void cz(unsigned ctrl, unsigned targ);
 
@@ -688,15 +752,24 @@ namespace qsl
 	 * \brief Apply a controlled arbitrary one-qubit (real) unitary.
 	 *
 	 * The matrix must have orthonormal columns, the columns will be
-	 * normalised in this function.
+	 * normalised in this function. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
 	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * A std::invalid_argument is thrown if matrix does not have orthonormal columns
+	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
 	 * \param ctrl The control qubit, U is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
 	 * \param matrix The unitary matrix to apply, in row-major form.
+	 *
+	 * Testing: 
+	 * - In debug mode, check exceptions thrown e.g. input invalid targ, put in 
+	 *   an invalid matrix such as matrix with det = 0, non-orthogonal columns.
+	 * - Apply gate to random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 
+	 *   to make sure edge cases have been checked. Input a few random unitary matrices.
 	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<F> & matrix);
 
@@ -704,15 +777,20 @@ namespace qsl
 	 * \brief Apply a controlled arbitrary one-qubit unitary.
 	 *
 	 * The matrix must have orthonormal columns, the columns will be
-	 * normalised in this function.
+	 * normalised in this function. If all the coefficients are real, use the
+	 * real version of cu1 for improved performance.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
 	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * A std::invalid_argument is thrown if matrix does not have orthonormal columns
+	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
 	 * \param ctrl The control qubit, U is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
 	 * \param targ The target qubit.
 	 * \param matrix The unitary matrix to apply, in row-major form.
+	 *
+	 * Testing: same as real version of cu1
 	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<std::complex<F>> & matrix);
 
@@ -737,6 +815,8 @@ namespace qsl
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
 	 * \param angle The angle to rotate by (in radians)
+	 *
+	 * Testing: same as crx
 	 */
 	void nrx(unsigned targ1, unsigned targ2, F angle);
 
@@ -762,6 +842,8 @@ namespace qsl
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
 	 * \param angle Angle to rotate by (in radians).
+	 *
+	 * Testing: same as crx
 	 */
 	void nry(unsigned targ1, unsigned targ2, F angle);
 
@@ -786,6 +868,8 @@ namespace qsl
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
 	 * \param angle Angle to rotate by (in radians).
+	 *
+	 * Testing: same as crx
 	 */	
 	void nrz(unsigned targ1, unsigned targ2, F angle);
 
@@ -806,6 +890,8 @@ namespace qsl
 	 *
 	 * \param targ1 The first qubit to swap.
 	 * \param targ2 The second qubit to swap.
+	 *
+	 * Testing: same as ch
 	 */
 	void swap(unsigned targ1, unsigned targ2);
 
@@ -828,6 +914,8 @@ namespace qsl
 	 *
 	 * \param targ1 The first qubit to fswap.
 	 * \param targ2 The second qubit to fswap.
+	 *
+	 * Testing: same as ch
 	 */
 	void fswap(unsigned targ1, unsigned targ2);
 
@@ -850,6 +938,8 @@ namespace qsl
 	 *
 	 * \param targ1 The first qubit to iswap.
 	 * \param targ2 The second qubit to iswap.
+	 *
+	 * Testing: same as ch
 	 */
 	void iswap(unsigned targ1, unsigned targ2);
 
@@ -871,6 +961,8 @@ namespace qsl
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
+	 *
+	 * Testing: same as ch
 	 */
 	void nh(unsigned targ1, unsigned targ2);
 
@@ -891,11 +983,15 @@ namespace qsl
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
 	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * A std::invalid_argument is thrown if a does not have orthonormal columns
+	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
 	 * \param a The four coefficients of the matrix, stored in 
 	 *          row-major order in a vector (in the order they are indexed above). 
+	 *
+	 * Testing: same as cu1
 	 */
 	void nu1(unsigned targ1, unsigned targ2, const std::vector<F> & a);
 
@@ -917,11 +1013,15 @@ namespace qsl
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
 	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * A std::invalid_argument is thrown if u does not have orthonormal columns
+	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
 	 * \param u The four complex coefficients of the matrix, stored in 
 	 *          row-major order in a vector (in the order they are indexed above).
+	 *
+	 * Testing: same as cu1
 	 */	
 	void nu1(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & u);
 
@@ -942,11 +1042,15 @@ namespace qsl
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
 	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * A std::invalid_argument is thrown if a does not have orthonormal columns
+	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
 	 * \param a The 16 real coefficients of the matrix, stored in row-major 
 	 *          order in a vector (in the order they are indexed above). 
+	 *
+	 * Testing: same as cu1
 	 */		
 	void u2(unsigned targ1, unsigned targ2, const std::vector<F> & a);
 
@@ -968,11 +1072,15 @@ namespace qsl
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
 	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * A std::invalid_argument is thrown if u does not have orthonormal columns
+	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
 	 * \param u The 16 complex coefficients of the matrix, stored in row-major 
 	 *          order in a vector (in the order they are indexed above).
+	 *
+	 * Testing: same as cu1
 	 */		
 	void u2(unsigned targ1, unsigned targ2, const std::vector<std::complex<F>> & u);
 
@@ -989,6 +1097,14 @@ namespace qsl
 	 * \param targ The qubit under consideration
 	 * \param outcome The outcome whose probability is desired.
 	 * \return The probability of the specifed outcome.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown e.g. input out of range targ, outcome
+	 *   not set to 0 or 1.
+	 * - Find prob of random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1, for 0 and 
+	 *   1 outcomes to make sure edge cases have been checked. Can probably be checked
+	 *   along with the postselect function.
 	 */
 	F prob(unsigned targ, unsigned outcome) const;
 
@@ -1009,6 +1125,17 @@ namespace qsl
 	 * \param targ The qubit to measure
 	 * \param g A generator used as the source of randomness
 	 * \return The measured outcome (either 0 or 1)
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown e.g. input out of range targ.
+	 * - Measure random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 to make sure 
+	 *   edge cases have been checked.
+	 * - Check randomness seeding by preparing the same random state and checking we
+	 *   get the same outcome everytime.
+	 * - Check that this function samples from the actual qubit probablity distribution. 
+	 *   Can be done by generating a bunch of outcomes, checking distribution in python
+	 *   and then making sure the seeding reproduces these outcomes.
 	 */
 	unsigned measure(unsigned targ, std::uniform_random_bit_generator auto g = gen);
 
@@ -1027,6 +1154,15 @@ namespace qsl
 	 * 
 	 * \param g A generator used as the source of randomness
 	 * \return The measurement outcomes (packed little-endian into an integer)
+	 *
+	 * Testing:
+	 * - Measure random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo.
+	 * - Check randomness seeding by preparing the same random state and checking we
+	 *   get the same outcome everytime.
+	 * - Check that this function samples from the actual qubit probablity distribution. 
+	 *   Can be done by generating a bunch of outcomes, checking distribution in python
+	 *   and then making sure the seeding reproduces these outcomes.
 	 */
 	std::size_t measure_all(std::uniform_random_bit_generator auto g = gen);
 
@@ -1040,6 +1176,14 @@ namespace qsl
 	 * \param outcome The desired outcome of targ
 	 * \return The measured outcome (either 0 or 1), this is the same as outcome
 	 *         but is returned for consistency with the measure function.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown e.g. input out of range targ, outcome
+	 *   not set to 0 or 1.
+	 * - Postselect a random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1, for 0 and 
+	 *   1 outcomes to make sure edge cases have been checked. Can probably be checked
+	 *   along with the prob function.
 	 */
 	unsigned postselect(unsigned targ, unsigned outcome);
 	
@@ -1058,12 +1202,25 @@ namespace qsl
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
 	 * num_qubits-1.
+	 *
+	 * \todo Think about whether measure and sample should agree on outcomes (using same seed).
 	 * 
 	 * \param targ The qubit to sample
 	 * \param samples Number of samples to take
 	 * \param g A generator used as the source of randomness
 	 * \return A length-two vector where element 0 is the number of times 0 was
 	 *         sampled, and element 1 the number of times 1 was sampled.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown e.g. input out of range targ.
+	 * - Measure random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 to make sure 
+	 *   edge cases have been checked.
+	 * - Check randomness seeding by preparing the same random state and checking we
+	 *   get the same samples everytime.
+	 * - Check that this function samples from the actual qubit probablity distribution. 
+	 *   Can be done by generating a bunch of outcomes, checking distribution in python
+	 *   and then making sure the seeding reproduces these outcomes.
 	 */
 	std::vector<std::size_t> sample(unsigned targ, std::size_t samples,
 					std::uniform_random_bit_generator auto g = gen) const;
@@ -1086,6 +1243,15 @@ namespace qsl
 	 * \return A map of the measurement outcomes where the keys are the computational
 	 *         basis state outcomes (encoded as a bitstring) and the associated values
 	 *         are the number of times that outcome was measured.
+	 *
+	 * Testing:
+	 * - Measure random state (smallish no. of qubits) and check output 
+	 *   matches with armadillo.
+	 * - Check randomness seeding by preparing the same random state and checking we
+	 *   get the same outcome everytime.
+	 * - Check that this function samples from the actual qubit probablity distribution. 
+	 *   Can be done by generating a bunch of outcomes, checking distribution in python
+	 *   and then making sure the seeding reproduces these outcomes.
 	 */
 	std::map<std::size_t, std::size_t> sample_all(std::size_t samples,
 						      std::uniform_random_bit_generator auto g = gen) const;
