@@ -38,51 +38,67 @@ namespace qsl
     template<typename T>
     struct get_precision;
 
-    /**
-     * \brief Obtain the precision of a simulator object
-     *
-     * The resulting precision is stored in the type member.
-     */
-    template<template<typename,bool,typename> typename S,
-	     std::floating_point F,
-	     bool D,
-	     parallelisation P>
-    struct get_precision<S<F, D, P>>
-    {
-	using type = F;
-    };
-
-    /**
-     * \brief Obtain the precision for a complex state vector
-     * 
-     * Precision is stored in the type member.
-     */
-    template<std::floating_point F>
-    struct get_precision<std::vector<std::complex<F>>>
-    {
-    	using type = F;
-    };
-
-    /**
-     * \brief Obtain the precision for a real state vector
-     * 
-     * Precision is stored in the type member.
-     */
-    template<std::floating_point F>
-    struct get_precision<std::vector<F>>
-    {
-    	using type = F;
-    };
-
-    
-    /**
-     * \brief Allow get_precision to work with built-in floating-point types too
-     */
+    /// Get precision of real
     template<std::floating_point F>
     struct get_precision<F>
     {
 	using type = F;
     };
+
+    /// Get precision of complex
+    template<std::floating_point F>
+    struct get_precision<std::complex<F>>
+    {
+	using type = F;
+    };
+
+    /// By default, nothing is a complex type
+    template<typename T>
+    struct is_complex : std::false_type {};
+
+    /// Only a std::complex<T> for floating-point T is complex 
+    template<std::floating_point F>
+    struct is_complex<std::complex<F>> : std::true_type {};
+
+    /**
+     * \brief Concept to check if a type is real or complex
+     *
+     * This concept is true for floating-point real or complex types. A real type is
+     * a built-in floating-point type. A complex type is a std::complex<F> where F is
+     * a real type. The concept is also true for any reference or const reference to
+     * a real or complex type.
+     */
+    template<typename T>
+    concept real_or_complex = std::floating_point<std::remove_cvref_t<T>>
+	|| is_complex<std::remove_cvref_t<T>>::value;
+    
+    template<typename T>
+    concept state_vector = requires (T t) {
+
+	// The type should have a value_type public typedef like std::vector and
+	// other containers.
+	typename T::value_type;
+	    
+	///\todo Check whether the input type to operator[] should be restricted
+	// Operator[] must be valid and return a real or complex number
+	{t[0]} -> real_or_complex;
+
+	///\todo Check whether using convertible_to is appropriate
+	// Must return its size like std::vector
+	{t.size()} -> std::unsigned_integral; 
+    };
+    
+    template<typename S>
+    concept debug_state_vector = state_vector<S> && requires (S s) {
+	{s.debug()} -> std::same_as<bool>;
+    };
+    
+    template<state_vector S>
+    struct get_precision<S>
+    {
+	using type = get_precision<typename S::value_type>::type;
+    };
+
     
     /**
      * \brief Helper to get the precision type of a simulator or state directly
@@ -108,39 +124,7 @@ namespace qsl
      */
     template<typename T, typename U>
     concept same_precision = std::is_same_v<get_precision_t<T>,
-					    get_precision_t<U>>;
-
-
-    /// By default, nothing is a complex type
-    template<typename T>
-    struct is_complex : std::false_type {};
-
-    /// Only a std::complex<T> for floating-point T is complex 
-    template<std::floating_point F>
-    struct is_complex<std::complex<F>> : std::true_type {};
-
-    /**
-     * \brief Concept to check if a type is real or complex
-     *
-     * This concept is true for floating-point real or complex types. A real type is
-     * a built-in floating-point type. A complex type is a std::complex<F> where F is
-     * a real type. The concept is also true for any reference or const reference to
-     * a real or complex type.
-     */
-    template<typename T>
-    concept real_or_complex = std::floating_point<std::remove_cvref_t<T>>
-	|| is_complex<std::remove_cvref_t<T>>::value;
-    
-    template<typename T>
-    concept state_vector = requires (T t) {
-	
-	// Operator[] must be valid and return a real or complex number
-	{t[0]} -> real_or_complex;
-	
-	// Must return its size like std::vector
-	{t.size()} -> std::same_as<std::size_t>; 
-    };
-   
+					    get_precision_t<U>>;   
 	
     /**
      * \brief Random number generator complying with std::uniform_random_bit_generator.
@@ -2689,8 +2673,8 @@ namespace qsl
      */
     template<state_vector S>
     std::ostream & operator << (std::ostream & os, const S & s);
-    
-    /**
+
+        /**
      * \brief Calculate the Fubini-Study metric between two simulators/state vectors
      *
      * The Fubini-Study metric is a distance between rays in complex projective
@@ -2713,23 +2697,20 @@ namespace qsl
      * the wikipedia page
      * </a>
      *
-     * You can use this function between any types that satisfy the 
-     * state_vector concept (meaning they have .size() and operator[] return
-     * a real or complex number). If the two state vector arguments have
-     * different lengths, then std::invalid_argument is thrown. If either 
-     * state vector is equal to zero (i.e. not normalisable), then
-     * std::invalid_argument is thrown.
+     * You can use this function between two simulator objects, or a simulator
+     * object and a state_vector (meaning it has .size() and operator[] that 
+     * returns a real or complex number). If the simulator argument has debugging
+     * enabled, then std::invalid_argument is thrown in the following two 
+     * scenarios: firstly, if the two arguments are different length state vectors;
+     * secondly, if either argument is the zero vector (i.e. not normalisable).
+     * If debugging is disabled, then the behaviour in these cases is unspecified.
      *
      * \param u The first state vector to compare
      * \param v The second state vector to compare
      * \return The (real) Fubini-Study distance between u and v
-     *
-     * Testing:
-     * - 
-     * 
      */
     template<state_vector S1, state_vector S2>
-    requires same_precision<S1, S2> 
+    requires same_precision<S1, S2> && (debug_state_vector<S1> || debug_state_vector<S2>)
     get_precision_t<S1> distance(const S1 & u, const S2 & v);
 
     /**
@@ -2751,20 +2732,22 @@ namespace qsl
      * <a href="https://en.wikipedia.org/wiki/Fidelity_of_quantum_states"> the
      * wikipedia page </a>.
      *
-     * You can use this function between any types that satisfy the 
-     * state_vector concept (meaning they have .size() and operator[] return
-     * a real or complex number). If the two state vector arguments have
-     * different lengths, then std::invalid_argument is thrown. If either 
-     * state vector is equal to zero (i.e. not normalisable), then
-     * std::invalid_argument is thrown. This function also normalises the
-     * states you pass in, so that the fidelity calculation is valid.
+     * You can use this function between two simulator objects, or a simulator
+     * object and a state_vector (meaning it has .size() and operator[] that 
+     * returns a real or complex number). If the simulator argument has debugging
+     * enabled, then std::invalid_argument if the two arguments are different 
+     * length state vectors. If debugging is disabled, then the behaviour in this 
+     * case is unspecified.
+     *
+     * This function also normalises the states you pass in, so that the fidelity 
+     * calculation is valid.
      *
      * \param u The first state vector to compare
      * \param v The second state vector to compare
      * \return The (real) fidelity between u and v. 
      */
     template<state_vector S1, state_vector S2>
-    requires same_precision<S1, S2> 
+    requires same_precision<S1, S2> && (debug_state_vector<S1> || debug_state_vector<S2>)
     get_precision_t<S1> fidelity(const S1 & u, const S2 & v);
 
     /**
@@ -2784,9 +2767,12 @@ namespace qsl
      * qsl::fidelity (which normalises the input state vectors) and
      * qsl::distance (for which normalisation does not matter).
      *
-     * You can use this function between any types that satisfy the 
-     * state_vector concept (meaning they have .size() and operator[] return
-     * a real or complex number). The zero vector is allowed.
+     * You can use this function between two simulator objects, or a simulator
+     * object and a state_vector (meaning it has .size() and operator[] that 
+     * returns a real or complex number). If the simulator argument has debugging
+     * enabled, then std::invalid_argument if the two arguments are different 
+     * length state vectors. If debugging is disabled, then the behaviour in this 
+     * case is unspecified.
      *
      * \param u The first state vector to compare
      * \param v The second state vector to compare
@@ -2794,8 +2780,9 @@ namespace qsl
      *
      */
     template<state_vector S1, state_vector S2>
-    requires same_precision<S1, S2> 
+    requires same_precision<S1, S2> && (debug_state_vector<S1> || debug_state_vector<S2>)
     std::complex<get_precision_t<S1>> inner_prod(const S1 & u, const S2 & v);    
+
 
 }
 

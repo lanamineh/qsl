@@ -13,8 +13,7 @@
 
 /// The namespace for all items in QSL
 namespace qsl
-{
-	
+{	
     /// Run functions without parallelisation
     struct seq;
     /// Run functions with omp
@@ -88,9 +87,6 @@ namespace qsl
 	// Must return its size like std::vector
 	{t.size()} -> std::unsigned_integral; 
     };
-
-    T::size_type -> std::unsigned_integral;
-    T::value_type -> real_or_complex;
     
     template<typename S>
     concept debug_state_vector = state_vector<S> && requires (S s) {
@@ -100,7 +96,7 @@ namespace qsl
     template<state_vector S>
     struct get_precision<S>
     {
-	    using type = get_precision<typename S::value_type>::type;
+	using type = get_precision<typename S::value_type>::type;
     };
 
     
