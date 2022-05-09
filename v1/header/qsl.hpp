@@ -199,7 +199,8 @@ namespace qsl
     class basic
     {
     public:
-	    
+	using value_type = std::complex<F>;
+	constexpr bool debug() { return D; }
 	    
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
@@ -1107,6 +1108,9 @@ namespace qsl
     class resize
     {
     public:
+	using value_type = std::complex<F>;
+	constexpr bool debug() { return D; }
+	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
 	 *
@@ -2027,6 +2031,9 @@ namespace qsl
     class number
     {
     public:
+	using value_type = std::complex<F>;
+	constexpr bool debug() { return D; }
+	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
 	 *
