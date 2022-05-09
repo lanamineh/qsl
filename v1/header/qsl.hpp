@@ -201,7 +201,19 @@ namespace qsl
     public:
 	using value_type = std::complex<F>;
 	constexpr bool debug() { return D; }
-	    
+
+	/**
+	 * \brief Construct an empty simulator
+	 *
+	 * Constructs a simulator with zero qubits. The number of qubits
+	 * can be changed using the qsl::basic::reset member function. This 
+	 * function is not especially useful for one or two simulators, but
+	 * may help in contexts that require construction-before-copy (for 
+	 * example, adding a simulator into a map without using emplace).
+	 *
+	 */
+	basic();
+	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
 	 *
@@ -281,20 +293,9 @@ namespace qsl
 	std::size_t size() const;
 
 	/**
-	 * \brief Return the current state of the qubits.
-	 *
-	 * \return The state of the qubits as a std::vector.
-	 *
-	 * Testing:
-	 * - Instantiate a simulator with a specific state and check this function 
-	 *   returns the same state (normalised).
-	 */
-	std::vector<std::complex<F>> state() const;
-
-	/**
 	 * \brief Change the simulator state to the state that is passed in. 
 	 *
-	 * If a stad::vector, the input state vector must be non-zero and have a length which
+	 * If a std::vector, the input state vector must be non-zero and have a length which
 	 * is a power of two. It does not need to be normalised as
 	 * this function will carry out a normalisation step. Note that this function
 	 * allows for a change in the number of qubits.
@@ -338,6 +339,17 @@ namespace qsl
 	 * - Check state vector is in the all-zero state and the correct size.
 	 */
 	void reset(unsigned num_qubits);
+
+	/**
+	 * \brief Return the current state of the qubits.
+	 *
+	 * \return The state of the qubits as a std::vector.
+	 *
+	 * Testing:
+	 * - Instantiate a simulator with a specific state and check this function 
+	 *   returns the same state (normalised).
+	 */
+	std::vector<std::complex<F>> state() const;
 	
 	/**
 	 * \brief Access state vector elements (read-only).
@@ -353,16 +365,35 @@ namespace qsl
 	 * Testing:
 	 * - In debug mode, check exceptions thrown. E.g. try accessing out of bound elements
 	 * - Check output of operator[] in a loop against the .state() method.
+	 * - Check the state is normalised -- might be superfluous if we check against
+	 *   state() (and check that is normalised).
 	 */ 
 	const std::complex<F> & operator[](std::size_t index) const;
 	
 	/**
 	 * \brief Set the state vector to a random state.
 	 *
+	 * This function places the simulator in a random state, chosen uniformly from 
+	 * the set of normalised states on the surface of the unit sphere in 
+	 * \f$\mathcal{C}^n,\f$ where \f$n\f$ is the number of qubits in the simulator.
+	 * (You can call qsl::basic::reset first if you need to change the number of
+	 * qubits.)
+	 *
 	 * This function allows the user to pass in a specific random number generator,
-	 * this is to allow for seeding and reproducibility.
+	 * this is to allow for seeding and reproducibility. 
 	 *
 	 * \param g Optional, uniform random number generator.
+	 *
+	 * Testing:
+	 * - Check that the result of several calls to make random is a normalised
+	 *   state vector (e.g. using state()) each time. Pass several different generator 
+	 *   types and check that the function produces normalised states in all cases.
+	 * - Use a fixed (deterministic, seeded) generator, get the resulting random
+	 *   vectors that are generated, and hard code them in the tests. Make this set
+	 *   quite large, and verify (externally, using python), that the random states
+	 *   are correctly distributed.
+	 * - The above tests also check that the states are reproducible.
+	 * 
 	 */ 
 	void make_random(std::uniform_random_bit_generator auto & g = gen)
 	    {
@@ -379,6 +410,11 @@ namespace qsl
 	 * this, it prints the first and last 20 elements.
 	 *
 	 * \param os Optional, output stream, defaults to printing to the console with std::cout. 
+	 *
+	 * Testing:
+	 * - Check that the function puts the correctly formatted string to a
+	 *   stringstream. 
+	 * - Check boundary cases like zero qubits.
 	 */
 	void print(std::ostream & os = std::cout) const;
 
@@ -388,10 +424,20 @@ namespace qsl
 	 * Capped at 20 qubits (16MB at double precision to store the state vector).
 	 * \todo Specify which metadata are stored.
 	 *
-	 * In debug mode, a std::runtime_error is thrown if too many qubits are to be stored
-	 * or if the file cannot be created. 
+	 * A std::runtime_error is thrown if too many qubits are to be stored
+	 * or if the file cannot be created. These exceptions are still thrown if
+	 * the simulator is not in debug mode.
 	 *
 	 * \param file Filename to save to.
+	 *
+	 * Testing:
+	 * - Check that exceptions are thrown for more than 20 qubits; if the
+	 *   file cannot be created for any reason (maybe try to write to 
+	 *   "/qsl.json" for the test, although this would work if they ran it
+	 *   as root. Might need some thinking about. Maybe could create a directory
+	 *   with no permissions as part of the test.
+	 * - Check the right file is written, by creating it and then reading it
+	 *   back and checking it has the right contents.
 	 */
 	void save_json(const std::filesystem::path & file) const;
 
@@ -405,12 +451,19 @@ namespace qsl
 	 * \todo Figure out how we will serialise std::vector<std::complex> so the input
 	 *       can be specified here.
 	 *
-	 * In debug mode, a std::runtime_error is thrown if the file doesn't exist or cannot be
+	 * A std::runtime_error is thrown if the file doesn't exist or cannot be
 	 * read. A std::invalid_argument is thrown if it does not contain a valid json object,
 	 * if it reads a json object that does not contain a 'state' field, or if the state that
-	 * is read is invalid. 
+	 * is read is invalid. These exceptions occur even when debugging is disabled.
 	 *
 	 * \param file The filename to read from. 
+	 *
+	 * Testing:
+	 * - Test by loading from fixed (hardcoded) JSON files in the test, and check
+	 *   that the data is correct. Include a test for normalised and non-normalised
+	 *   states.
+	 * - Check exceptions (error if wrong fields, invalid json)
+	 * - Check round trip save/load json gives the same state.
 	 */
 	void load_json(const std::filesystem::path & file);
 
@@ -1276,6 +1329,19 @@ namespace qsl
     public:
 	using value_type = std::complex<F>;
 	constexpr bool debug() { return D; }
+
+	/**
+	 * \brief Construct an empty simulator
+	 *
+	 * Constructs a simulator with zero qubits. The number of qubits
+	 * can be changed using the qsl::resize::reset member function, or by 
+	 * calling the qsl::resize::add_qubit method. This function
+	 * is not especially useful for one or two simulators, but may help
+	 * in contexts that require construction-before-copy (for example,
+	 * adding a simulator into a map without using emplace).
+	 *
+	 */
+	resize();
 	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
@@ -1442,8 +1508,9 @@ namespace qsl
 	 * Capped at 20 qubits (16MB at double precision to store the state vector).
 	 * \todo Specify which metadata are stored.
 	 *
-	 * In debug mode, a std::runtime_error is thrown if too many qubits are to be stored
-	 * or if the file cannot be created. 
+	 * A std::runtime_error is thrown if too many qubits are to be stored
+	 * or if the file cannot be created. These exceptions are still thrown if
+	 * the simulator is not in debug mode.
 	 *
 	 * \param file Filename to save to.
 	 */
@@ -1459,10 +1526,10 @@ namespace qsl
 	 * \todo Figure out how we will serialise std::vector<std::complex> so the input
 	 *       can be specified here.
 	 *
-    	 * In debug mode, a std::runtime_error is thrown if the file doesn't exist or cannot be
+	 * A std::runtime_error is thrown if the file doesn't exist or cannot be
 	 * read. A std::invalid_argument is thrown if it does not contain a valid json object,
 	 * if it reads a json object that does not contain a 'state' field, or if the state that
-	 * is read is invalid. 
+	 * is read is invalid. These exceptions occur even when debugging is disabled.
 	 *
 	 * \param file The filename to read from. 
 	 */
@@ -2199,6 +2266,18 @@ namespace qsl
     public:
 	using value_type = std::complex<F>;
 	constexpr bool debug() { return D; }
+
+	/**
+	 * \brief Construct an empty simulator
+	 *
+	 * Constructs a simulator with zero qubits. The number of qubits
+	 * can be changed using the qsl::number::reset member function. This 
+	 * function is not especially useful for one or two simulators, but 
+	 * may help in contexts that require construction-before-copy (for 
+	 * example, adding a simulator into a map without using emplace).
+	 *
+	 */
+	number();
 	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
@@ -2377,8 +2456,9 @@ namespace qsl
 	 * Capped at 20 qubits (16MB at double precision to store the state vector).
 	 * \todo Specify which metadata are stored.
 	 *
-	 * In debug mode, a std::runtime_error is thrown if too many qubits are to be stored
-	 * or if the file cannot be created. 
+	 * A std::runtime_error is thrown if too many qubits are to be stored
+	 * or if the file cannot be created. These exceptions are still thrown if
+	 * the simulator is not in debug mode.
 	 *
 	 * \param file Filename to save to.
 	 */	
@@ -2394,10 +2474,10 @@ namespace qsl
 	 * \todo Figure out how we will serialise std::vector<std::complex> so the input
 	 *       can be specified here.
 	 *
-	 * In debug mode, a std::runtime_error is thrown if the file doesn't exist or cannot be
+	 * A std::runtime_error is thrown if the file doesn't exist or cannot be
 	 * read. A std::invalid_argument is thrown if it does not contain a valid json object,
 	 * if it reads a json object that does not contain a 'state' field, or if the state that
-	 * is read is invalid. 
+	 * is read is invalid. These exceptions occur even when debugging is disabled.
 	 *
 	 * \param file The filename to read from. 
 	 */
@@ -2819,7 +2899,6 @@ namespace qsl
 	std::map<std::size_t, std::size_t> sample_all(std::size_t samples,
 						      std::uniform_random_bit_generator auto g = gen) const;
     };
-
 
     /**
      * \brief Print the full state vector of a simulator object
