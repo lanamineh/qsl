@@ -424,10 +424,20 @@ namespace qsl
 	 * Capped at 20 qubits (16MB at double precision to store the state vector).
 	 * \todo Specify which metadata are stored.
 	 *
-	 * In debug mode, a std::runtime_error is thrown if too many qubits are to be stored
-	 * or if the file cannot be created. 
+	 * A std::runtime_error is thrown if too many qubits are to be stored
+	 * or if the file cannot be created. These exceptions are still thrown if
+	 * the simulator is not in debug mode.
 	 *
 	 * \param file Filename to save to.
+	 *
+	 * Testing:
+	 * - Check that exceptions are thrown for more than 20 qubits; if the
+	 *   file cannot be created for any reason (maybe try to write to 
+	 *   "/qsl.json" for the test, although this would work if they ran it
+	 *   as root. Might need some thinking about. Maybe could create a directory
+	 *   with no permissions as part of the test.
+	 * - Check the right file is written, by creating it and then reading it
+	 *   back and checking it has the right contents.
 	 */
 	void save_json(const std::filesystem::path & file) const;
 
@@ -441,12 +451,19 @@ namespace qsl
 	 * \todo Figure out how we will serialise std::vector<std::complex> so the input
 	 *       can be specified here.
 	 *
-	 * In debug mode, a std::runtime_error is thrown if the file doesn't exist or cannot be
+	 * A std::runtime_error is thrown if the file doesn't exist or cannot be
 	 * read. A std::invalid_argument is thrown if it does not contain a valid json object,
 	 * if it reads a json object that does not contain a 'state' field, or if the state that
-	 * is read is invalid. 
+	 * is read is invalid. These exceptions occur even when debugging is disabled.
 	 *
 	 * \param file The filename to read from. 
+	 *
+	 * Testing:
+	 * - Test by loading from fixed (hardcoded) JSON files in the test, and check
+	 *   that the data is correct. Include a test for normalised and non-normalised
+	 *   states.
+	 * - Check exceptions (error if wrong fields, invalid json)
+	 * - Check round trip save/load json gives the same state.
 	 */
 	void load_json(const std::filesystem::path & file);
 
@@ -1325,8 +1342,9 @@ namespace qsl
 	 * Capped at 20 qubits (16MB at double precision to store the state vector).
 	 * \todo Specify which metadata are stored.
 	 *
-	 * In debug mode, a std::runtime_error is thrown if too many qubits are to be stored
-	 * or if the file cannot be created. 
+	 * A std::runtime_error is thrown if too many qubits are to be stored
+	 * or if the file cannot be created. These exceptions are still thrown if
+	 * the simulator is not in debug mode.
 	 *
 	 * \param file Filename to save to.
 	 */
@@ -1342,10 +1360,10 @@ namespace qsl
 	 * \todo Figure out how we will serialise std::vector<std::complex> so the input
 	 *       can be specified here.
 	 *
-    	 * In debug mode, a std::runtime_error is thrown if the file doesn't exist or cannot be
+	 * A std::runtime_error is thrown if the file doesn't exist or cannot be
 	 * read. A std::invalid_argument is thrown if it does not contain a valid json object,
 	 * if it reads a json object that does not contain a 'state' field, or if the state that
-	 * is read is invalid. 
+	 * is read is invalid. These exceptions occur even when debugging is disabled.
 	 *
 	 * \param file The filename to read from. 
 	 */
@@ -2272,8 +2290,9 @@ namespace qsl
 	 * Capped at 20 qubits (16MB at double precision to store the state vector).
 	 * \todo Specify which metadata are stored.
 	 *
-	 * In debug mode, a std::runtime_error is thrown if too many qubits are to be stored
-	 * or if the file cannot be created. 
+	 * A std::runtime_error is thrown if too many qubits are to be stored
+	 * or if the file cannot be created. These exceptions are still thrown if
+	 * the simulator is not in debug mode.
 	 *
 	 * \param file Filename to save to.
 	 */	
@@ -2289,10 +2308,10 @@ namespace qsl
 	 * \todo Figure out how we will serialise std::vector<std::complex> so the input
 	 *       can be specified here.
 	 *
-	 * In debug mode, a std::runtime_error is thrown if the file doesn't exist or cannot be
+	 * A std::runtime_error is thrown if the file doesn't exist or cannot be
 	 * read. A std::invalid_argument is thrown if it does not contain a valid json object,
 	 * if it reads a json object that does not contain a 'state' field, or if the state that
-	 * is read is invalid. 
+	 * is read is invalid. These exceptions occur even when debugging is disabled.
 	 *
 	 * \param file The filename to read from. 
 	 */
