@@ -2708,6 +2708,12 @@ namespace qsl
      * \param u The first state vector to compare
      * \param v The second state vector to compare
      * \return The (real) Fubini-Study distance between u and v
+     *
+     * Testing: 
+     * - Check that the right exceptions are thrown when debugging is enabled
+     * - Check that passing in the same vector results in distance zero
+     * - Check that passing orthogonal states results in M_PI/2 (todo check this)
+     * - Check that the scaling/global phases of the state vectors do not matter
      */
     template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> && (debug_state_vector<S1> || debug_state_vector<S2>)
@@ -2744,7 +2750,14 @@ namespace qsl
      *
      * \param u The first state vector to compare
      * \param v The second state vector to compare
-     * \return The (real) fidelity between u and v. 
+     * \return The (real) fidelity between u and v.
+     *
+     * Testing: 
+     * - Check that the right exceptions are thrown when debugging is enabled
+     * - Check that passing in the same vector results in fidelity 1
+     * - Check that passing orthogonal states results in 0
+     * - Check that the scaling/global phases of the state vectors do not matter.
+     *
      */
     template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> && (debug_state_vector<S1> || debug_state_vector<S2>)
@@ -2777,6 +2790,12 @@ namespace qsl
      * \param u The first state vector to compare
      * \param v The second state vector to compare
      * \return The (complex) inner product between u and v. 
+     *
+     * Testing: 
+     * - Check that the right exceptions are thrown when debugging is enabled
+     * - Check that passing orthogonal states results in 0 (todo check this)
+     * - Check that the inner product between equal unit vectors is 1
+     * - Check that the outputs from some simulators are normalised (checks sims too).
      *
      */
     template<state_vector S1, state_vector S2>
