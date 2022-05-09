@@ -1266,9 +1266,6 @@ namespace qsl
 	 *
 	 * Testing:
 	 * - In debug mode, check exceptions thrown e.g. input out of range targ.
-	 * - Measure random state (smallish no. of qubits) and check output 
-	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 to make sure 
-	 *   edge cases have been checked.
 	 * - Check randomness seeding by preparing the same random state and checking we
 	 *   get the same samples everytime.
 	 * - Check that this function samples from the actual qubit probablity distribution. 
@@ -1298,8 +1295,6 @@ namespace qsl
 	 *         are the number of times that outcome was measured.
 	 *
 	 * Testing:
-	 * - Measure random state (smallish no. of qubits) and check output 
-	 *   matches with armadillo.
 	 * - Check randomness seeding by preparing the same random state and checking we
 	 *   get the same outcome everytime.
 	 * - Check that this function samples from the actual qubit probablity distribution. 
