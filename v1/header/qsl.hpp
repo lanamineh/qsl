@@ -13,7 +13,7 @@
 
 /// The namespace for all items in QSL
 namespace qsl
-{	
+{
     /// Run functions without parallelisation
     struct seq;
     /// Run functions with omp
@@ -124,14 +124,19 @@ namespace qsl
      */
     template<typename T, typename U>
     concept same_precision = std::is_same_v<get_precision_t<T>,
-					    get_precision_t<U>>;
-
-
-    
+					    get_precision_t<U>>;   
+	
     /**
      * \brief Random number generator complying with std::uniform_random_bit_generator.
      *
      * This is a wrapper around std::mt19937_64.
+     *
+     * Testing:
+     * - Set a seed, read the seed, check they match (both setting with constructor and seed function).
+     * - Check operator() by generating some random values and checking they are between min() and max()
+     * - Check operator() is uniform, for example, generate lots of random numbers, check 
+     *   in python whether they are uniform, then check if the same numbers are regenerated with the seed.
+     * - Check seeding works
      */
     class gen_t
     {
@@ -141,7 +146,7 @@ namespace qsl
 	static result_type min();
 	/// Return maximum possible value
 	static result_type max();
-	/// Obtain the next3 sample from the generator
+	/// Obtain the next sample from the generator
 	result_type operator() ();
 
 	/// Instantiate generator with a random seed
@@ -163,10 +168,23 @@ namespace qsl
      * sets whether a logger which prints debugging information is activated or not.
      * Note that this function switches logging on/off globally. 
      *
+     * QSL simulators will only record logging information if debugging is enabled
+     * (template parameter D = true in the simulator). If D = false, the state of
+     * this global logger is ignored.
+     *
      * \param activate Switch logging on (true) or off (false).
      * \param os Stream to output the logging data to, defaults to std::cout.
+     *
+     * Testing:
+     * - Enable logging using a dummy stream (such as a string stream), and then
+     *   execute one of each kind of operation that should print to the log. This
+     *   will test all the simulator logging functions. Compare the string stream
+     *   with correct messages.
+     * - Disable logging (in the same context as above, with a stream stream), and
+     *   check that operations do not write to the stream.
+     * 
      */
-    void log(bool activate, std::ostream & os = std::cout);	 
+    void log(bool activate, std::ostream & os = std::cout);
     
     /**
      * \brief General purpose quantum simulator.
@@ -181,9 +199,8 @@ namespace qsl
     class basic
     {
     public:
-	using value_type = std::complex<F>;
-	constexpr static bool debug() { return D; };
-	
+	    
+	    
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
 	 *
@@ -193,6 +210,11 @@ namespace qsl
 	 * std::runtime_error is thrown.
 	 *
 	 * \param num_qubits The number of qubits to simulate.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown. E.g. try inputting a large number,
+	 *   negative numbers etc.
+	 * - Check state vector is in the all-zero state and the correct size.
 	 */ 
 	explicit basic(unsigned num_qubits);
 
@@ -212,6 +234,14 @@ namespace qsl
 	 *
 	 * \param s A valid qsl simulator object with the same floating point precision,
          *          or std::vector<std::complex<F>> or std::vector<F>.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown. E.g. input wrong length state vector,
+	 *   or one of correct length and all zeros.
+	 * - Input un-normalised state and check it becomes normalised.
+	 * - Input normalised state and check it stays the same.
+	 * - Try all possible input types (std::vectors and simulators) and check state is correct.
+	 * - Check number of qubits is correctly calculated.
 	 */
 	template<state_vector S>
 	requires same_precision<F, S>
@@ -219,6 +249,10 @@ namespace qsl
 
 	/**
 	 * \brief Convert between different floating point types for qsl::basic simulators.
+	 *
+	 * Testing:
+	 * - Check state vector is correct and normalised (this function could introduce small
+	 *   floating point errors). 
 	 */
 	template<std::floating_point F1, bool D1, parallelisation P1>
 	explicit operator basic<F1,D1,P1>();
@@ -227,6 +261,10 @@ namespace qsl
 	 * \brief Get the number of qubits.
 	 *
 	 * \return Number of qubits.
+	 *
+	 * Testing:
+	 * - Instantiate a simulator with a number of qubits and check this function 
+	 *   returns the correct number.
 	 */
 	unsigned qubits() const;
 
@@ -234,6 +272,10 @@ namespace qsl
 	 * \brief Get the dimension of the Hilbert space = 2 ^ num_qubits.
 	 *
 	 * \return Dimension of Hilbert space.
+	 *
+	 * Testing:
+	 * - Instantiate a simulator with a number of qubits and check this function 
+	 *   returns the correct state vector size.
 	 */
 	std::size_t size() const;
 
@@ -241,6 +283,10 @@ namespace qsl
 	 * \brief Return the current state of the qubits.
 	 *
 	 * \return The state of the qubits as a std::vector.
+	 *
+	 * Testing:
+	 * - Instantiate a simulator with a specific state and check this function 
+	 *   returns the same state (normalised).
 	 */
 	std::vector<std::complex<F>> state() const;
 
@@ -256,6 +302,14 @@ namespace qsl
 	 * a std::invalid_argument is thrown.
 	 *
 	 * \param state A vector or qsl simulator containing the new state for the object.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown. E.g. input wrong length state vector,
+	 *   or one of correct length and all zeros.
+	 * - Input un-normalised state and check it becomes normalised.
+	 * - Input normalised state and check it stays the same.
+	 * - Try all possible input types (std::vectors and simulators) and check state is correct.
+	 * - Check number of qubits is correctly calculated.
 	 */ 		
 	template<state_vector S>
 	requires same_precision<F, S>
@@ -263,6 +317,9 @@ namespace qsl
 
 	/**
 	 * \brief Reset to the all-zero computational basis state.
+	 *
+	 * Testing:
+	 * - Check state after this function is called is the all-zero state.
 	 */
 	void reset();
 
@@ -273,6 +330,11 @@ namespace qsl
 	 * std::runtime_error is thrown.
 	 *
 	 * \param num_qubits The number of qubits to simulate.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown. E.g. try inputting a large number,
+	 *   negative numbers etc.
+	 * - Check state vector is in the all-zero state and the correct size.
 	 */
 	void reset(unsigned num_qubits);
 	
@@ -286,6 +348,10 @@ namespace qsl
 	 *
 	 * \param index The state vector index to access.
 	 * \return The complex amplitude at index.
+	 *
+	 * Testing:
+	 * - In debug mode, check exceptions thrown. E.g. try accessing out of bound elements
+	 * - Check output of operator[] in a loop against the .state() method.
 	 */ 
 	const std::complex<F> & operator[](std::size_t index) const;
 	
@@ -1041,9 +1107,6 @@ namespace qsl
     class resize
     {
     public:
-	using value_type = std::complex<F>;
-	constexpr static bool debug() { return D; };
-	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
 	 *
@@ -1964,9 +2027,6 @@ namespace qsl
     class number
     {
     public:
-	using value_type = std::complex<F>;
-	constexpr static bool debug() { return D; };
-	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
 	 *
@@ -2601,11 +2661,22 @@ namespace qsl
      * \param os The output stream to print the vector to
      * \param s The simulator whose state is to be printed.
      *
+     * Testing:
+     * - Check that the function prints the correct state vector to a string
+     *   stream, for a number of example simulators (and vectors? see below).
+     *   Need to think of a way to check the format properly.
+     * 
+     * Todo:
+     * - This function will match std::vector too probably -- can the user still
+     *   override it with their own implmentation if they want? (In the global
+     *   namespace?) What happens if their one is in a namespace? Might be better
+     *   to restrict this to only simulators, since QSL is not really supposed
+     *   to tamper with std::vector.
      */
-    template<typename S>
+    template<state_vector S>
     std::ostream & operator << (std::ostream & os, const S & s);
-    
-    /**
+
+        /**
      * \brief Calculate the Fubini-Study metric between two simulators/state vectors
      *
      * The Fubini-Study metric is a distance between rays in complex projective
@@ -2639,6 +2710,13 @@ namespace qsl
      * \param u The first state vector to compare
      * \param v The second state vector to compare
      * \return The (real) Fubini-Study distance between u and v
+     *
+     * Testing: 
+     * - Check that the right exceptions are thrown when debugging is enabled
+     * - Check that passing in the same vector results in distance zero
+     * - Check that passing orthogonal states results in M_PI/2 (todo check this)
+     * - Check that the scaling/global phases of the state vectors do not matter
+     * - Check all the above with both simulators and vectors in any order
      */
     template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> && (debug_state_vector<S1> || debug_state_vector<S2>)
@@ -2675,7 +2753,15 @@ namespace qsl
      *
      * \param u The first state vector to compare
      * \param v The second state vector to compare
-     * \return The (real) fidelity between u and v. 
+     * \return The (real) fidelity between u and v.
+     *
+     * Testing: 
+     * - Check that the right exceptions are thrown when debugging is enabled
+     * - Check that passing in the same vector results in fidelity 1
+     * - Check that passing orthogonal states results in 0
+     * - Check that the scaling/global phases of the state vectors do not matter.
+     * - Check all the above with both simulators and vectors in any order
+     *
      */
     template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> && (debug_state_vector<S1> || debug_state_vector<S2>)
@@ -2709,10 +2795,18 @@ namespace qsl
      * \param v The second state vector to compare
      * \return The (complex) inner product between u and v. 
      *
+     * Testing: 
+     * - Check that the right exceptions are thrown when debugging is enabled
+     * - Check that passing orthogonal states results in 0 (todo check this)
+     * - Check that the inner product between equal unit vectors is 1
+     * - Check that the outputs from some simulators are normalised (checks sims too).
+     * - Check all the above with both simulators and vectors in any order 
+     *
      */
     template<state_vector S1, state_vector S2>
     requires same_precision<S1, S2> && (debug_state_vector<S1> || debug_state_vector<S2>)
     std::complex<get_precision_t<S1>> inner_prod(const S1 & u, const S2 & v);    
+
 
 }
 
