@@ -76,6 +76,10 @@ namespace qsl
     template<typename T>
     concept state_vector = requires (T t) {
 
+	// The type should have a value_type public typedef like std::vector and
+	// other containers.
+	typename T::value_type;
+	    
 	///\todo Check whether the input type to operator[] should be restricted
 	// Operator[] must be valid and return a real or complex number
 	{t[0]} -> real_or_complex;
@@ -85,6 +89,9 @@ namespace qsl
 	{t.size()} -> std::unsigned_integral; 
     };
 
+    T::size_type -> std::unsigned_integral;
+    T::value_type -> real_or_complex;
+    
     template<typename S>
     concept debug_state_vector = state_vector<S> && requires (S s) {
 	{s.debug()} -> std::same_as<bool>;
