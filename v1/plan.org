@@ -10,9 +10,9 @@
    - Any additional utilities? (fidelity, distance, etc?)
 2. [X] Plan seeding/reproducibility
 3. [X] Create header files for the interface
-4. [ ] Plan how to test each feature
+4. [-] Plan how to test each feature
    - [ ] How to cover simulator variants without repetition?
-   - [ ] Any need for mocks?
+   - [X] Any need for mocks?
    - [ ] Plan for checking random elements based on seeds
 5. [ ] Plan how to check performance of each feature
 6. [ ] Sketch-plan eventual build system, and set up development build system. 

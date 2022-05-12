@@ -1,0 +1,38 @@
+cmake_minimum_required(VERSION 3.12.4) # To get std=c++20
+
+# set the project name
+project(sim VERSION 0.1 LANGUAGES CXX)
+
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# Set output directories
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+# using GCC
+set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall -Wextra -g -pg -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5 -fprofile-arcs -ftest-coverage")
+set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall -Wextra -O2 -fopenmp")
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip
+  )
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+add_executable(
+  sim-test
+  sim-tests.cpp
+)
+target_link_libraries(
+  sim-test
+  gtest_main
+)
+
+include(GoogleTest)
+gtest_discover_tests(sim-test)
