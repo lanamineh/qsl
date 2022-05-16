@@ -277,4 +277,30 @@ TYPED_TEST(MyTestFixture2, Test12)
     EXPECT_EQ(0, 0);
 }
 
+/////////////////////////////////////////////////
+template <typename T>
+class MyTestFixture3: public testing::Test {};
 
+
+template <template<typename, bool> typename S, typename T>
+struct make_sims {};
+
+template <template<typename, bool> typename S, typename... F, typename... D>
+struct make_sims<S, std::tuple<std::tuple<F, D>...>>
+{
+    // Return std::tuple of simulator objects
+    using type = std::tuple<S<F, D::value>...>;
+};
+
+
+using TestTypes6 = ::testing::Types<make_sims<Sim2,
+					      std::tuple<std::tuple<double, std::true_type>,
+							 std::tuple<float, std::false_type>>>::type>;
+
+
+TYPED_TEST_SUITE(MyTestFixture3, TestTypes6);
+
+TYPED_TEST(MyTestFixture3, Test12)
+{
+    EXPECT_EQ(0, 0);
+}

@@ -11,7 +11,7 @@
 2. [X] Plan seeding/reproducibility
 3. [X] Create header files for the interface
 4. [-] Plan how to test each feature
-   - [ ] How to cover simulator variants without repetition?
+   - [X] How to cover simulator variants without repetition?
    - [X] Any need for mocks?
    - [ ] Plan for checking random elements based on seeds
 5. [ ] Plan how to check performance of each feature
@@ -440,7 +440,7 @@ Potential logging levels:
 - File i/o: if file to be read doesn't exist, if we don't have permission to write to output file, if the file to be read does not contain a json object, or the object doesn't have a state vector in it. Trying to write a simulator object that contains too many qubits (number to be decided on). Input file contains too many qubits.
 - Utilities: trying to find distance between vectors/simulators of different sizes, vector is all zeros.
 
-
+  
 ** Interface specification 
 
 This section contains the full specification for the interface.
