@@ -220,7 +220,7 @@ namespace qsl
 	 * The simulator is initialised in the all-zero state.
 	 *
 	 * In debug mode, if the number of qubits is too large to simulate, a
-	 * std::runtime_error is thrown.
+	 * std::runtime_error is thrown. 
 	 *
 	 * \param num_qubits The number of qubits to simulate.
 	 *
