@@ -13,8 +13,10 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # using GCC
-set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall -Wextra -g -pg -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5 -fprofile-arcs -ftest-coverage")
-set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall -Wextra -O2 -fopenmp")
+# set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall -Wextra -g -pg -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5 -fprofile-arcs -ftest-coverage")
+# set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall -Wextra -O2 -fopenmp")
+
+add_compile_options(-Wall -Wextra -O2 -fopenmp)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -28,6 +30,7 @@ enable_testing()
 add_executable(
   qsl-test
   qsl-testing.cpp
+  qsl.cpp
 )
 target_link_libraries(
   qsl-test

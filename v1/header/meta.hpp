@@ -25,11 +25,11 @@ namespace qsl
     template <typename... T1, typename... T2, typename... T3>
     struct cat<std::tuple<T1...>, std::tuple<T2...>, T3...>
     {
-	using type = cat<std::tuple<T1..., T2...>, T3...>::type;
+	using type = typename cat<std::tuple<T1..., T2...>, T3...>::type;
     };
 
     template <typename... T>
-    using cat_t = cat<T...>::type;
+    using cat_t = typename cat<T...>::type;
 
     /**
      * \brief Prepend a type T to the beginning of every tuple in a tuple of tuples.
@@ -47,7 +47,7 @@ namespace qsl
     };
 
     template <typename T, typename L>
-    using prepend_t = prepend<T, L>::type;
+    using prepend_t = typename prepend<T, L>::type;
 
     /**
      * \brief Construct all combinations of one type extracted from each tuple in a list.
@@ -74,14 +74,14 @@ namespace qsl
     struct comb<std::tuple<T1...>, T2...>
     {
 	// Construct the combination of all the remaining std::tuples
-	using combined = comb<T2...>::type;
+	using combined = typename comb<T2...>::type;
 
 	// Prepend each type in the first tuple T1 to every combination
 	using type = cat_t<prepend_t<T1, combined>...>;
     };
 
     template <typename... T>
-    using comb_t = comb<T...>::type;
+    using comb_t = typename comb<T...>::type;
 
     /**
      * \brief Construct a std::tuple of simulator objects from a std::tuple of std::tuple
@@ -100,32 +100,17 @@ namespace qsl
     };
 
     template <template<typename, bool, typename> typename S, typename T>
-    using make_sims_t = make_sims<S, T>::type;
-
-    /**
-     * \brief Extract tuple contents into gtest.
-     */
-    template <typename T>
-    struct gtest_typelist;
-
-    template <typename... T>
-    struct gtest_typelist<std::tuple<T...>>
-    {
-	using type = ::testing::Types<T...>;
-    };
-
-    template <typename T>
-    using gtest_typelist_t = gtest_typelist<T>::type;
+    using make_sims_t = typename make_sims<S, T>::type;
 
     /**
      * \brief Extract the debug value from the simulator
      */
     template <typename S>
-    constexpr bool is_debug;
+    constexpr bool is_debug = false;
 
     template <template<typename, bool, typename> typename S, typename F, bool D, typename P>
     constexpr bool is_debug<S<F, D, P>> = D;
-    
+
 }
 
 #endif 

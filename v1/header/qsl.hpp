@@ -3,6 +3,9 @@
  * \brief First draft of qsl interface.
  */
 
+#ifndef QSL_HPP
+#define QSL_HPP
+
 #include <concepts>
 #include <vector>
 #include <complex>
@@ -14,7 +17,7 @@
 /// The namespace for all items in QSL
 namespace qsl
 {
-    /// Run functions without parallelisation
+    /// Run functions without parallel_t
     struct seq;
     /// Run functions with omp
     struct omp;
@@ -22,14 +25,14 @@ namespace qsl
     struct opt;
 
     /**
-     * \brief Restricted to the types that specify a parallelisation level
+     * \brief Restricted to the types that specify a parallel_t level
      *
      * This concept restricts a template parameter to the types that are
-     * valid parallelisation levels.
+     * valid parallel_t levels.
      *
      */
     template<typename T>
-    concept parallelisation = std::is_same_v<T,seq> || std::is_same_v<T,omp>
+    concept parallel_t = std::is_same_v<T,seq> || std::is_same_v<T,omp>
 	|| std::is_same_v<T,opt>;
 
     /**
@@ -96,7 +99,7 @@ namespace qsl
     template<state_vector S>
     struct get_precision<S>
     {
-	using type = get_precision<typename S::value_type>::type;
+	using type = typename get_precision<typename S::value_type>::type;
     };
 
     
@@ -192,10 +195,10 @@ namespace qsl
      * \tparam F The floating point precision.
      * \tparam D Set debugging to be on (true) or off (false). Defaults to off
      *           to prioritise speed. 
-     * \tparam P Set parallelisation level. Available options are off (qsl::seq), 
+     * \tparam P Set parallel_t level. Available options are off (qsl::seq), 
      *           on (qsl::omp), or an automatic optimal selection (qsl::opt).
      */
-    template<std::floating_point F, bool D = false, parallelisation P = opt>
+    template<std::floating_point F, bool D = false, parallel_t P = opt>
     class basic
     {
     public:
@@ -212,7 +215,7 @@ namespace qsl
 	 * example, adding a simulator into a map without using emplace).
 	 *
 	 */
-	basic();
+	basic() = default;
 	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
@@ -222,14 +225,14 @@ namespace qsl
 	 * In debug mode, if the number of qubits is too large to simulate, a
 	 * std::runtime_error is thrown. 
 	 *
-	 * \param num_qubits The number of qubits to simulate.
+	 * \param qubits The number of qubits to simulate.
 	 *
 	 * Testing:
 	 * - In debug mode, check exceptions thrown. E.g. try inputting a large number,
 	 *   negative numbers etc.
 	 * - Check state vector is in the all-zero state and the correct size.
 	 */ 
-	explicit basic(unsigned num_qubits);
+	explicit basic(unsigned qubits);
 
 	/**
 	 * \brief Instantiate a simulator based on a std::vector or another simulator
@@ -267,7 +270,7 @@ namespace qsl
 	 * - Check state vector is correct and normalised (this function could introduce small
 	 *   floating point errors). 
 	 */
-	template<std::floating_point F1, bool D1, parallelisation P1>
+	template<std::floating_point F1, bool D1, parallel_t P1>
 	explicit operator basic<F1,D1,P1>();
 	
 	/**
@@ -279,10 +282,10 @@ namespace qsl
 	 * - Instantiate a simulator with a number of qubits and check this function 
 	 *   returns the correct number.
 	 */
-	unsigned qubits() const;
+	unsigned qubits() const { return qubits_; };
 
 	/**
-	 * \brief Get the dimension of the Hilbert space = 2 ^ num_qubits.
+	 * \brief Get the dimension of the Hilbert space = 2 ^ qubits.
 	 *
 	 * \return Dimension of Hilbert space.
 	 *
@@ -290,7 +293,7 @@ namespace qsl
 	 * - Instantiate a simulator with a number of qubits and check this function 
 	 *   returns the correct state vector size.
 	 */
-	std::size_t size() const;
+	std::size_t size() const { return size_; };
 
 	/**
 	 * \brief Change the simulator state to the state that is passed in. 
@@ -331,14 +334,14 @@ namespace qsl
 	 * In debug mode, if the number of qubits is too large to simulate, a
 	 * std::runtime_error is thrown.
 	 *
-	 * \param num_qubits The number of qubits to simulate.
+	 * \param qubits The number of qubits to simulate.
 	 *
 	 * Testing:
 	 * - In debug mode, check exceptions thrown. E.g. try inputting a large number,
 	 *   negative numbers etc.
 	 * - Check state vector is in the all-zero state and the correct size.
 	 */
-	void reset(unsigned num_qubits);
+	void reset(unsigned qubits);
 
 	/**
 	 * \brief Return the current state of the qubits.
@@ -349,7 +352,7 @@ namespace qsl
 	 * - Instantiate a simulator with a specific state and check this function 
 	 *   returns the same state (normalised).
 	 */
-	std::vector<std::complex<F>> state() const;
+	std::vector<std::complex<F>> state() const { return state_; };
 	
 	/**
 	 * \brief Access state vector elements (read-only).
@@ -478,7 +481,7 @@ namespace qsl
 	 *       \end{pmatrix} 
 	 * \f]
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -486,7 +489,7 @@ namespace qsl
 	 * Testing:
 	 * - In debug mode, check exceptions thrown e.g. input invalid targ.
 	 * - Apply gate to random state (smallish no. of qubits) and check output 
-	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 
+	 *   matches with armadillo. Do this with targ = 0 up to qubits-1 
 	 *   to make sure edge cases have been checked. Pick random values for angle.
 	 */
 	void rx(unsigned targ, F angle);
@@ -502,7 +505,7 @@ namespace qsl
 	 *       \end{pmatrix} 
 	 * \f]
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -522,7 +525,7 @@ namespace qsl
 	 *       \end{pmatrix} 
 	 * \f]
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -543,7 +546,7 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ e^{i\theta/2} R_z(\theta) \f$.
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -562,14 +565,14 @@ namespace qsl
 	 *     \end{pmatrix} 
 	 * \f]
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 *
 	 * Testing: 
 	 * - In debug mode, check exceptions thrown e.g. input invalid targ.
 	 * - Apply gate to random state (smallish no. of qubits) and check output 
-	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 
+	 *   matches with armadillo. Do this with targ = 0 up to qubits-1 
 	 *   to make sure edge cases have been checked. 
 	 */
 	void h(unsigned targ);
@@ -586,7 +589,7 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_x(\pi) \f$.
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 *
@@ -606,7 +609,7 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_y(\pi) \f$.
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 *
@@ -626,7 +629,7 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_z(\pi) \f$ or \f$ \text{phase}(\pi) \f$
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 *
@@ -640,7 +643,7 @@ namespace qsl
 	 * The matrix must have orthonormal columns, the columns will be
 	 * normalised in this function.
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 * A std::invalid_argument is thrown if matrix does not have orthonormal columns
 	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
@@ -651,7 +654,7 @@ namespace qsl
 	 * - In debug mode, check exceptions thrown e.g. input invalid targ, put in 
 	 *   an invalid matrix such as matrix with det = 0, non-orthogonal columns.
 	 * - Apply gate to random state (smallish no. of qubits) and check output 
-	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 
+	 *   matches with armadillo. Do this with targ = 0 up to qubits-1 
 	 *   to make sure edge cases have been checked. Input a few random unitary matrices.
 	 */
 	void u1(unsigned targ, const std::vector<F> & matrix);
@@ -663,7 +666,7 @@ namespace qsl
 	 * normalised in this function. If all the coefficients are real, use the
 	 * real version of u1 for improved performance.
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 * A std::invalid_argument is thrown if matrix does not have orthonormal columns
 	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
@@ -678,7 +681,7 @@ namespace qsl
 	 * \brief Perform a controlled X-rotation on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, \f$ R_x \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -689,7 +692,7 @@ namespace qsl
 	 * - In debug mode, check exceptions thrown e.g. input invalid targ and ctrl, set
 	 *   targ = ctrl.
 	 * - Apply gate to random state (smallish no. of qubits) and check output 
-	 *   matches with armadillo. Do this with targ and ctrl  = 0 up to num_qubits-1 
+	 *   matches with armadillo. Do this with targ and ctrl  = 0 up to qubits-1 
 	 *   to make sure edge cases have been checked. Pick random values for angle.
 	 */
 	void crx(unsigned ctrl, unsigned targ, F angle);
@@ -698,7 +701,7 @@ namespace qsl
 	 * \brief Perform a controlled Y-rotation on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, \f$ R_y \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -713,7 +716,7 @@ namespace qsl
 	 * \brief Perform a controlled Z-rotation on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, \f$ R_z \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -728,7 +731,7 @@ namespace qsl
 	 * \brief Perform a controlled phase gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, a phase shift is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -743,7 +746,7 @@ namespace qsl
 	 * \brief Perform a controlled Hadamard gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, H is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -753,7 +756,7 @@ namespace qsl
 	 * - In debug mode, check exceptions thrown e.g. input invalid targ and ctrl, set
 	 *   targ = ctrl.
 	 * - Apply gate to random state (smallish no. of qubits) and check output 
-	 *   matches with armadillo. Do this with targ and ctrl  = 0 up to num_qubits-1 
+	 *   matches with armadillo. Do this with targ and ctrl  = 0 up to qubits-1 
 	 *   to make sure edge cases have been checked. 
 	 */
 	void ch(unsigned ctrl, unsigned targ);
@@ -763,7 +766,7 @@ namespace qsl
 	 *        gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, X is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -777,7 +780,7 @@ namespace qsl
 	 * \brief Perform a controlled Pauli-Y gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, Y is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -791,7 +794,7 @@ namespace qsl
 	 * \brief Perform a controlled Pauli-Z gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, Z is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -808,7 +811,7 @@ namespace qsl
 	 * normalised in this function. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 * A std::invalid_argument is thrown if matrix does not have orthonormal columns
 	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
@@ -821,7 +824,7 @@ namespace qsl
 	 * - In debug mode, check exceptions thrown e.g. input invalid targ, put in 
 	 *   an invalid matrix such as matrix with det = 0, non-orthogonal columns.
 	 * - Apply gate to random state (smallish no. of qubits) and check output 
-	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 
+	 *   matches with armadillo. Do this with targ = 0 up to qubits-1 
 	 *   to make sure edge cases have been checked. Input a few random unitary matrices.
 	 */
 	void cu1(unsigned ctrl, unsigned targ, const std::vector<F> & matrix);
@@ -834,7 +837,7 @@ namespace qsl
 	 * real version of cu1 for improved performance.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 * A std::invalid_argument is thrown if matrix does not have orthonormal columns
 	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
@@ -863,7 +866,7 @@ namespace qsl
 	 * This is equivalent to applying \f$ e^{-i\theta (XX+YY)/2} \f$. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -890,7 +893,7 @@ namespace qsl
 	 * \f]
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -916,7 +919,7 @@ namespace qsl
 	 * This is equivalent to applying TODO fix this -> \f$ e^{-i\theta (YX-XY)/2} \f$.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 * 
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -939,7 +942,7 @@ namespace qsl
 	 * \f]
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit to swap.
 	 * \param targ2 The second qubit to swap.
@@ -963,7 +966,7 @@ namespace qsl
 	 * This corresponds to a swap gate followed by a CZ gate.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit to fswap.
 	 * \param targ2 The second qubit to fswap.
@@ -987,7 +990,7 @@ namespace qsl
 	 * This corresponds to the fixed-number \f[R_x(-\pi/2)\f].
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit to iswap.
 	 * \param targ2 The second qubit to iswap.
@@ -1010,7 +1013,7 @@ namespace qsl
 	 * \f]
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -1035,7 +1038,7 @@ namespace qsl
 	 * \f$a_i\f$ above are real.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 * A std::invalid_argument is thrown if a does not have orthonormal columns
 	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
@@ -1065,7 +1068,7 @@ namespace qsl
 	 * real version of nu1 for improved performance.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 * A std::invalid_argument is thrown if u does not have orthonormal columns
 	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
@@ -1094,7 +1097,7 @@ namespace qsl
 	 * \f$a_i\f$ above are real.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 * A std::invalid_argument is thrown if a does not have orthonormal columns
 	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
@@ -1124,7 +1127,7 @@ namespace qsl
 	 * real version of u2 for improved performance.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 * A std::invalid_argument is thrown if u does not have orthonormal columns
 	 * (i.e. cannot be normalised to a unitary matrix).
 	 *
@@ -1145,7 +1148,7 @@ namespace qsl
 	 * is not affected by this function.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
+	 * qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
 	 *
 	 * \param targ The qubit under consideration
 	 * \param outcome The outcome whose probability is desired.
@@ -1155,7 +1158,7 @@ namespace qsl
 	 * - In debug mode, check exceptions thrown e.g. input out of range targ, outcome
 	 *   not set to 0 or 1.
 	 * - Find prob of random state (smallish no. of qubits) and check output 
-	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1, for 0 and 
+	 *   matches with armadillo. Do this with targ = 0 up to qubits-1, for 0 and 
 	 *   1 outcomes to make sure edge cases have been checked. Can probably be checked
 	 *   along with the postselect function.
 	 */
@@ -1173,7 +1176,7 @@ namespace qsl
 	 * function. By default, qsl::gen is used as the source of randomness. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1.
+	 * qubits-1.
 	 * 
 	 * \param targ The qubit to measure
 	 * \param g A generator used as the source of randomness
@@ -1182,7 +1185,7 @@ namespace qsl
 	 * Testing:
 	 * - In debug mode, check exceptions thrown e.g. input out of range targ.
 	 * - Measure random state (smallish no. of qubits) and check output 
-	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1 to make sure 
+	 *   matches with armadillo. Do this with targ = 0 up to qubits-1 to make sure 
 	 *   edge cases have been checked.
 	 * - Check randomness seeding by preparing the same random state and checking we
 	 *   get the same outcome everytime.
@@ -1223,7 +1226,7 @@ namespace qsl
 	 * \brief Collapse one qubit to a specific outcome
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
+	 * qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
 	 * 
 	 * \param targ The qubit to measure
 	 * \param outcome The desired outcome of targ
@@ -1234,7 +1237,7 @@ namespace qsl
 	 * - In debug mode, check exceptions thrown e.g. input out of range targ, outcome
 	 *   not set to 0 or 1.
 	 * - Postselect a random state (smallish no. of qubits) and check output 
-	 *   matches with armadillo. Do this with targ = 0 up to num_qubits-1, for 0 and 
+	 *   matches with armadillo. Do this with targ = 0 up to qubits-1, for 0 and 
 	 *   1 outcomes to make sure edge cases have been checked. Can probably be checked
 	 *   along with the prob function.
 	 */
@@ -1254,7 +1257,7 @@ namespace qsl
 	 * function. By default, qsl::gen is used as the source of randomness. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1.
+	 * qubits-1.
 	 *
 	 * \todo Think about whether measure and sample should agree on outcomes (using same seed).
 	 * 
@@ -1303,6 +1306,11 @@ namespace qsl
 	 */
 	std::map<std::size_t, std::size_t> sample_all(std::size_t samples,
 						      std::uniform_random_bit_generator auto g = gen) const;
+
+    private:
+	unsigned qubits_{0};
+	std::size_t size_{1};
+	std::vector<value_type> state_{1};
     };
 
 
@@ -1318,7 +1326,7 @@ namespace qsl
      * \tparam P Set paralellisation level. Available options are off (qsl::seq), 
      *           on (qsl::omp), or an automatic optimal selection (qsl::opt).
      */
-    template<std::floating_point F, bool D = false, parallelisation P = opt>
+    template<std::floating_point F, bool D = false, parallel_t P = opt>
     class resize
     {
     public:
@@ -1336,7 +1344,7 @@ namespace qsl
 	 * adding a simulator into a map without using emplace).
 	 *
 	 */
-	resize();
+	resize() = default;
 	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
@@ -1346,9 +1354,9 @@ namespace qsl
 	 * In debug mode, if the number of qubits is too large to simulate, a
 	 * std::runtime_error is thrown.
 	 *
-	 * \param num_qubits The number of qubits to simulate.
+	 * \param qubits The number of qubits to simulate.
 	 */ 
-	explicit resize(unsigned num_qubits);
+	explicit resize(unsigned qubits);
 
 	/**
 	 * \brief Instantiate a simulator based on a std::vector or another simulator
@@ -1374,7 +1382,7 @@ namespace qsl
 	/**
 	 * \brief Convert between different floating point types for qsl::resize simulators.
 	 */
-	template<std::floating_point F1, bool D1, parallelisation P1>
+	template<std::floating_point F1, bool D1, parallel_t P1>
 	explicit operator resize<F1,D1,P1>();
 	
 	/**
@@ -1382,14 +1390,14 @@ namespace qsl
 	 *
 	 * \return Number of qubits.
 	 */
-	unsigned qubits() const;
+	unsigned qubits() const { return qubits_; };
 	
 	/**
-	 * \brief Get the current dimension of the Hilbert space = 2 ^ num_qubits.
+	 * \brief Get the current dimension of the Hilbert space = 2 ^ qubits.
 	 *
 	 * \return Dimension of Hilbert space.
 	 */
-	std::size_t size() const;
+	std::size_t size() const { return size_; };
 	
 	/**
 	 * \brief Return the current state of the qubits.
@@ -1426,9 +1434,9 @@ namespace qsl
 	 * In debug mode, if the number of qubits is too large to simulate, a
 	 * std::runtime_error is thrown.
 	 *
-	 * \param num_qubits The number of qubits to simulate.
+	 * \param qubits The number of qubits to simulate.
 	 */
-	void reset(unsigned num_qubits);
+	void reset(unsigned qubits);
 
 	/**
 	 * \brief Access state vector elements (read-only).
@@ -1461,6 +1469,10 @@ namespace qsl
 
 	/**
 	 * \brief Add a qubit in the zero state to the end of the state vector.
+	 *
+	 * Testing:
+	 * - Check that state vector of correct size is returned when adding and removing
+	 *   qubits.
 	 */
 	void add_qubit();
 
@@ -1470,7 +1482,7 @@ namespace qsl
 	 * Qubits that were in positions above targ will be shifted along i.e. the previous 
 	 * qubit that was at position targ will now be indexed as targ+1.
 	 *
-	 * A std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * A std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The value the inserted qubit will be indexed as.
 	 */
@@ -1541,7 +1553,7 @@ namespace qsl
 	 *       \end{pmatrix} 
 	 * \f]
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -1559,7 +1571,7 @@ namespace qsl
 	 *       \end{pmatrix} 
 	 * \f]
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -1577,7 +1589,7 @@ namespace qsl
 	 *       \end{pmatrix} 
 	 * \f]
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -1596,7 +1608,7 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ e^{i\theta/2} R_z(\theta) \f$.
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -1613,7 +1625,7 @@ namespace qsl
 	 *     \end{pmatrix} 
 	 * \f]
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 */
@@ -1631,7 +1643,7 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_x(\pi) \f$.
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 */
@@ -1649,7 +1661,7 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_y(\pi) \f$.
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 */
@@ -1667,7 +1679,7 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_z(\pi) \f$ or \f$ \text{phase}(\pi) \f$
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 */
@@ -1679,7 +1691,7 @@ namespace qsl
 	 * The matrix must have orthonormal columns, the columns will be
 	 * normalised in this function.
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param matrix The unitary matrix to apply, in row-major form.
@@ -1692,7 +1704,7 @@ namespace qsl
 	 * The matrix must have orthonormal columns, the columns will be
 	 * normalised in this function.
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param matrix The unitary matrix to apply in row-major form.
@@ -1703,7 +1715,7 @@ namespace qsl
 	 * \brief Perform a controlled X-rotation on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, \f$ R_x \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1716,7 +1728,7 @@ namespace qsl
 	 * \brief Perform a controlled Y-rotation on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, \f$ R_y \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1729,7 +1741,7 @@ namespace qsl
 	 * \brief Perform a controlled Z-rotation on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, \f$ R_z \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1742,7 +1754,7 @@ namespace qsl
 	 * \brief Perform a controlled phase gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, a phase shift is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1755,7 +1767,7 @@ namespace qsl
 	 * \brief Perform a controlled Hadamard gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, H is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1768,7 +1780,7 @@ namespace qsl
 	 *        gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, X is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1780,7 +1792,7 @@ namespace qsl
 	 * \brief Perform a controlled Pauli-Y gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, Y is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1792,7 +1804,7 @@ namespace qsl
 	 * \brief Perform a controlled Pauli-Z gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, Z is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1807,7 +1819,7 @@ namespace qsl
 	 * normalised in this function.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, U is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1823,7 +1835,7 @@ namespace qsl
 	 * normalised in this function.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, U is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -1848,7 +1860,7 @@ namespace qsl
 	 * This is equivalent to applying \f$ e^{-i\theta (XX+YY)/2} \f$. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -1873,7 +1885,7 @@ namespace qsl
 	 * \f]
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -1897,7 +1909,7 @@ namespace qsl
 	 * This is equivalent to applying TODO fix this -> \f$ e^{-i\theta (YX-XY)/2} \f$.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 * 
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -1918,7 +1930,7 @@ namespace qsl
 	 * \f]
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit to swap.
 	 * \param targ2 The second qubit to swap.
@@ -1940,7 +1952,7 @@ namespace qsl
 	 * This corresponds to a swap gate followed by a CZ gate.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit to fswap.
 	 * \param targ2 The second qubit to fswap.
@@ -1962,7 +1974,7 @@ namespace qsl
 	 * This corresponds to the fixed-number \f[R_x(-\pi/2)\f].
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit to iswap.
 	 * \param targ2 The second qubit to iswap.
@@ -1983,7 +1995,7 @@ namespace qsl
 	 * \f]
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -2006,7 +2018,7 @@ namespace qsl
 	 * \f$a_i\f$ above are real.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -2032,7 +2044,7 @@ namespace qsl
 	 * real version of nu1 for improved performance.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -2057,7 +2069,7 @@ namespace qsl
 	 * \f$a_i\f$ above are real.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -2083,7 +2095,7 @@ namespace qsl
 	 * real version of u2 for improved performance.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -2100,7 +2112,7 @@ namespace qsl
 	 * is not affected by this function.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
+	 * qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
 	 *
 	 * \param targ The qubit under consideration
 	 * \param outcome The outcome whose probability is desired.
@@ -2120,7 +2132,7 @@ namespace qsl
 	 * function. By default, qsl::gen is used as the source of randomness. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1.
+	 * qubits-1.
 	 * 
 	 * \param targ The qubit to measure
 	 * \param g A generator used as the source of randomness
@@ -2150,7 +2162,7 @@ namespace qsl
 	 * \brief Collapse one qubit to a specific outcome
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
+	 * qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
 	 * 
 	 * \param targ The qubit to measure
 	 * \param outcome The desired outcome of targ
@@ -2173,7 +2185,7 @@ namespace qsl
 	 * function. By default, qsl::gen is used as the source of randomness. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1.
+	 * qubits-1.
 	 * 
 	 * \param targ The qubit to sample
 	 * \param samples Number of samples to take
@@ -2219,7 +2231,7 @@ namespace qsl
 	 * function. By default, qsl::gen is used as the source of randomness. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1.
+	 * qubits-1.
 	 * 
 	 * \param targ The qubit to measure
 	 * \param g A generator used as the source of randomness
@@ -2231,7 +2243,7 @@ namespace qsl
 	 * \brief Collapse one qubit to a specific outcome, and remove from the state vector.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
+	 * qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
 	 * 
 	 * \param targ The qubit to measure
 	 * \param outcome The desired outcome of targ
@@ -2239,6 +2251,11 @@ namespace qsl
 	 *         but is returned for consistency with the measure function.
 	 */
 	unsigned postselect_out(unsigned targ, unsigned outcome);
+
+    private:
+	unsigned qubits_{0};
+	std::size_t size_{1};
+	std::vector<value_type> state_{1};
     };
 
 
@@ -2255,7 +2272,7 @@ namespace qsl
      * \tparam P Set paralellisation level. Available options are off (qsl::seq), 
      *           on (qsl::omp), or an automatic optimal selection (qsl::opt).
      */
-    template<std::floating_point F, bool D = false, parallelisation P = opt>
+    template<std::floating_point F, bool D = false, parallel_t P = opt>
     class number
     {
     public:
@@ -2272,7 +2289,7 @@ namespace qsl
 	 * example, adding a simulator into a map without using emplace).
 	 *
 	 */
-	number();
+	number() = default;
 	
 	/**
 	 * \brief Initialise the class with a specified number of qubits.
@@ -2283,9 +2300,9 @@ namespace qsl
 	 * In debug mode, if the number of qubits is too large to simulate, a
 	 * std::runtime_error is thrown.
 	 *
-	 * \param num_qubits The number of qubits to simulate.
+	 * \param qubits The number of qubits to simulate.
 	 */ 
-	explicit number(unsigned num_qubits);
+	explicit number(unsigned qubits);
 
 	/**
 	 * \brief Instantiate a simulator based on a std::vector or another simulator
@@ -2315,18 +2332,18 @@ namespace qsl
 	 * with num_ones ones.
 	 *
 	 * In debug mode, if the number of qubits is too large to simulate, a
-	 * std::runtime_error is thrown. If num_ones is bigger than num_qubits, 
+	 * std::runtime_error is thrown. If num_ones is bigger than qubits, 
 	 * std::invalid_argument is thrown.
 	 *
-	 * \param num_qubits The number of qubits to simulate.
+	 * \param qubits The number of qubits to simulate.
 	 * \param num_ones The number of ones in the fixed number simulator.
 	 */ 
-	number(unsigned num_qubits, unsigned num_ones);
+	number(unsigned qubits, unsigned num_ones);
 
 	/**
 	 * \brief Convert between different floating point types for qsl::number simulators.
 	 */
-	template<std::floating_point F1, bool D1, parallelisation P1>
+	template<std::floating_point F1, bool D1, parallel_t P1>
 	explicit operator number<F1,D1,P1>();
 
 	/**
@@ -2334,21 +2351,21 @@ namespace qsl
 	 *
 	 * \return Number of qubits.
 	 */
-	unsigned qubits() const;
+	unsigned qubits() const { return qubits_; };
 
 	/**
-	 * \brief Get the dimension of the Hilbert space = 2 ^ num_qubits.
+	 * \brief Get the dimension of the Hilbert space = 2 ^ qubits.
 	 *
 	 * \return Dimension of Hilbert space.
 	 */	
-	std::size_t size() const;
+	std::size_t size() const { return size_; };
 
 	/**
 	 * \brief Return the current state of the qubits.
 	 *
 	 * \return The state of the qubits as a std::vector.
 	 */
-	std::vector<std::complex<F>> state() const;
+	std::vector<std::complex<F>> state() const { return state_; };
 
 	/**
 	 * \brief Change the simulator state to the state that is passed in. 
@@ -2380,9 +2397,9 @@ namespace qsl
 	 * In debug mode, if the number of qubits is too large to simulate, a
 	 * std::runtime_error is thrown.
 	 *
-	 * \param num_qubits The number of qubits to simulate.
+	 * \param qubits The number of qubits to simulate.
 	 */
-	void reset(unsigned num_qubits);
+	void reset(unsigned qubits);
 
 	/**
 	 * \brief Change number of qubits number of ones.
@@ -2391,13 +2408,13 @@ namespace qsl
 	 * state with the specified number of ones.
 	 *
 	 * In debug mode, if the number of qubits is too large to simulate, a
-	 * std::runtime_error is thrown. If num_ones is bigger than num_qubits, 
+	 * std::runtime_error is thrown. If num_ones is bigger than qubits, 
 	 * std::invalid_argument is thrown.
 	 *
-	 * \param num_qubits The number of qubits to simulate.
+	 * \param qubits The number of qubits to simulate.
 	 * \param num_ones The number of ones to set.
 	 */
-	void reset(unsigned num_qubits, unsigned num_ones);
+	void reset(unsigned qubits, unsigned num_ones);
 	    
 	/**
 	 * \brief Access state vector elements (read-only).
@@ -2489,7 +2506,7 @@ namespace qsl
 	 *       \end{pmatrix} 
 	 * \f]
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -2508,7 +2525,7 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ e^{i\theta/2} R_z(\theta) \f$.
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 * \param angle The angle to rotate the qubit by (in radians).
@@ -2527,7 +2544,7 @@ namespace qsl
 	 *
 	 * Also equivalent to \f$ iR_z(\pi) \f$ or \f$ \text{phase}(\pi) \f$
 	 *
-	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than num_qubits-1.
+	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than qubits-1.
 	 *
 	 * \param targ The target qubit.
 	 */
@@ -2537,7 +2554,7 @@ namespace qsl
 	 * \brief Perform a controlled Z-rotation on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, \f$ R_z \f$ is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -2550,7 +2567,7 @@ namespace qsl
 	 * \brief Perform a controlled phase gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, a phase shift is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -2563,7 +2580,7 @@ namespace qsl
 	 * \brief Perform a controlled Pauli-Z gate on two qubits. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ or ctrl is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if ctrl = targ.
+	 * than qubits-1. A std::invalid_argument is thrown if ctrl = targ.
 	 *
 	 * \param ctrl The control qubit, Z is applied on the target qubit
 	 *             if this qubit is \f$ |1\rangle \f$.
@@ -2587,7 +2604,7 @@ namespace qsl
 	 * This is equivalent to applying \f$ e^{-i\theta (XX+YY)/2} \f$. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -2612,7 +2629,7 @@ namespace qsl
 	 * \f]
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -2636,7 +2653,7 @@ namespace qsl
 	 * This is equivalent to applying TODO fix this -> \f$ e^{-i\theta (YX-XY)/2} \f$.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 * 
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -2657,7 +2674,7 @@ namespace qsl
 	 * \f]
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit to swap.
 	 * \param targ2 The second qubit to swap.
@@ -2679,7 +2696,7 @@ namespace qsl
 	 * This corresponds to a swap gate followed by a CZ gate.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit to fswap.
 	 * \param targ2 The second qubit to fswap.
@@ -2701,7 +2718,7 @@ namespace qsl
 	 * This corresponds to the fixed-number \f[R_x(-\pi/2)\f].
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit to iswap.
 	 * \param targ2 The second qubit to iswap.
@@ -2722,7 +2739,7 @@ namespace qsl
 	 * \f]
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -2745,7 +2762,7 @@ namespace qsl
 	 * \f$a_i\f$ above are real.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -2771,7 +2788,7 @@ namespace qsl
 	 * real version of nu1 for improved performance.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ1 or targ2 is bigger 
-	 * than num_qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
+	 * than qubits-1. A std::invalid_argument is thrown if targ1 = targ2.
 	 *
 	 * \param targ1 The first qubit.
 	 * \param targ2 The second qubit.
@@ -2788,7 +2805,7 @@ namespace qsl
 	 * is not affected by this function.
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
+	 * qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
 	 *
 	 * \param targ The qubit under consideration
 	 * \param outcome The outcome whose probability is desired.
@@ -2808,7 +2825,7 @@ namespace qsl
 	 * function. By default, qsl::gen is used as the source of randomness. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1.
+	 * qubits-1.
 	 * 
 	 * \param targ The qubit to measure
 	 * \param g A generator used as the source of randomness
@@ -2838,7 +2855,7 @@ namespace qsl
 	 * \brief Collapse one qubit to a specific outcome
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
+	 * qubits-1. A std::invalid_argument is thrown if outcome is not 0 or 1.
 	 * 
 	 * \param targ The qubit to measure
 	 * \param outcome The desired outcome of targ
@@ -2861,7 +2878,7 @@ namespace qsl
 	 * function. By default, qsl::gen is used as the source of randomness. 
 	 *
 	 * In debug mode, a std::out_of_range error is thrown if targ is bigger than
-	 * num_qubits-1.
+	 * qubits-1.
 	 * 
 	 * \param targ The qubit to sample
 	 * \param samples Number of samples to take
@@ -2893,6 +2910,11 @@ namespace qsl
 	 */
 	std::map<std::size_t, std::size_t> sample_all(std::size_t samples,
 						      std::uniform_random_bit_generator auto g = gen) const;
+
+    private:
+	unsigned qubits_{0};
+	std::size_t size_{1};
+	std::vector<value_type> state_{1};
     };
 
     /**
@@ -3057,3 +3079,4 @@ namespace qsl
 
 }
 
+#endif

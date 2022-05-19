@@ -10,13 +10,30 @@
 #include "qsl.hpp"
 #include <armadillo>
 
+/**
+ * \brief Extract tuple contents into gtest.
+ */
+template <typename T>
+struct gtest_typelist;
+
+template <typename... T>
+struct gtest_typelist<std::tuple<T...>>
+{
+    using type = ::testing::Types<T...>;
+};
+
+template <typename T>
+using gtest_typelist_t = typename gtest_typelist<T>::type;
+
+
 // Make combination of all simulator arguments
 using sim_args = qsl::comb_t<std::tuple<float, double, long double>,
 			     std::tuple<std::true_type, std::false_type>,
 			     std::tuple<qsl::seq, qsl::omp, qsl::opt>>;
-using test_sims = qsl::gtest_typelist_t<qsl::cat_t<qsl::make_sims_t<qsl::basic, sim_args>,
-						   qsl::make_sims_t<qsl::resize, sim_args>,
-						   qsl::make_sims_t<qsl::number, sim_args>>>;
+
+using test_sims = gtest_typelist_t<qsl::cat_t<qsl::make_sims_t<qsl::basic, sim_args>,
+					      qsl::make_sims_t<qsl::resize, sim_args>,
+					      qsl::make_sims_t<qsl::number, sim_args>>>;
 
 
 template <typename T>
