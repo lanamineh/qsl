@@ -16,7 +16,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # set(CMAKE_CXX_FLAGS_DEBUG_INIT "-Wall -Wextra -g -pg -fmax-errors=10 -fopenmp -fconcepts-diagnostics-depth=5 -fprofile-arcs -ftest-coverage")
 # set(CMAKE_CXX_FLAGS_RELEASE_INIT "-Wall -Wextra -O2 -fopenmp")
 
-add_compile_options(-Wall -Wextra -O2 -fopenmp)
+add_compile_options(-Wall -Wextra -O2 -fopenmp -g)
 
 include(FetchContent)
 FetchContent_Declare(
@@ -36,6 +36,18 @@ target_link_libraries(
   qsl-test
   gtest_main
 )
+
+add_executable(
+  main
+  main.cpp
+  qsl.cpp
+)
+
+add_library(
+  qsl
+  SHARED
+  qsl.cpp
+  )
 
 include(GoogleTest)
 gtest_discover_tests(qsl-test)
