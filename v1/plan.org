@@ -635,3 +635,15 @@ F inner_prod(const qsl::simulator &, const qsl::simulator &);
 
 
 * Testing
+
+* Build system
+
+What the build system should do:
+- Uses cmake
+- Build the release libary and test suite by default
+- Provide some optional debugging functionality (for us)
+- Provide an install target (compatible with what we need to get on the ubuntu repositories), which install the header file and shared object file.
+- Provide some means of calculating code coverage
+- Integrated with github CI
+- Allows the user to build without openmp being present
+- Performs checks that all dependencies are present before building.
