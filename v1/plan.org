@@ -647,3 +647,13 @@ What the build system should do:
 - Integrated with github CI
 - Allows the user to build without openmp being present
 - Performs checks that all dependencies are present before building.
+
+We want to encourage the user to run the tests, while also minimising the dependencies they need to install. In the old version of QSL, the tests needed armadillo, so we disabled compiling the tests by default (to reduce dependencies). But that encourages the user not to run the tests. Also, it feels silly to require armadillo when the actual library does not need it. We have the following options:
+- Leave it as it is; don't compile tests, and don't require armadillo. Pass a flag to enable compiling tests, which would require armadillo.
+- Compile tests by default, requiring armadillo by default. Provide a flag to disable test compilation if the user does not want to use armadillo.
+- Force the user to compile the tests, requiring armadillo always. 
+- Put armadillo in the repository, like the nlohmann json file. This is bad practise, because it is so big (could increase clone time and compile time).
+- Get all dependencies using conan, if it can be integrated with cmake. However, this still requires conan as a dependency, which is not much better than requiring armadillo (and might be worse, because it involves python)
+- Write an implementation of matrix arithmetic, and use that for the testing. Then we have no dependencies at all, but our matrix functions might be wrong. However, the tests could be compiled by default with not dependencies.
+- Write the matrix arithmetic, and also have tests that check them using armadillo. However, only run the armadillo tests if the user wants (using a flag). Always compile the tests using the matrix arithmetic, because they have no dependencies.
+- Find an alternative (i.e. lightweight, one-file, header library) to replace armadillo.
